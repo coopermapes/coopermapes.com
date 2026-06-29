@@ -1,26 +1,117 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  /* Fonts */
+  --font-anton: var(--font-anton);
+  --font-inter: var(--font-inter);
+
+  /* Brand colors */
+  --color-black: #111111;
+  --color-rich-black: #020201;
+  --color-white: #ffffff;
+  --color-gray: #eaeaea;
+  --color-border: #dcdbd7;
+  --color-blue: #1254d9;
+  --color-blue-hover: #0e45b5;
+  --color-blue-light: #5b7bd6;
+  --color-muted: #5a5a5a;
+  --color-secondary-text: #6a6a6a;
+  --color-dark-text: #3a3a3a;
+  --color-placeholder: #a6a5a0;
+  --color-step-gray: #9a9a95;
+  /* Input & surface colors */
+  --color-input-border: #cfcec9;
+  --color-divider: #e4e3de;
+  --color-surface-step: #f7f6f4;
+  /* Dark section colors */
+  --color-dark-border: #242422;
+  --color-dark-card: #0a0a09;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Zero border-radius on all form elements — enforced at CSS level */
+button, input, select, textarea {
+  border-radius: 0;
+}
+
+/* Radio inputs use rounded-full — exempt from the zero border-radius rule */
+input[type="radio"] {
+  border-radius: 9999px;
+}
+
+/* Global focus indicator — applies to all interactive elements */
+:focus-visible {
+  outline: 2px solid var(--color-blue);
+  outline-offset: 3px;
+}
+
+/* Skip-to-content link — visually hidden, appears on keyboard focus */
+.skip-link {
+  position: absolute;
+  top: -9999px;
+  left: 0;
+  background: var(--color-blue);
+  color: #fff;
+  padding: 12px 24px;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  z-index: 9999;
+  transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Inputs show focus via JS-driven border-color change — suppress the ring */
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: none;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), system-ui, sans-serif;
+  color: var(--color-black);
+  background: var(--color-white);
+}
+
+/* Suppress default dark mode — this site has no dark theme */
+@media (prefers-color-scheme: dark) {
+  body {
+    background: var(--color-white);
+    color: var(--color-black);
+  }
+}
+
+/* Fade-up animation used for hero stagger and scroll reveals */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fade-up 500ms ease forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
 }
