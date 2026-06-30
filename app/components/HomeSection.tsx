@@ -219,7 +219,7 @@ export default function HomeSection() {
           flexDirection: "column",
           justifyContent: "flex-start",
           padding: isMobile
-            ? "clamp(32px,8vw,56px) clamp(20px,5vw,40px) clamp(32px,8vw,48px)"
+            ? "clamp(12px,3vw,24px) clamp(20px,5vw,40px) clamp(32px,8vw,48px)"
             : "clamp(24px,calc(27vh - 36px),384px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
           position: "relative",
           zIndex: 1,
