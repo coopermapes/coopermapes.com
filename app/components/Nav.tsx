@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { Button } from "./ui/button";
@@ -21,6 +21,7 @@ export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -36,6 +37,14 @@ export default function Nav() {
   useEffect(() => {
     document.body.style.overflow = menuOpen ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
+
+  // Move focus to first overlay link when menu opens
+  useEffect(() => {
+    if (menuOpen && overlayRef.current) {
+      const firstLink = overlayRef.current.querySelector<HTMLAnchorElement>("a");
+      firstLink?.focus();
+    }
   }, [menuOpen]);
 
   const isHome = pathname === "/";
@@ -134,6 +143,8 @@ export default function Nav() {
       {/* Full-screen mobile overlay — z-index 99, sits below nav bar (100) */}
       {isMobile && (
         <div
+          ref={overlayRef}
+          inert={!menuOpen}
           aria-hidden={!menuOpen}
           style={{
             position: "fixed",
