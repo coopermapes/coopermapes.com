@@ -141,6 +141,7 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
   icon: React.ReactNode; title: string; description: string; cta: string;
   onClick: () => void; active?: boolean; locked?: boolean;
 }) {
+  const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
   const ease = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
   return (
@@ -154,7 +155,7 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
         background: "#FFFFFF",
         border: `1.5px solid ${hov && !locked ? "#1254D9" : "#DCDBD7"}`,
         position: "relative", overflow: "hidden",
-        aspectRatio: "1",
+        aspectRatio: isMobile ? undefined : "1",
         width: "100%",
         cursor: locked ? "default" : "pointer",
         opacity: locked ? 0.45 : 1,
@@ -164,7 +165,7 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
       }}
     >
       <div style={{
-        padding: "44px 44px calc(44px + 72px)",
+        padding: isMobile ? "28px 24px calc(28px + 72px)" : "44px 44px calc(44px + 72px)",
         display: "flex", flexDirection: "column", gap: 24,
         transform: hov && !locked ? "translateY(-16px)" : "translateY(0)",
         transition: `transform .38s ${ease}`,
@@ -973,7 +974,7 @@ export default function ContactSection() {
                       onMouseEnter={e => { if (valid) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
                       onMouseLeave={e => { e.currentTarget.style.background = "#1254D9"; e.currentTarget.style.borderColor = "#1254D9"; }}
                     >
-                      {isFinalStep ? "Send Inquiry" : "Continue"}
+                      {isFinalStep ? "Submit Quote" : "Continue"}
                     </button>
                   </div>
                 </div>
