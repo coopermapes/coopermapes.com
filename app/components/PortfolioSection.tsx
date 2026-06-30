@@ -226,11 +226,13 @@ export default function PortfolioSection() {
           </div>
 
           {/* Audio player */}
+          <div style={{
+            flex: isMobile ? "0 0 100%" : "0 0 auto",
+            minWidth: isMobile ? 0 : 280,
+          }}>
           <CaptionAnimate initialDelay={1050}>
             <div style={{
-              flex: "0 0 auto",
-              minWidth: isMobile ? 0 : 280,
-              width: isMobile ? "100%" : undefined,
+              width: "100%",
               background: "#0E0E0D",
               border: "1px solid #242422",
               padding: "14px 16px 12px",
@@ -267,6 +269,7 @@ export default function PortfolioSection() {
               <div ref={waveRef} style={{ width: "100%", opacity: wsReady ? 1 : 0.15, transition: "opacity .4s ease" }} />
             </div>
           </CaptionAnimate>
+          </div>
         </div>
 
         {/* ── Carousel ── */}
