@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import AboutGridPattern from "./AboutGridPattern";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 function ScrollFadeUp({ delay = 0, children, style }: { delay?: number; children: React.ReactNode; style?: React.CSSProperties }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -122,21 +123,31 @@ function LogoItem({ src, alt, label, lines }: typeof LOGOS[0]) {
 }
 
 export default function AboutSection() {
+  const isMobile = useIsMobile();
   return (
     <div style={{ position: "relative", overflow: "hidden", minHeight: "calc(100vh - 98px)" }}>
-      <AboutGridPattern />
+      {!isMobile && <AboutGridPattern />}
 
       <div style={{
         position: "relative",
         zIndex: 1,
         display: "flex",
         flexWrap: "wrap",
+        flexDirection: isMobile ? "column" : "row",
         alignItems: "stretch",
         minHeight: "calc(100vh - 98px)",
       }}>
 
         {/* Left — Photo */}
-        <ScrollFadeUp delay={0} style={{ flex: "0 0 35%", minWidth: 280, position: "relative", overflow: "hidden", minHeight: 540 }}>
+        <ScrollFadeUp delay={0} style={{
+          flex: isMobile ? "0 0 auto" : "0 0 35%",
+          width: isMobile ? "100%" : undefined,
+          minWidth: isMobile ? 0 : 280,
+          position: "relative",
+          overflow: "hidden",
+          minHeight: isMobile ? "clamp(280px,70vw,420px)" : 540,
+          order: isMobile ? 0 : undefined,
+        }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/grad.jpg"
@@ -153,17 +164,21 @@ export default function AboutSection() {
 
         {/* Middle — Bio */}
         <div style={{
-          flex: 1,
-          padding: "clamp(48px,6vw,80px) clamp(24px,3vw,48px) clamp(48px,6vw,80px) clamp(40px,5vw,80px)",
+          flex: isMobile ? "0 0 auto" : 1,
+          width: isMobile ? "100%" : undefined,
+          padding: isMobile
+            ? "clamp(28px,7vw,48px) clamp(20px,5vw,40px)"
+            : "clamp(48px,6vw,80px) clamp(24px,3vw,48px) clamp(48px,6vw,80px) clamp(40px,5vw,80px)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
+          order: isMobile ? 1 : undefined,
         }}>
           <ScrollFadeUp delay={150}>
             <h1 style={{
               fontFamily: "var(--font-anton)",
               fontWeight: 400,
-              fontSize: "clamp(44px,5.5vw,82px)",
+              fontSize: isMobile ? "clamp(36px,9vw,56px)" : "clamp(44px,5.5vw,82px)",
               lineHeight: 0.92,
               letterSpacing: "-1.5px",
               textTransform: "uppercase",
@@ -210,11 +225,16 @@ export default function AboutSection() {
 
         {/* Right — Stats */}
         <div style={{
-          flex: "0 0 22%",
-          padding: "clamp(80px,10.4vw,150px) clamp(20px,2.2vw,36px) clamp(48px,5vw,72px)",
+          flex: isMobile ? "0 0 auto" : "0 0 22%",
+          width: isMobile ? "100%" : undefined,
+          padding: isMobile
+            ? "clamp(20px,5vw,36px) clamp(20px,5vw,40px) clamp(32px,7vw,52px)"
+            : "clamp(80px,10.4vw,150px) clamp(20px,2.2vw,36px) clamp(48px,5vw,72px)",
           display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
+          flexDirection: isMobile ? "row" : "column",
+          justifyContent: isMobile ? "space-around" : "flex-start",
+          order: isMobile ? 2 : undefined,
+          background: isMobile ? "#F7F6F4" : undefined,
         }}>
           {[
             { label: "Years Arranging", value: "13", initialDelay: 1050 },
@@ -224,8 +244,10 @@ export default function AboutSection() {
             <ScrollFadeUp key={i} delay={stat.initialDelay}>
             <div
               style={{
-                padding: "clamp(22px,2.8vw,36px) 0",
-                borderBottom: i < arr.length - 1 ? "1px solid #E4E3DE" : "none",
+                padding: isMobile ? "clamp(12px,3vw,20px) 0" : "clamp(22px,2.8vw,36px) 0",
+                borderBottom: isMobile ? "none" : (i < arr.length - 1 ? "1px solid #E4E3DE" : "none"),
+                textAlign: isMobile ? "center" : undefined,
+                flex: isMobile ? 1 : undefined,
               }}
             >
               <div style={{
