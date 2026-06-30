@@ -5,6 +5,7 @@ import { Chats, Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 // ── Fade-up animation (matches homepage stagger) ─────────────────────────────
 function FadeUp({ delay, instant = false, children, style }: { delay: number; instant?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -346,6 +347,7 @@ function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; c
 
 // ── Inquiry screen ────────────────────────────────────────────────────────────
 function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBack: () => void }) {
+  const isMobile = useIsMobile();
   const [iName, setIName] = useState("");
   const [iEmail, setIEmail] = useState("");
   const [iSchool, setISchool] = useState("");
@@ -417,7 +419,9 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
           <FadeUp delay={360} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <form onSubmit={handleSubmit} style={{
               flex: 1, display: "flex", flexDirection: "column",
-              padding: "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
+              padding: isMobile
+                ? "clamp(28px,7vw,48px) clamp(20px,5vw,36px)"
+                : "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
             }}>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#1254D9", marginBottom: 16 }}>
                 Send an Inquiry
@@ -431,7 +435,7 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
 
               <div style={{ flex: 1, maxWidth: 680, display: "flex", flexDirection: "column", gap: 18 }}>
                 {/* Row 1: Name + Email */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
                     aria-label="Name" style={inputStyle} placeholder="Name *"
                     value={iName} onChange={e => setIName(e.target.value)}
@@ -446,7 +450,7 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
                   />
                 </div>
                 {/* Row 2: School + Service */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
                     aria-label="School or organization" style={inputStyle} placeholder="School / Organization *"
                     value={iSchool} onChange={e => setISchool(e.target.value)}
@@ -468,7 +472,7 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
                   </select>
                 </div>
                 {/* Row 3: Phone + How did you hear */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
                     aria-label="Phone number" style={inputStyle} type="tel" placeholder="Phone (optional)"
                     value={iPhone} onChange={e => setIPhone(e.target.value)}
@@ -560,6 +564,42 @@ function ComingSoonScreen({ title, subtitle, transitioning, onBack }: {
   );
 }
 
+// ── Mobile contact strip ──────────────────────────────────────────────────────
+function MobileContactStrip() {
+  return (
+    <div style={{
+      background: "#111111",
+      padding: "clamp(28px,7vw,48px) clamp(20px,5vw,40px)",
+      display: "flex",
+      flexDirection: "column",
+      gap: 24,
+    }}>
+      <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#6B8FE8" }}>
+        Contact
+      </div>
+      <a href="mailto:contact@coopermapes.com" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+        contact@coopermapes.com
+      </a>
+      <a href="tel:6629859780" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+        662-985-9780
+      </a>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
+          { label: "Facebook",  href: "https://www.facebook.com/cooper.mapes.1/" },
+          { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
+          { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
+        ].map(s => (
+          <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+            style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+            {s.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function ContactSection() {
   const [wizardStep, setWizardStep] = useState(1);
@@ -587,6 +627,7 @@ export default function ContactSection() {
   const [wDeadline, setWDeadline] = useState("");
   const [wExpress, setWExpress] = useState(false);
 
+  const isMobile = useIsMobile();
   const steps = wizardPath === "revoice" ? REVOICE_STEPS : FLIP_STEPS;
   const totalSteps = steps.length;
   const isFilesStep = wizardPath === "flip" ? wizardStep === 4 : wizardStep === 5;
@@ -724,7 +765,9 @@ export default function ContactSection() {
         <div style={{
           position: "relative", minHeight: "calc(100vh - 98px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start",
-          padding: "clamp(72px,9vw,120px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
+          padding: isMobile
+            ? "clamp(48px,10vw,80px) clamp(20px,5vw,40px) clamp(40px,8vw,64px)"
+            : "clamp(72px,9vw,120px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
           opacity: transitioning ? 0 : 1,
           transform: transitioning ? "translateY(10px)" : "translateY(0)",
           transition: "opacity 0.3s ease, transform 0.3s ease",
@@ -737,7 +780,7 @@ export default function ContactSection() {
           }} />
           <div style={{ textAlign: "center", marginBottom: "clamp(24px,3vw,40px)", position: "relative", zIndex: 1 }}>
             <FadeUp delay={80} instant={fromBack.current}>
-              <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(52px,7.5vw,96px)", textTransform: "uppercase", letterSpacing: "-1.5px", lineHeight: 0.92, color: "#111111", margin: 0 }}>
+              <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,64px)" : "clamp(52px,7.5vw,96px)", textTransform: "uppercase", letterSpacing: "-1.5px", lineHeight: 0.92, color: "#111111", margin: 0 }}>
                 Get In Touch
               </h1>
             </FadeUp>
@@ -748,7 +791,7 @@ export default function ContactSection() {
             </FadeUp>
           </div>
           <div style={{
-            display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 400px))",
+            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, minmax(0, 400px))",
             justifyContent: "center",
             gap: 24, width: "100%", maxWidth: 1080, position: "relative", zIndex: 1,
           }}>
@@ -772,6 +815,7 @@ export default function ContactSection() {
 
       {/* ── Screen 2: Wizard ── */}
       {contactView === "wizard" && (
+        <>
         <div style={{
           display: "flex", minHeight: "calc(100vh - 98px)",
           opacity: transitioning ? 0 : 1,
@@ -809,7 +853,9 @@ export default function ContactSection() {
                 <FadeUp delay={360} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
                 <div style={{
                   flex: 1, display: "flex", flexDirection: "column",
-                  padding: "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
+                  padding: isMobile
+                    ? "clamp(28px,7vw,48px) clamp(20px,5vw,36px)"
+                    : "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
                   opacity: stepTransitioning ? 0 : 1,
                   transform: stepTransitioning ? "translateY(8px)" : "translateY(0)",
                   transition: stepTransitioning
@@ -936,15 +982,20 @@ export default function ContactSection() {
             )}
           </div>
         </div>
+        {isMobile && <MobileContactStrip />}
+        </>
       )}
 
       {/* ── Screen 3: Send an Inquiry ── */}
       {contactView === "inquiry" && (
-        <InquiryScreen transitioning={transitioning} onBack={goToLanding} />
+        <>
+          <InquiryScreen transitioning={transitioning} onBack={goToLanding} />
+          {isMobile && <MobileContactStrip />}
+        </>
       )}
 
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
           .contact-left-panel { display: none !important; }
         }
       `}</style>
