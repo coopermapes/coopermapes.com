@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import GridPattern from "./GridPattern";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 function FadeUp({ delay, children, style }: { delay: number; children: React.ReactNode; style?: React.CSSProperties }) {
   const [visible, setVisible] = useState(false);
@@ -114,7 +115,7 @@ function BeforeAfterSlider() {
         if (e.key === "ArrowRight") { e.preventDefault(); setPosition(positionRef.current + 5); }
         if (e.key === "ArrowLeft")  { e.preventDefault(); setPosition(positionRef.current - 5); }
       }}
-      style={{ position: "relative", width: "100%", aspectRatio: "3/2", overflow: "hidden", background: "#fff", cursor: "ew-resize", userSelect: "none", touchAction: "none", border: "1px solid #2A2A2A" }}
+      style={{ position: "relative", width: "100%", aspectRatio: "3/2", overflow: "hidden", background: "#fff", cursor: "ew-resize", userSelect: "none", touchAction: "pan-y", border: "1px solid #2A2A2A" }}
     >
       {/* Before (base layer) */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -143,18 +144,26 @@ function BeforeAfterSlider() {
   );
 }
 
-function CtaButton({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
+function CtaButton({ onClick, isMobile }: { onClick: (e: React.MouseEvent) => void; isMobile: boolean }) {
   const sweepRef = useRef<HTMLSpanElement>(null);
-
   const btnRef = useRef<HTMLButtonElement>(null);
+  const [pressed, setPressed] = useState(false);
 
   const onEnter = () => {
     if (sweepRef.current) sweepRef.current.style.transform = "scaleY(1)";
-    if (btnRef.current) { btnRef.current.style.color = "#ffffff"; btnRef.current.style.borderColor = "#1254D9"; }
+    if (btnRef.current) {
+      btnRef.current.style.color = "#ffffff";
+      btnRef.current.style.borderColor = "#1254D9";
+      btnRef.current.style.boxShadow = "0 8px 20px rgba(18,84,217,.22)";
+    }
   };
   const onLeave = () => {
     if (sweepRef.current) sweepRef.current.style.transform = "scaleY(0)";
-    if (btnRef.current) { btnRef.current.style.color = "#111111"; btnRef.current.style.borderColor = "#111111"; }
+    if (btnRef.current) {
+      btnRef.current.style.color = "#111111";
+      btnRef.current.style.borderColor = "#111111";
+      btnRef.current.style.boxShadow = "0 4px 16px rgba(0,0,0,.08)";
+    }
   };
 
   return (
@@ -162,18 +171,24 @@ function CtaButton({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
       ref={btnRef}
       type="button"
       onClick={onClick}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
+      onMouseEnter={isMobile ? undefined : onEnter}
+      onMouseLeave={isMobile ? undefined : onLeave}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
       style={{
         position: "relative", overflow: "hidden",
         fontFamily: "var(--font-inter)", fontSize: 14, fontWeight: 600, letterSpacing: "1.6px", textTransform: "uppercase",
         color: "#111111", marginTop: 36, display: "inline-flex", alignItems: "center", justifyContent: "center",
         gap: 10, cursor: "pointer", width: "fit-content", lineHeight: 1,
-        border: "1.5px solid #111111", padding: "16px 32px", background: "transparent",
-        transition: "color .32s ease, border-color .32s ease",
+        border: "1.5px solid #111111", padding: "16px 32px", background: "#ffffff",
+        boxShadow: "0 4px 16px rgba(0,0,0,.08)",
+        transition: "color .32s ease, border-color .32s ease, box-shadow .32s ease, transform 0.1s ease, opacity 0.1s ease",
+        transform: isMobile && pressed ? "scale(0.96)" : "scale(1)",
+        opacity: isMobile && pressed ? 0.75 : 1,
       }}
     >
-      <span ref={sweepRef} style={{ position: "absolute", left: 0, right: 0, top: 0, height: "100%", background: "#1254D9", transform: "scaleY(0)", transformOrigin: "top", transition: "transform .32s cubic-bezier(.4,0,.2,1)", pointerEvents: "none", zIndex: 0 }} />
+      {!isMobile && <span ref={sweepRef} style={{ position: "absolute", left: 0, right: 0, top: 0, height: "100%", background: "#1254D9", transform: "scaleY(0)", transformOrigin: "top", transition: "transform .32s cubic-bezier(.4,0,.2,1)", pointerEvents: "none", zIndex: 0 }} />}
       <span style={{ position: "relative", zIndex: 1 }}>See A Before &amp; After</span>
     </button>
   );
@@ -182,6 +197,49 @@ function CtaButton({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
 export default function HomeSection() {
   const fixRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const isMobile = useIsMobile();
+  const topLineRef = useRef<HTMLSpanElement>(null);
+  const bottomLineRef = useRef<HTMLSpanElement>(null);
+  const copyDivRef = useRef<HTMLDivElement>(null);
+  const [topFontSize, setTopFontSize] = useState<string | undefined>(undefined);
+  const [bottomFontSize, setBottomFontSize] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const fit = () => {
+      const container = copyDivRef.current;
+      const top = topLineRef.current;
+      const bottom = bottomLineRef.current;
+      if (!container || !top || !bottom) return;
+      const w = container.offsetWidth;
+
+      // Fit top line
+      top.style.whiteSpace = "nowrap";
+      let lo = 8, hi = 80;
+      while (hi - lo > 0.25) {
+        const mid = (lo + hi) / 2;
+        top.style.fontSize = mid + "px";
+        if (top.scrollWidth <= w) lo = mid; else hi = mid;
+      }
+      const topPx = lo;
+      setTopFontSize(topPx + "px");
+
+      // Fit bottom line to same container width
+      bottom.style.whiteSpace = "nowrap";
+      lo = 8; hi = 180;
+      while (hi - lo > 0.25) {
+        const mid = (lo + hi) / 2;
+        bottom.style.fontSize = mid + "px";
+        if (bottom.scrollWidth <= w) lo = mid; else hi = mid;
+      }
+      setBottomFontSize(lo + "px");
+    };
+
+    fit();
+    const ro = new ResizeObserver(fit);
+    if (copyDivRef.current) ro.observe(copyDivRef.current);
+    return () => ro.disconnect();
+  }, [isMobile]);
 
   const scrollToFix = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -194,14 +252,37 @@ export default function HomeSection() {
     router.push(path);
   };
 
+  const [pressedServices, setPressedServices] = useState(false);
+  const [pressedContact, setPressedContact] = useState(false);
+
   return (
     <section id="home">
       {/* ── Panel 1: Hero ── */}
-      <div style={{ position: "relative", overflow: "hidden", display: "flex", flexWrap: "wrap", flexDirection: "row-reverse", minHeight: "calc(100vh - 98px)", background: "#ffffff" }}>
+      <div style={{
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexWrap: "wrap",
+        flexDirection: isMobile ? "column" : "row-reverse",
+        minHeight: isMobile ? "auto" : "calc(100vh - 98px)",
+        background: "#ffffff",
+        paddingTop: isMobile ? 98 : 0,
+      }}>
         <GridPattern interactive />
 
         {/* Text column */}
-        <div style={{ flex: "1 1 460px", display: "flex", flexDirection: "column", justifyContent: "flex-start", padding: "clamp(24px,calc(27vh - 36px),384px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)", position: "relative", zIndex: 1 }}>
+        <div style={{
+          flex: isMobile ? "0 0 auto" : "1 1 460px",
+          width: isMobile ? "100%" : undefined,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          padding: isMobile
+            ? "clamp(36px,8vw,52px) clamp(20px,5vw,40px) clamp(32px,8vw,48px)"
+            : "clamp(24px,calc(27vh - 36px),384px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
+          position: "relative",
+          zIndex: 1,
+        }}>
           {/* Eyebrow */}
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 22 }}>
             <FadeUp delay={550} style={{ display: "inline-block" }}>
@@ -231,19 +312,35 @@ export default function HomeSection() {
 
           {/* Subtitle */}
           <FadeUp delay={1050}>
-            <p style={{ fontSize: "clamp(18px,1.55vw,21px)", lineHeight: 1.5, fontWeight: 600, color: "#3A3A3A", margin: "26px 0 0", maxWidth: 440, textAlign: "left" }}>
+            <p style={{
+              fontSize: isMobile ? "clamp(16px,4.2vw,21px)" : "clamp(18px,1.55vw,21px)",
+              lineHeight: 1.5,
+              fontWeight: 600,
+              color: "#3A3A3A",
+              margin: "26px 0 0",
+              maxWidth: isMobile ? "100%" : 440,
+              textAlign: "left",
+            }}>
               Music editing, engraving, and arranging<br />for performing ensembles.
             </p>
           </FadeUp>
 
           {/* CTA */}
           <FadeUp delay={1200}>
-            <CtaButton onClick={scrollToFix} />
+            <CtaButton onClick={scrollToFix} isMobile={isMobile} />
           </FadeUp>
         </div>
 
         {/* Photo column */}
-        <FadeUp delay={0} style={{ flex: "1 1 460px", alignSelf: "stretch", overflow: "hidden", minHeight: 440, background: "#EAEAEA", position: "relative" }}>
+        <FadeUp delay={0} style={{
+          flex: isMobile ? "0 0 auto" : "1 1 460px",
+          width: isMobile ? "100%" : undefined,
+          alignSelf: "stretch",
+          overflow: "hidden",
+          minHeight: isMobile ? "clamp(280px,80vw,420px)" : 440,
+          background: "#EAEAEA",
+          position: "relative",
+        }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/teaching.jpg"
@@ -255,23 +352,52 @@ export default function HomeSection() {
       </div>
 
       {/* ── Panel 2: Before/After (dark) ── */}
-      <div ref={fixRef} style={{ background: "#020201", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "clamp(40px,5vw,72px)", padding: "clamp(64px,7vw,96px) clamp(24px,5vw,64px) clamp(32px,3.5vw,52px)" }}>
+      <div ref={fixRef} style={{
+        background: "#020201",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: isMobile ? "clamp(28px,7vw,48px)" : "clamp(40px,5vw,72px)",
+        padding: isMobile
+          ? "clamp(40px,9vw,64px) clamp(20px,5vw,40px) clamp(32px,7vw,52px)"
+          : "clamp(64px,7vw,96px) clamp(24px,5vw,64px) clamp(32px,3.5vw,52px)",
+      }}>
         {/* Slider */}
-        <div style={{ flex: "1 1 440px" }}>
+        <div style={{ flex: isMobile ? "0 0 100%" : "1 1 440px", width: isMobile ? "100%" : undefined }}>
           <ScrollFadeUp delay={0} scale>
             <BeforeAfterSlider />
           </ScrollFadeUp>
         </div>
 
         {/* Copy */}
-        <div style={{ flex: "1 1 380px" }}>
+        <div ref={copyDivRef} style={{ flex: isMobile ? "0 0 100%" : "1 1 380px", width: isMobile ? "100%" : undefined }}>
           <ScrollFadeUp delay={0}>
-            <span style={{ display: "block", fontFamily: "var(--font-anton)", fontWeight: 400, textTransform: "uppercase", color: "#ffffff", fontSize: "clamp(20px,2.86vw,38px)", lineHeight: 1.04, letterSpacing: ".2px", whiteSpace: "nowrap" }}>
+            <span ref={topLineRef} style={{
+              display: "block",
+              fontFamily: "var(--font-anton)",
+              fontWeight: 400,
+              textTransform: "uppercase",
+              color: "#ffffff",
+              fontSize: isMobile ? (topFontSize ?? "clamp(14px,4.6vw,26px)") : "clamp(20px,2.86vw,38px)",
+              lineHeight: 1.04,
+              letterSpacing: ".2px",
+              whiteSpace: isMobile ? "nowrap" : "nowrap",
+            }}>
               Your sheet music is not cutting it.
             </span>
           </ScrollFadeUp>
           <ScrollFadeUp delay={150} distance={32}>
-            <span style={{ display: "block", fontFamily: "var(--font-anton)", fontWeight: 400, textTransform: "uppercase", color: "#1254D9", fontSize: "clamp(54px,7.9vw,106px)", lineHeight: ".88", letterSpacing: "-2px", marginTop: 10 }}>
+            <span ref={bottomLineRef} style={{
+              display: "block",
+              fontFamily: "var(--font-anton)",
+              fontWeight: 400,
+              textTransform: "uppercase",
+              color: "#1254D9",
+              fontSize: isMobile ? (bottomFontSize ?? "clamp(36px,11.8vw,68px)") : "clamp(54px,7.9vw,106px)",
+              lineHeight: ".88",
+              letterSpacing: "-2px",
+              marginTop: 10,
+            }}>
               I can fix that
             </span>
           </ScrollFadeUp>
@@ -291,20 +417,32 @@ export default function HomeSection() {
             </p>
           </ScrollFadeUp>
           <ScrollFadeUp delay={700} rootMargin="0px 0px 200px 0px">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 30 }}>
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              flexDirection: isMobile ? "column" : "row",
+              gap: 14,
+              marginTop: 30,
+            }}>
               <button
                 onClick={goTo("/services")}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#ffffff"; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,.35)"; }}
-                style={{ background: "transparent", color: "#ffffff", border: "1.5px solid rgba(255,255,255,.35)", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "border-color .2s ease", fontFamily: "var(--font-inter)", borderRadius: 0 }}
+                onMouseEnter={isMobile ? undefined : (e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#ffffff"; }}
+                onMouseLeave={isMobile ? undefined : (e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,.35)"; }}
+                onTouchStart={() => setPressedServices(true)}
+                onTouchEnd={() => setPressedServices(false)}
+                onTouchCancel={() => setPressedServices(false)}
+                style={{ background: "transparent", color: "#ffffff", border: "1.5px solid rgba(255,255,255,.35)", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "border-color .2s ease, transform 0.1s ease, opacity 0.1s ease", fontFamily: "var(--font-inter)", borderRadius: 0, width: isMobile ? "100%" : undefined, transform: isMobile && pressedServices ? "scale(0.96)" : "scale(1)", opacity: isMobile && pressedServices ? 0.75 : 1 }}
               >
                 More About What I Do
               </button>
               <button
                 onClick={goTo("/contact")}
-                onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#0E45B5"; b.style.borderColor = "#0E45B5"; }}
-                onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#1254D9"; b.style.borderColor = "#1254D9"; }}
-                style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "background-color .2s ease, border-color .2s ease", fontFamily: "var(--font-inter)", borderRadius: 0 }}
+                onMouseEnter={isMobile ? undefined : (e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#0E45B5"; b.style.borderColor = "#0E45B5"; }}
+                onMouseLeave={isMobile ? undefined : (e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#1254D9"; b.style.borderColor = "#1254D9"; }}
+                onTouchStart={() => setPressedContact(true)}
+                onTouchEnd={() => setPressedContact(false)}
+                onTouchCancel={() => setPressedContact(false)}
+                style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "background-color .2s ease, border-color .2s ease, transform 0.1s ease, opacity 0.1s ease", fontFamily: "var(--font-inter)", borderRadius: 0, width: isMobile ? "100%" : undefined, transform: isMobile && pressedContact ? "scale(0.96)" : "scale(1)", opacity: isMobile && pressedContact ? 0.75 : 1 }}
               >
                 Get In Touch
               </button>

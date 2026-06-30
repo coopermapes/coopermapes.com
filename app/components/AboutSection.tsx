@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import AboutGridPattern from "./AboutGridPattern";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 function ScrollFadeUp({ delay = 0, children, style }: { delay?: number; children: React.ReactNode; style?: React.CSSProperties }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -58,43 +59,51 @@ const LOGOS = [
   },
 ];
 
-function LogoItem({ src, alt, label, lines }: typeof LOGOS[0]) {
+function LogoItem({ src, alt, label, lines, active, onActivate }: typeof LOGOS[0] & { active: boolean; onActivate: () => void }) {
+  const isMobile = useIsMobile();
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const ariaLabel = `${label}: ${lines.map(l => `${l.text} ${l.year}`).join(", ")}`;
+  const isRevealed = isMobile ? active : hovered;
   return (
     <div
       role="button"
       tabIndex={0}
       aria-label={ariaLabel}
-      style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center" }}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
-      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); setHovered(h => !h); } }}
+      style={{ position: "relative", cursor: "pointer", display: "flex", alignItems: "center", transition: "transform 0.1s ease, opacity 0.1s ease", transform: isMobile && pressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && pressed ? 0.75 : 1 }}
+      onMouseEnter={isMobile ? undefined : () => setHovered(true)}
+      onMouseLeave={isMobile ? undefined : () => setHovered(false)}
+      onFocus={isMobile ? undefined : () => setHovered(true)}
+      onBlur={isMobile ? undefined : () => setHovered(false)}
+      onClick={isMobile ? onActivate : undefined}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
+      onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onActivate(); } }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         src={src}
         alt={alt}
         style={{
-          height: 175,
+          height: "clamp(80px,23vw,175px)",
           width: "auto",
           display: "block",
           transition: "opacity .35s ease",
-          opacity: hovered ? 0.1 : 1,
+          opacity: isRevealed ? 0.1 : 1,
         }}
       />
       <div
         style={{
           position: "absolute",
           inset: 0,
+          minWidth: isMobile ? "clamp(110px,30vw,140px)" : undefined,
           background: "rgba(255,255,255,0.95)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
           padding: 10,
-          opacity: hovered ? 1 : 0,
+          opacity: isRevealed ? 1 : 0,
           transition: "opacity .35s ease",
           pointerEvents: "none",
         }}
@@ -122,21 +131,36 @@ function LogoItem({ src, alt, label, lines }: typeof LOGOS[0]) {
 }
 
 export default function AboutSection() {
+  const isMobile = useIsMobile();
+  const [activeLogo, setActiveLogo] = useState<string | null>(null);
+
+  const handleActivate = (src: string) => {
+    setActiveLogo(prev => prev === src ? null : src);
+  };
   return (
     <div style={{ position: "relative", overflow: "hidden", minHeight: "calc(100vh - 98px)" }}>
-      <AboutGridPattern />
+      {!isMobile && <AboutGridPattern />}
 
       <div style={{
         position: "relative",
         zIndex: 1,
         display: "flex",
         flexWrap: "wrap",
+        flexDirection: isMobile ? "column" : "row",
         alignItems: "stretch",
         minHeight: "calc(100vh - 98px)",
       }}>
 
         {/* Left — Photo */}
-        <ScrollFadeUp delay={0} style={{ flex: "0 0 35%", minWidth: 280, position: "relative", overflow: "hidden", minHeight: 540 }}>
+        <ScrollFadeUp delay={0} style={{
+          flex: isMobile ? "0 0 auto" : "0 0 35%",
+          width: isMobile ? "100%" : undefined,
+          minWidth: isMobile ? 0 : 280,
+          position: "relative",
+          overflow: "hidden",
+          minHeight: isMobile ? "clamp(280px,70vw,420px)" : 540,
+          order: isMobile ? 0 : undefined,
+        }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/grad.jpg"
@@ -153,17 +177,21 @@ export default function AboutSection() {
 
         {/* Middle — Bio */}
         <div style={{
-          flex: 1,
-          padding: "clamp(48px,6vw,80px) clamp(24px,3vw,48px) clamp(48px,6vw,80px) clamp(40px,5vw,80px)",
+          flex: isMobile ? "0 0 auto" : 1,
+          width: isMobile ? "100%" : undefined,
+          padding: isMobile
+            ? "clamp(28px,7vw,48px) clamp(20px,5vw,40px)"
+            : "clamp(48px,6vw,80px) clamp(24px,3vw,48px) clamp(48px,6vw,80px) clamp(40px,5vw,80px)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
+          order: isMobile ? 1 : undefined,
         }}>
           <ScrollFadeUp delay={150}>
             <h1 style={{
               fontFamily: "var(--font-anton)",
               fontWeight: 400,
-              fontSize: "clamp(44px,5.5vw,82px)",
+              fontSize: isMobile ? "clamp(36px,9vw,56px)" : "clamp(44px,5.5vw,82px)",
               lineHeight: 0.92,
               letterSpacing: "-1.5px",
               textTransform: "uppercase",
@@ -202,7 +230,7 @@ export default function AboutSection() {
               justifyContent: "space-between",
             }}>
               {LOGOS.map(logo => (
-                <LogoItem key={logo.src} {...logo} />
+                <LogoItem key={logo.src} {...logo} active={activeLogo === logo.src} onActivate={() => handleActivate(logo.src)} />
               ))}
             </div>
           </ScrollFadeUp>
@@ -210,33 +238,39 @@ export default function AboutSection() {
 
         {/* Right — Stats */}
         <div style={{
-          flex: "0 0 22%",
-          padding: "clamp(80px,10.4vw,150px) clamp(20px,2.2vw,36px) clamp(48px,5vw,72px)",
+          flex: isMobile ? "0 0 auto" : "0 0 22%",
+          width: isMobile ? "100%" : undefined,
+          padding: isMobile
+            ? "clamp(20px,5vw,36px) clamp(20px,5vw,40px) clamp(32px,7vw,52px)"
+            : "clamp(80px,10.4vw,150px) clamp(20px,2.2vw,36px) clamp(48px,5vw,72px)",
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-start",
+          order: isMobile ? 2 : undefined,
+          background: isMobile ? "#F7F6F4" : undefined,
         }}>
           {[
-            { label: "Years Arranging", value: "13", initialDelay: 1050 },
-            { label: "Years Teaching", value: "7", initialDelay: 1150 },
-            { label: <>Years of Collegiate<br />Music Experience</>, value: "7", initialDelay: 1250 },
+            { label: "Years Arranging with Music Notation Software", value: "13", initialDelay: 1050 },
+            { label: "Years Teaching Competitive Marching Band", value: "7", initialDelay: 1150 },
+            { label: "Years of Collegiate Music Experience", value: "7", initialDelay: 1250 },
           ].map((stat, i, arr) => (
             <ScrollFadeUp key={i} delay={stat.initialDelay}>
             <div
               style={{
-                padding: "clamp(22px,2.8vw,36px) 0",
+                padding: isMobile ? "clamp(12px,3vw,20px) 0" : "clamp(22px,2.8vw,36px) 0",
                 borderBottom: i < arr.length - 1 ? "1px solid #E4E3DE" : "none",
               }}
             >
               <div style={{
                 fontFamily: "var(--font-inter)",
-                fontSize: 18,
+                fontSize: isMobile ? 12 : 16,
                 fontWeight: 600,
-                letterSpacing: "2px",
+                letterSpacing: isMobile ? "1px" : "2px",
                 textTransform: "uppercase",
-                color: "#9A9A95",
-                marginBottom: 20,
-                lineHeight: 1.5,
+                color: "#6F6F6A",
+                marginBottom: isMobile ? 12 : 20,
+                lineHeight: 1.4,
+                maxWidth: isMobile ? "155px" : undefined,
               }}>
                 {stat.label}
               </div>

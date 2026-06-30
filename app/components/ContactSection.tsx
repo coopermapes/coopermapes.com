@@ -5,6 +5,7 @@ import { Chats, Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 // ── Fade-up animation (matches homepage stagger) ─────────────────────────────
 function FadeUp({ delay, instant = false, children, style }: { delay: number; instant?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -91,17 +92,25 @@ function StepDot({ state }: { state: "completed" | "active" | "upcoming" }) {
 function RadioCard({ selected, onClick, children, size = "lg" }: {
   selected: boolean; onClick: () => void; children: React.ReactNode; size?: "lg" | "sm";
 }) {
+  const isMobile = useIsMobile();
+  const [pressed, setPressed] = useState(false);
   return (
-    <button type="button" onClick={onClick} style={{
+    <button type="button" onClick={onClick}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
+      style={{
       flex: 1,
       border: `2px solid ${selected ? "#1254D9" : "#DCDBD7"}`,
       background: selected ? "#EEF3FD" : "#FFFFFF",
       padding: size === "lg" ? "18px 24px" : "14px 16px",
       cursor: "pointer", display: "flex", gap: 14, alignItems: "center",
-      transition: "border-color .15s ease, background-color .15s ease",
+      transition: "border-color .15s ease, background-color .15s ease, transform 0.1s ease, opacity 0.1s ease",
       width: size === "lg" ? "100%" : undefined,
       minWidth: size === "sm" ? 160 : undefined,
       textAlign: "left",
+      transform: isMobile && pressed ? "scale(0.96)" : "scale(1)",
+      opacity: isMobile && pressed ? 0.75 : 1,
     }}>
       <span
         className={twMerge(clsx(
@@ -119,11 +128,17 @@ function RadioCard({ selected, onClick, children, size = "lg" }: {
 
 // ── Review group ──────────────────────────────────────────────────────────────
 function ReviewGroup({ title, rows, onEdit }: { title: string; rows: { label: string; value: string }[]; onEdit: () => void }) {
+  const isMobile = useIsMobile();
+  const [editPressed, setEditPressed] = useState(false);
   return (
     <div style={{ border: "1px solid #E4E3DE", overflow: "hidden" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "9px 16px", background: "#F7F6F4", borderBottom: "1px solid #E4E3DE" }}>
         <span style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 600, letterSpacing: "1.2px", textTransform: "uppercase", color: "#6A6A6A" }}>{title}</span>
-        <button type="button" onClick={onEdit} style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, color: "#1254D9", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: 0 }}>Edit</button>
+        <button type="button" onClick={onEdit}
+          onTouchStart={() => setEditPressed(true)}
+          onTouchEnd={() => setEditPressed(false)}
+          onTouchCancel={() => setEditPressed(false)}
+          style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, color: "#1254D9", background: "none", border: "none", cursor: "pointer", textDecoration: "underline", padding: 0, transition: "transform 0.1s ease, opacity 0.1s ease", transform: isMobile && editPressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && editPressed ? 0.75 : 1 }}>Edit</button>
       </div>
       {rows.map((r, i) => (
         <div key={i} style={{ display: "flex", gap: 16, padding: "9px 16px", borderBottom: i < rows.length - 1 ? "1px solid #F5F4F0" : "none" }}>
@@ -135,37 +150,64 @@ function ReviewGroup({ title, rows, onEdit }: { title: string; rows: { label: st
   );
 }
 
+// ── Outline button with reliable hover state ─────────────────────────────────
+function OutlineButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  const isMobile = useIsMobile();
+  const [hov, setHov] = useState(false);
+  const [pressed, setPressed] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      onMouseEnter={isMobile ? undefined : () => setHov(true)}
+      onMouseLeave={isMobile ? undefined : () => setHov(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
+      style={{ background: "transparent", border: `1.5px solid ${hov && !isMobile ? "#111111" : "#DCDBD7"}`, color: "#111111", fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", padding: "14px 32px", cursor: "pointer", transition: "border-color 0.2s ease, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && pressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && pressed ? 0.75 : 1 }}
+    >
+      {children}
+    </button>
+  );
+}
+
 // ── Contact card (landing) ────────────────────────────────────────────────────
 function ContactCard({ icon, title, description, cta, onClick, active, locked }: {
   icon: React.ReactNode; title: string; description: string; cta: string;
   onClick: () => void; active?: boolean; locked?: boolean;
 }) {
+  const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
+  const [pressed, setPressed] = useState(false);
   const ease = "cubic-bezier(0.25, 0.46, 0.45, 0.94)";
   return (
     <button
       type="button"
       onClick={onClick}
       disabled={locked}
-      onMouseEnter={() => !locked && setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onMouseEnter={isMobile ? undefined : () => !locked && setHov(true)}
+      onMouseLeave={isMobile ? undefined : () => setHov(false)}
+      onTouchStart={() => { if (!locked) setPressed(true); }}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
       style={{
         background: "#FFFFFF",
-        border: `1.5px solid ${hov && !locked ? "#1254D9" : "#DCDBD7"}`,
+        border: `1.5px solid ${hov && !locked && !isMobile ? "#1254D9" : "#DCDBD7"}`,
         position: "relative", overflow: "hidden",
-        aspectRatio: "1",
+        aspectRatio: isMobile ? undefined : "1",
         width: "100%",
         cursor: locked ? "default" : "pointer",
-        opacity: locked ? 0.45 : 1,
-        transition: `border-color .32s ${ease}, opacity .18s ease`,
+        opacity: locked ? 0.45 : isMobile && pressed ? 0.75 : 1,
+        transition: `border-color .32s ${ease}, opacity .18s ease, transform 0.1s ease`,
+        transform: isMobile && pressed ? "scale(0.97)" : "scale(1)",
         textAlign: "left",
         padding: 0,
       }}
     >
       <div style={{
-        padding: "44px 44px calc(44px + 72px)",
+        padding: isMobile ? "clamp(32px,8vw,48px) 24px" : "44px 44px calc(44px + 72px)",
         display: "flex", flexDirection: "column", gap: 24,
-        transform: hov && !locked ? "translateY(-16px)" : "translateY(0)",
+        transform: !isMobile && hov && !locked ? "translateY(-16px)" : "translateY(0)",
         transition: `transform .38s ${ease}`,
       }}>
         <div style={{ width: 80, height: 80, background: "#FFFFFF", border: "1.5px solid #DCDBD7", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -180,7 +222,7 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
         position: "absolute", bottom: 0, left: 0, right: 0, height: 72,
         background: "#1254D9", display: "flex", alignItems: "center", justifyContent: "center",
         gap: 4,
-        transform: hov && !locked ? "translateY(0)" : "translateY(100%)",
+        transform: !isMobile && hov && !locked ? "translateY(0)" : "translateY(100%)",
         transition: `transform .38s ${ease}`,
       }}>
         <span style={{ fontFamily: "var(--font-inter)", fontSize: 14, fontWeight: 600, letterSpacing: "0.8px", textTransform: "uppercase", color: "#FFFFFF", lineHeight: 1 }}>
@@ -260,7 +302,7 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Social Media</div>
           {[
             { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
-            { label: "Facebook",  href: "https://www.facebook.com/cooper.mapes.1/" },
+            { label: "Facebook",  href: "https://www.facebook.com/ctmapes/" },
             { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
             { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
           ].map(s => (
@@ -288,6 +330,27 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll
 
 // ── Horizontal step progress bar ──────────────────────────────────────────────
 function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; currentStep: number }) {
+  const isMobile = useIsMobile();
+  const pct = ((currentStep - 1) / (steps.length - 1)) * 100;
+
+  if (isMobile) {
+    return (
+      <div style={{ background: "#F7F6F4", borderBottom: "1px solid #E4E3DE", padding: "16px 20px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+          <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", color: "#1254D9" }}>
+            {steps[currentStep - 1].name}
+          </span>
+          <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: "#9A9A95" }}>
+            {currentStep} / {steps.length}
+          </span>
+        </div>
+        <div style={{ height: 3, background: "#E4E3DE", borderRadius: 2, overflow: "hidden" }}>
+          <div style={{ height: "100%", background: "#1254D9", width: `${pct}%`, transition: "width 0.38s cubic-bezier(0.4,0,0.2,1)", borderRadius: 2 }} />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       display: "flex", alignItems: "flex-start",
@@ -345,7 +408,8 @@ function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; c
 }
 
 // ── Inquiry screen ────────────────────────────────────────────────────────────
-function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBack: () => void }) {
+function InquiryScreen({ transitioning, onBack, initialDone = false }: { transitioning: boolean; onBack: () => void; initialDone?: boolean }) {
+  const isMobile = useIsMobile();
   const [iName, setIName] = useState("");
   const [iEmail, setIEmail] = useState("");
   const [iSchool, setISchool] = useState("");
@@ -353,9 +417,15 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
   const [iPhone, setIPhone] = useState("");
   const [iHear, setIHear] = useState("");
   const [iMessage, setIMessage] = useState("");
-  const [iDone, setIDone] = useState(false);
+  const [iDone, setIDone] = useState(initialDone);
   const [iError, setIError] = useState("");
   const [iSubmitting, setISubmitting] = useState(false);
+  const [sendPressed, setSendPressed] = useState(false);
+  const iDoneHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (iDone) iDoneHeadingRef.current?.focus();
+  }, [iDone]);
 
   const isValid = !!(iName.trim() && iEmail.trim() && iEmail.includes("@") && iSchool.trim() && iService && iHear && iMessage.trim());
 
@@ -385,39 +455,37 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
 
   return (
     <div style={{
-      display: "flex", minHeight: "calc(100vh - 98px)",
+      display: "flex", minHeight: isMobile ? "auto" : "calc(100vh - 98px)",
       opacity: transitioning ? 0 : 1,
       transition: "opacity 0.32s ease",
     }}>
       <LeftPanel onBack={onBack} subtitle="Fill out this form to get started. You will receive a message back from me within the next business day." />
       <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", overflow: "hidden" }}>
         {iDone ? (
-          <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(48px,6vw,96px) clamp(40px,5vw,80px)" }}>
+          <div role="status" aria-live="polite" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: isMobile ? "flex-start" : "center", padding: isMobile ? "clamp(60px,15vw,100px) clamp(40px,5vw,80px)" : "clamp(48px,6vw,96px) clamp(40px,5vw,80px)" }}>
             <div style={{ textAlign: "center", maxWidth: 480 }}>
               <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#1254D9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M4 12l6 6 10-10" />
                 </svg>
               </div>
-              <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(28px,3vw,42px)", textTransform: "uppercase", letterSpacing: "-1px", margin: "0 0 16px" }}>
+              {/* tabIndex -1 + outline:none: programmatic focus target for screen readers only, not a tab stop */}
+              <h2 ref={iDoneHeadingRef} tabIndex={-1} style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(36px,3.6vw,52px)", textTransform: "uppercase", letterSpacing: "-1px", margin: "0 0 16px", outline: "none" }}>
                 Message Sent
               </h2>
-              <p style={{ fontFamily: "var(--font-inter)", fontSize: 16, color: "#3A3A3A", maxWidth: 420, margin: "0 auto 32px", lineHeight: 1.6 }}>
-                Your inquiry has been received. I&apos;ll get back to you within 1–2 business days.
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", maxWidth: 420, margin: "0 auto 32px", lineHeight: 1.6 }}>
+                Thanks for reaching out! Your inquiry has been submitted. I&apos;ll be reaching out to you as soon as possible to answer your questions.
               </p>
-              <a href="/services" style={{ display: "inline-block", background: "#1254D9", color: "#fff", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", padding: "12px 24px", textDecoration: "none", marginBottom: 16 }}>
-                Explore My Services →
-              </a>
-              <button type="button" onClick={() => setIDone(false)} style={{ background: "none", border: "none", color: "#9A9A95", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 500, letterSpacing: ".4px", textDecoration: "underline", cursor: "pointer", padding: 0 }}>
-                Send Another Message
-              </button>
+              <OutlineButton onClick={() => setIDone(false)}>Send Another Message</OutlineButton>
             </div>
           </div>
         ) : (
           <FadeUp delay={360} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
             <form onSubmit={handleSubmit} style={{
               flex: 1, display: "flex", flexDirection: "column",
-              padding: "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
+              padding: isMobile
+                ? "clamp(28px,7vw,48px) clamp(20px,5vw,36px)"
+                : "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
             }}>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#1254D9", marginBottom: 16 }}>
                 Send an Inquiry
@@ -431,7 +499,7 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
 
               <div style={{ flex: 1, maxWidth: 680, display: "flex", flexDirection: "column", gap: 18 }}>
                 {/* Row 1: Name + Email */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
                     aria-label="Name" style={inputStyle} placeholder="Name *"
                     value={iName} onChange={e => setIName(e.target.value)}
@@ -446,7 +514,7 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
                   />
                 </div>
                 {/* Row 2: School + Service */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
                     aria-label="School or organization" style={inputStyle} placeholder="School / Organization *"
                     value={iSchool} onChange={e => setISchool(e.target.value)}
@@ -468,7 +536,7 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
                   </select>
                 </div>
                 {/* Row 3: Phone + How did you hear */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
                     aria-label="Phone number" style={inputStyle} type="tel" placeholder="Phone (optional)"
                     value={iPhone} onChange={e => setIPhone(e.target.value)}
@@ -512,17 +580,21 @@ function InquiryScreen({ transitioning, onBack }: { transitioning: boolean; onBa
               <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
                 <button
                   type="submit" disabled={!isValid || iSubmitting}
+                  onMouseEnter={isMobile ? undefined : e => { if (isValid && !iSubmitting) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
+                  onMouseLeave={isMobile ? undefined : e => { e.currentTarget.style.background = "#1254D9"; e.currentTarget.style.borderColor = "#1254D9"; }}
+                  onTouchStart={() => { if (isValid && !iSubmitting) setSendPressed(true); }}
+                  onTouchEnd={() => setSendPressed(false)}
+                  onTouchCancel={() => setSendPressed(false)}
                   style={{
                     background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9",
-                    padding: "12px 28px", fontFamily: "var(--font-inter)", fontSize: 13,
+                    padding: isMobile ? "14px 28px" : "12px 28px", fontFamily: "var(--font-inter)", fontSize: 13,
                     fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase",
                     cursor: isValid && !iSubmitting ? "pointer" : "default",
-                    opacity: isValid && !iSubmitting ? 1 : 0.38,
+                    opacity: !isValid || iSubmitting ? 0.38 : isMobile && sendPressed ? 0.75 : 1,
                     pointerEvents: isValid && !iSubmitting ? "auto" : "none",
-                    transition: "background .15s, border-color .15s",
+                    transition: "background .15s, border-color .15s, transform 0.1s ease, opacity 0.1s ease",
+                    transform: isMobile && sendPressed ? "scale(0.96)" : "scale(1)",
                   }}
-                  onMouseEnter={e => { if (isValid && !iSubmitting) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "#1254D9"; e.currentTarget.style.borderColor = "#1254D9"; }}
                 >
                   {iSubmitting ? "Sending…" : "Send Inquiry"}
                 </button>
@@ -560,6 +632,42 @@ function ComingSoonScreen({ title, subtitle, transitioning, onBack }: {
   );
 }
 
+// ── Mobile contact strip ──────────────────────────────────────────────────────
+function MobileContactStrip() {
+  return (
+    <div style={{
+      background: "#111111",
+      padding: "clamp(28px,7vw,48px) clamp(20px,5vw,40px)",
+      display: "flex",
+      flexDirection: "column",
+      gap: 24,
+    }}>
+      <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#6B8FE8" }}>
+        Contact
+      </div>
+      <a href="mailto:contact@coopermapes.com" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+        contact@coopermapes.com
+      </a>
+      <a href="tel:6629859780" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+        662-985-9780
+      </a>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {[
+          { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
+          { label: "Facebook",  href: "https://www.facebook.com/ctmapes/" },
+          { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
+          { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
+        ].map(s => (
+          <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
+            style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+            {s.label}
+          </a>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 // ── Main component ────────────────────────────────────────────────────────────
 export default function ContactSection() {
   const [wizardStep, setWizardStep] = useState(1);
@@ -568,7 +676,15 @@ export default function ContactSection() {
   const [wizardError, setWizardError] = useState("");
   const [contactView, setContactView] = useState<"landing" | "wizard" | "inquiry">("landing");
   const [transitioning, setTransitioning] = useState(false);
+  const [inquiryInitDone, setInquiryInitDone] = useState(false);
   const [stepTransitioning, setStepTransitioning] = useState(false);
+  const [backPressed, setBackPressed] = useState(false);
+  const [continuePressed, setContinuePressed] = useState(false);
+  const wizardDoneHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (wizardDone) wizardDoneHeadingRef.current?.focus();
+  }, [wizardDone]);
   const fromBack = useRef(false);
 
   const [wName, setWName] = useState("");
@@ -587,6 +703,7 @@ export default function ContactSection() {
   const [wDeadline, setWDeadline] = useState("");
   const [wExpress, setWExpress] = useState(false);
 
+  const isMobile = useIsMobile();
   const steps = wizardPath === "revoice" ? REVOICE_STEPS : FLIP_STEPS;
   const totalSteps = steps.length;
   const isFilesStep = wizardPath === "flip" ? wizardStep === 4 : wizardStep === 5;
@@ -657,6 +774,14 @@ export default function ContactSection() {
     if (hash === "#inquiry") {
       window.history.replaceState({ contactView: "inquiry" }, "");
       setContactView("inquiry");
+    } else if (hash === "#inquiry-success") {
+      window.history.replaceState({ contactView: "inquiry" }, "");
+      setContactView("inquiry");
+      setInquiryInitDone(true);
+    } else if (hash === "#quote-success") {
+      window.history.replaceState({ contactView: "wizard" }, "");
+      setContactView("wizard");
+      setWizardDone(true);
     } else {
       window.history.replaceState({ contactView: "landing" }, "");
     }
@@ -724,7 +849,9 @@ export default function ContactSection() {
         <div style={{
           position: "relative", minHeight: "calc(100vh - 98px)",
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-start",
-          padding: "clamp(72px,9vw,120px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
+          padding: isMobile
+            ? "clamp(48px,10vw,80px) clamp(20px,5vw,40px) clamp(40px,8vw,64px)"
+            : "clamp(72px,9vw,120px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
           opacity: transitioning ? 0 : 1,
           transform: transitioning ? "translateY(10px)" : "translateY(0)",
           transition: "opacity 0.3s ease, transform 0.3s ease",
@@ -737,18 +864,18 @@ export default function ContactSection() {
           }} />
           <div style={{ textAlign: "center", marginBottom: "clamp(24px,3vw,40px)", position: "relative", zIndex: 1 }}>
             <FadeUp delay={80} instant={fromBack.current}>
-              <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(52px,7.5vw,96px)", textTransform: "uppercase", letterSpacing: "-1.5px", lineHeight: 0.92, color: "#111111", margin: 0 }}>
+              <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,64px)" : "clamp(52px,7.5vw,96px)", textTransform: "uppercase", letterSpacing: "-1.5px", lineHeight: 0.92, color: "#111111", margin: 0 }}>
                 Get In Touch
               </h1>
             </FadeUp>
             <FadeUp delay={260} instant={fromBack.current}>
-              <p style={{ fontFamily: "var(--font-inter)", fontSize: 20, color: "#5A5A5A", maxWidth: 480, margin: "24px auto 0", lineHeight: 1.55 }}>
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#5A5A5A", maxWidth: 480, margin: "24px auto 0", lineHeight: 1.55 }}>
                 The first step to better sheet music. Get a quote or send an inquiry to start our work together.
               </p>
             </FadeUp>
           </div>
           <div style={{
-            display: "grid", gridTemplateColumns: "repeat(2, minmax(0, 400px))",
+            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, minmax(0, 400px))",
             justifyContent: "center",
             gap: 24, width: "100%", maxWidth: 1080, position: "relative", zIndex: 1,
           }}>
@@ -772,8 +899,9 @@ export default function ContactSection() {
 
       {/* ── Screen 2: Wizard ── */}
       {contactView === "wizard" && (
+        <>
         <div style={{
-          display: "flex", minHeight: "calc(100vh - 98px)",
+          display: "flex", minHeight: isMobile ? "auto" : "calc(100vh - 98px)",
           opacity: transitioning ? 0 : 1,
           transform: transitioning ? "translateY(10px)" : "translateY(0)",
           transition: "opacity 0.3s ease, transform 0.3s ease",
@@ -782,22 +910,21 @@ export default function ContactSection() {
 
           <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", overflow: "hidden" }}>
             {wizardDone ? (
-              <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "clamp(48px,6vw,96px) clamp(40px,5vw,80px)" }}>
+              <div role="status" aria-live="polite" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: isMobile ? "flex-start" : "center", padding: isMobile ? "clamp(60px,15vw,100px) clamp(40px,5vw,80px)" : "clamp(48px,6vw,96px) clamp(40px,5vw,80px)" }}>
                 <div style={{ textAlign: "center", maxWidth: 480 }}>
                   <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#1254D9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M4 12l6 6 10-10" />
                     </svg>
                   </div>
-                  <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(28px,3vw,42px)", textTransform: "uppercase", letterSpacing: "-1px", margin: "0 0 16px" }}>
+                  {/* tabIndex -1 + outline:none: programmatic focus target for screen readers only, not a tab stop */}
+                  <h2 ref={wizardDoneHeadingRef} tabIndex={-1} style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(36px,3.6vw,52px)", textTransform: "uppercase", letterSpacing: "-1px", margin: "0 0 16px", outline: "none" }}>
                     Quote Submitted
                   </h2>
-                  <p style={{ fontFamily: "var(--font-inter)", fontSize: 16, color: "#3A3A3A", maxWidth: 420, margin: "0 auto 32px", lineHeight: 1.6 }}>
-                    Your quote request has been submitted. I&apos;ll be in touch within 1–2 business days.
+                  <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", maxWidth: 420, margin: "0 auto 32px", lineHeight: 1.6 }}>
+                    Thanks for reaching out! Your quote request has been submitted. I&apos;ll be reaching out to you as soon as possible with more information.
                   </p>
-                  <button type="button" onClick={resetWizard} style={{ background: "transparent", border: "1.5px solid #DCDBD7", color: "#111111", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", padding: "12px 24px", cursor: "pointer" }}>
-                    Submit Another Quote
-                  </button>
+                  <OutlineButton onClick={resetWizard}>Request Another Quote</OutlineButton>
                 </div>
               </div>
             ) : (
@@ -809,7 +936,9 @@ export default function ContactSection() {
                 <FadeUp delay={360} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
                 <div style={{
                   flex: 1, display: "flex", flexDirection: "column",
-                  padding: "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
+                  padding: isMobile
+                    ? "clamp(28px,7vw,48px) clamp(20px,5vw,36px)"
+                    : "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
                   opacity: stepTransitioning ? 0 : 1,
                   transform: stepTransitioning ? "translateY(8px)" : "translateY(0)",
                   transition: stepTransitioning
@@ -826,7 +955,7 @@ export default function ContactSection() {
                     {sub}
                   </p>
 
-                  <div style={{ flex: 1, maxWidth: 840 }}>
+                  <div style={{ flex: isMobile ? undefined : 1, maxWidth: 840 }}>
                     {wizardStep === 1 && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 18, width: "fit-content" }}>
                         <RadioCard selected={wizardPath === "flip"} onClick={() => setWizardPath("flip")}>My parts need reformatting or organizing.</RadioCard>
@@ -917,17 +1046,28 @@ export default function ContactSection() {
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
                     {wizardStep > 1 ? (
-                      <button onClick={handleBack} style={{ background: "transparent", color: "#111111", border: "1.5px solid #DCDBD7", padding: "12px 24px", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", cursor: "pointer" }} onMouseEnter={e => (e.currentTarget.style.borderColor = "#111111")} onMouseLeave={e => (e.currentTarget.style.borderColor = "#DCDBD7")}>
+                      <button
+                        onClick={handleBack}
+                        onMouseEnter={isMobile ? undefined : e => (e.currentTarget.style.borderColor = "#111111")}
+                        onMouseLeave={isMobile ? undefined : e => (e.currentTarget.style.borderColor = "#DCDBD7")}
+                        onTouchStart={() => setBackPressed(true)}
+                        onTouchEnd={() => setBackPressed(false)}
+                        onTouchCancel={() => setBackPressed(false)}
+                        style={{ background: "transparent", color: "#111111", border: "1.5px solid #DCDBD7", padding: isMobile ? "14px 24px" : "12px 24px", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s ease, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && backPressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && backPressed ? 0.75 : 1 }}
+                      >
                         Back
                       </button>
                     ) : <div style={{ width: 1 }} />}
                     <button
                       onClick={handleContinue} disabled={!valid}
-                      style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: "12px 28px", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", cursor: valid ? "pointer" : "default", opacity: valid ? 1 : 0.38, pointerEvents: valid ? "auto" : "none", transition: "background .15s, border-color .15s" }}
-                      onMouseEnter={e => { if (valid) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "#1254D9"; e.currentTarget.style.borderColor = "#1254D9"; }}
+                      onMouseEnter={isMobile ? undefined : e => { if (valid) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
+                      onMouseLeave={isMobile ? undefined : e => { e.currentTarget.style.background = "#1254D9"; e.currentTarget.style.borderColor = "#1254D9"; }}
+                      onTouchStart={() => { if (valid) setContinuePressed(true); }}
+                      onTouchEnd={() => setContinuePressed(false)}
+                      onTouchCancel={() => setContinuePressed(false)}
+                      style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: isMobile ? "14px 28px" : "12px 28px", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", cursor: valid ? "pointer" : "default", opacity: !valid ? 0.38 : isMobile && continuePressed ? 0.75 : 1, pointerEvents: valid ? "auto" : "none", transition: "background .15s, border-color .15s, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && continuePressed ? "scale(0.96)" : "scale(1)" }}
                     >
-                      {isFinalStep ? "Send Inquiry" : "Continue"}
+                      {isFinalStep ? "Submit Quote" : "Continue"}
                     </button>
                   </div>
                 </div>
@@ -936,15 +1076,20 @@ export default function ContactSection() {
             )}
           </div>
         </div>
+        {isMobile && <MobileContactStrip />}
+        </>
       )}
 
       {/* ── Screen 3: Send an Inquiry ── */}
       {contactView === "inquiry" && (
-        <InquiryScreen transitioning={transitioning} onBack={goToLanding} />
+        <>
+          <InquiryScreen transitioning={transitioning} onBack={goToLanding} initialDone={inquiryInitDone} />
+          {isMobile && <MobileContactStrip />}
+        </>
       )}
 
       <style>{`
-        @media (max-width: 900px) {
+        @media (max-width: 768px) {
           .contact-left-panel { display: none !important; }
         }
       `}</style>
