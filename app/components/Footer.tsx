@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const SOCIAL = [
   {
@@ -70,6 +71,7 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
 
 export default function Footer() {
   const [emailHov, setEmailHov] = useState(false);
+  const isMobile = useIsMobile();
 
   return (
     <footer style={{
@@ -118,11 +120,12 @@ export default function Footer() {
       }}>
         <span style={{
           fontFamily: "var(--font-inter)",
-          fontSize: 12,
+          fontSize: isMobile ? 10 : 12,
           fontWeight: 500,
-          letterSpacing: "1.2px",
+          letterSpacing: isMobile ? "0.5px" : "1.2px",
           textTransform: "uppercase",
           color: "#A0A09B",
+          whiteSpace: isMobile ? "nowrap" : undefined,
         }}>
           © Cooper Mapes 2026{" "}
           <span style={{ color: "#3A3A3A" }}>|</span>
