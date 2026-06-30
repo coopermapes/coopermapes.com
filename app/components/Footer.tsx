@@ -77,7 +77,9 @@ export default function Footer() {
     <footer style={{
       background: "#020201",
       color: "#FFFFFF",
-      padding: "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
+      padding: isMobile
+        ? "clamp(32px,8vw,56px) clamp(20px,5vw,40px) 24px"
+        : "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
     }}>
       {/* Wordmark */}
       <Link
@@ -92,6 +94,7 @@ export default function Footer() {
           letterSpacing: "-3px",
           textTransform: "uppercase",
           color: "#FFFFFF",
+          whiteSpace: isMobile ? "normal" : "nowrap",
         }}>
           Cooper Mapes
           <span style={{
