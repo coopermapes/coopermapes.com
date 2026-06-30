@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useIsMobile } from "../hooks/useIsMobile";
 import type WaveSurfer from "wavesurfer.js";
 
 function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
@@ -90,6 +91,8 @@ export default function PortfolioSection() {
   const wsRef      = useRef<WaveSurfer | null>(null);
   const fadeRef    = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const isMobile = useIsMobile();
+
   function stopFade() { if (fadeRef.current) { clearInterval(fadeRef.current); fadeRef.current = null; } }
 
   function fadeOut(cb?: () => void) {
@@ -175,7 +178,13 @@ export default function PortfolioSection() {
 
   return (
     <section id="portfolio" style={{ background: "#020201", paddingTop: "98px" }}>
-      <div style={{ maxWidth: 1320, margin: "0 auto", padding: "clamp(48px,6vw,96px) clamp(24px,5vw,64px) clamp(48px,5vw,64px)" }}>
+      <div style={{
+        maxWidth: 1320,
+        margin: "0 auto",
+        padding: isMobile
+          ? "clamp(32px,8vw,56px) clamp(16px,4vw,32px) clamp(32px,6vw,56px)"
+          : "clamp(48px,6vw,96px) clamp(24px,5vw,64px) clamp(48px,5vw,64px)",
+      }}>
 
         {/* ── Header ── */}
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", flexWrap: "wrap", gap: 18, borderBottom: "1px solid #242422", paddingBottom: 22 }}>
@@ -218,7 +227,17 @@ export default function PortfolioSection() {
 
           {/* Audio player */}
           <CaptionAnimate initialDelay={1050}>
-            <div style={{ flex: "0 0 auto", minWidth: 280, background: "#0E0E0D", border: "1px solid #242422", padding: "14px 16px 12px", display: "flex", flexDirection: "column", gap: 10 }}>
+            <div style={{
+              flex: "0 0 auto",
+              minWidth: isMobile ? 0 : 280,
+              width: isMobile ? "100%" : undefined,
+              background: "#0E0E0D",
+              border: "1px solid #242422",
+              padding: "14px 16px 12px",
+              display: "flex",
+              flexDirection: "column",
+              gap: 10,
+            }}>
               {/* Top row: circle button + track info + timestamp */}
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
                 <button
@@ -253,7 +272,13 @@ export default function PortfolioSection() {
         {/* ── Carousel ── */}
         <ScrollFadeUp delay={0}>
           <div
-            style={{ position: "relative", overflow: "hidden", width: "100%", height: "clamp(520px,46vw,660px)", marginTop: 8 }}
+            style={{
+              position: "relative",
+              overflow: "hidden",
+              width: "100%",
+              height: isMobile ? "clamp(380px,85vw,480px)" : "clamp(520px,46vw,660px)",
+              marginTop: 8,
+            }}
           >
             {WORKS.map((w, i) => {
               const rawOffset = ((i - pfIndex) % N + N) % N;
