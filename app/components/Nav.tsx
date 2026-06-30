@@ -48,7 +48,7 @@ export default function Nav() {
   }, [menuOpen]);
 
   const isHome = pathname === "/";
-  const solid = !isHome || scrolled || menuOpen;
+  const solid = !isHome || scrolled || menuOpen || isMobile;
 
   return (
     <>
@@ -81,7 +81,7 @@ export default function Nav() {
               fontSize: 13,
               fontWeight: 500,
               position: "relative",
-              top: "-1.8em",
+              top: "-0.9em",
               marginLeft: 3,
               letterSpacing: 0,
             }}>©</span>
@@ -134,7 +134,20 @@ export default function Nav() {
               aria-expanded={menuOpen}
               style={{ width: 44, height: 44 }}
             >
-              {menuOpen ? <X size={24} weight="regular" /> : <List size={24} weight="regular" />}
+              <div style={{ position: "relative", width: 24, height: 24 }}>
+                <List size={24} weight="regular" style={{
+                  position: "absolute", inset: 0,
+                  transition: "opacity 0.25s ease, transform 0.25s ease",
+                  opacity: menuOpen ? 0 : 1,
+                  transform: menuOpen ? "rotate(45deg)" : "rotate(0deg)",
+                }} />
+                <X size={24} weight="regular" style={{
+                  position: "absolute", inset: 0,
+                  transition: "opacity 0.25s ease, transform 0.25s ease",
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? "rotate(0deg)" : "rotate(-45deg)",
+                }} />
+              </div>
             </Button>
           )}
         </div>
@@ -157,14 +170,20 @@ export default function Nav() {
             alignItems: "center",
             opacity: menuOpen ? 1 : 0,
             pointerEvents: menuOpen ? "auto" : "none",
-            transition: "opacity 0.28s ease",
+            transition: "opacity 0.32s cubic-bezier(.4,0,.2,1)",
           }}
         >
           <ul style={{ listStyle: "none", textAlign: "center", display: "flex", flexDirection: "column", gap: 4 }}>
-            {LINKS.map(({ label, href }) => {
+            {LINKS.map(({ label, href }, i) => {
               const isActive = pathname === href;
               return (
-                <li key={href}>
+                <li key={href} style={{
+                  opacity: menuOpen ? 1 : 0,
+                  transform: menuOpen ? "translateY(0)" : "translateY(16px)",
+                  transition: menuOpen
+                    ? `opacity 0.32s ease ${i * 48 + 80}ms, transform 0.32s cubic-bezier(.4,0,.2,1) ${i * 48 + 80}ms`
+                    : "none",
+                }}>
                   <Link
                     href={href}
                     aria-current={isActive ? "page" : undefined}

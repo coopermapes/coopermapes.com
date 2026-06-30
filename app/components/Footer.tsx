@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
 
 const SOCIAL = [
@@ -20,7 +20,7 @@ const SOCIAL = [
   {
     key: "facebook",
     label: "Facebook",
-    href: "https://www.facebook.com/cooper.mapes.1/",
+    href: "https://www.facebook.com/ctmapes/",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
@@ -72,6 +72,31 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
 export default function Footer() {
   const [emailHov, setEmailHov] = useState(false);
   const isMobile = useIsMobile();
+  const bottomRowRef = useRef<HTMLDivElement>(null);
+  const copyrightRef = useRef<HTMLSpanElement>(null);
+  const [copyrightFontSize, setCopyrightFontSize] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const fit = () => {
+      const row = bottomRowRef.current;
+      const el = copyrightRef.current;
+      if (!row || !el) return;
+      const w = row.offsetWidth;
+      el.style.whiteSpace = "nowrap";
+      let lo = 6, hi = 40;
+      while (hi - lo > 0.25) {
+        const mid = (lo + hi) / 2;
+        el.style.fontSize = mid + "px";
+        if (el.scrollWidth <= w) lo = mid; else hi = mid;
+      }
+      setCopyrightFontSize(lo + "px");
+    };
+    fit();
+    const ro = new ResizeObserver(fit);
+    if (bottomRowRef.current) ro.observe(bottomRowRef.current);
+    return () => ro.disconnect();
+  }, [isMobile]);
 
   return (
     <footer style={{
@@ -80,18 +105,19 @@ export default function Footer() {
       padding: isMobile
         ? "clamp(32px,8vw,56px) clamp(20px,5vw,40px) 24px"
         : "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
+      marginTop: -2,
     }}>
       {/* Wordmark */}
       <Link
         href="/"
-        style={{ textDecoration: "none", display: "inline-block" }}
+        style={{ textDecoration: "none", display: isMobile ? "block" : "inline-block" }}
       >
         <div style={{
           fontFamily: "var(--font-anton)",
           fontWeight: 400,
-          fontSize: "clamp(44px,9vw,128px)",
+          fontSize: isMobile ? "clamp(52px,13vw,128px)" : "clamp(44px,9vw,128px)",
           lineHeight: 0.85,
-          letterSpacing: "-3px",
+          letterSpacing: isMobile ? "0px" : "-3px",
           textTransform: "uppercase",
           color: "#FFFFFF",
           whiteSpace: isMobile ? "normal" : "nowrap",
@@ -111,31 +137,32 @@ export default function Footer() {
       </Link>
 
       {/* Bottom row */}
-      <div style={{
+      <div ref={bottomRowRef} style={{
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
         justifyContent: "space-between",
         gap: 18,
-        marginTop: "clamp(36px,5vw,56px)",
+        marginTop: isMobile ? "clamp(16px,4vw,24px)" : "clamp(36px,5vw,56px)",
         borderTop: "1px solid #242422",
         paddingTop: 24,
       }}>
-        <span style={{
+        <span ref={copyrightRef} style={{
           fontFamily: "var(--font-inter)",
-          fontSize: isMobile ? 10 : 12,
+          fontSize: isMobile ? (copyrightFontSize ?? 10) : 12,
           fontWeight: 500,
           letterSpacing: isMobile ? "0.5px" : "1.2px",
           textTransform: "uppercase",
           color: "#A0A09B",
           whiteSpace: isMobile ? "nowrap" : undefined,
+          width: isMobile ? "100%" : undefined,
         }}>
           © Cooper Mapes 2026{" "}
           <span style={{ color: "#3A3A3A" }}>|</span>
           {" "}Arranger · Composer · Educator
         </span>
 
-        <div style={{ display: "flex", gap: 18, alignItems: "center" }}>
+        <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined }}>
           {SOCIAL.map(s => (
             <SocialLink key={s.key} href={s.href} label={s.label} icon={s.icon} />
           ))}
