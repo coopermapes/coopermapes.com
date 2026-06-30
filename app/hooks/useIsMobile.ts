@@ -6,20 +6,12 @@ export function useIsMobile(breakpoint = 768): boolean {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= breakpoint);
+    const mql = window.matchMedia(`(max-width: ${breakpoint}px)`);
+    const check = () => setIsMobile(mql.matches);
     check();
 
-    let timer: ReturnType<typeof setTimeout>;
-    const debounced = () => {
-      clearTimeout(timer);
-      timer = setTimeout(check, 150);
-    };
-
-    window.addEventListener("resize", debounced);
-    return () => {
-      window.removeEventListener("resize", debounced);
-      clearTimeout(timer);
-    };
+    mql.addEventListener("change", check);
+    return () => mql.removeEventListener("change", check);
   }, [breakpoint]);
 
   return isMobile;

@@ -29,7 +29,7 @@
   /* Button component tokens */
   --color-accent: rgba(18, 84, 217, 0.08);
   --color-accent-foreground: #111111;
-  --color-ring: #1254d9;
+  --color-ring: var(--color-blue);
 }
 
 * {
