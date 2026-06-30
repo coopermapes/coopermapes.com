@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import GridPattern from "./GridPattern";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 function FadeUp({ delay, children, style }: { delay: number; children: React.ReactNode; style?: React.CSSProperties }) {
   const [visible, setVisible] = useState(false);
@@ -182,6 +183,7 @@ function CtaButton({ onClick }: { onClick: (e: React.MouseEvent) => void }) {
 export default function HomeSection() {
   const fixRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const isMobile = useIsMobile();
 
   const scrollToFix = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -197,11 +199,31 @@ export default function HomeSection() {
   return (
     <section id="home">
       {/* ── Panel 1: Hero ── */}
-      <div style={{ position: "relative", overflow: "hidden", display: "flex", flexWrap: "wrap", flexDirection: "row-reverse", minHeight: "calc(100vh - 98px)", background: "#ffffff" }}>
+      <div style={{
+        position: "relative",
+        overflow: "hidden",
+        display: "flex",
+        flexWrap: "wrap",
+        flexDirection: isMobile ? "column" : "row-reverse",
+        minHeight: isMobile ? "auto" : "calc(100vh - 98px)",
+        background: "#ffffff",
+        paddingTop: isMobile ? 98 : 0,
+      }}>
         <GridPattern interactive />
 
         {/* Text column */}
-        <div style={{ flex: "1 1 460px", display: "flex", flexDirection: "column", justifyContent: "flex-start", padding: "clamp(24px,calc(27vh - 36px),384px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)", position: "relative", zIndex: 1 }}>
+        <div style={{
+          flex: isMobile ? "0 0 auto" : "1 1 460px",
+          width: isMobile ? "100%" : undefined,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-start",
+          padding: isMobile
+            ? "clamp(32px,8vw,56px) clamp(20px,5vw,40px) clamp(32px,8vw,48px)"
+            : "clamp(24px,calc(27vh - 36px),384px) clamp(24px,5vw,64px) clamp(48px,6vw,96px)",
+          position: "relative",
+          zIndex: 1,
+        }}>
           {/* Eyebrow */}
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 22 }}>
             <FadeUp delay={550} style={{ display: "inline-block" }}>
@@ -231,7 +253,15 @@ export default function HomeSection() {
 
           {/* Subtitle */}
           <FadeUp delay={1050}>
-            <p style={{ fontSize: "clamp(18px,1.55vw,21px)", lineHeight: 1.5, fontWeight: 600, color: "#3A3A3A", margin: "26px 0 0", maxWidth: 440, textAlign: "left" }}>
+            <p style={{
+              fontSize: isMobile ? "clamp(16px,4.2vw,21px)" : "clamp(18px,1.55vw,21px)",
+              lineHeight: 1.5,
+              fontWeight: 600,
+              color: "#3A3A3A",
+              margin: "26px 0 0",
+              maxWidth: isMobile ? "100%" : 440,
+              textAlign: "left",
+            }}>
               Music editing, engraving, and arranging<br />for performing ensembles.
             </p>
           </FadeUp>
@@ -243,7 +273,15 @@ export default function HomeSection() {
         </div>
 
         {/* Photo column */}
-        <FadeUp delay={0} style={{ flex: "1 1 460px", alignSelf: "stretch", overflow: "hidden", minHeight: 440, background: "#EAEAEA", position: "relative" }}>
+        <FadeUp delay={0} style={{
+          flex: isMobile ? "0 0 auto" : "1 1 460px",
+          width: isMobile ? "100%" : undefined,
+          alignSelf: "stretch",
+          overflow: "hidden",
+          minHeight: isMobile ? "clamp(280px,80vw,420px)" : 440,
+          background: "#EAEAEA",
+          position: "relative",
+        }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src="/teaching.jpg"
@@ -255,23 +293,52 @@ export default function HomeSection() {
       </div>
 
       {/* ── Panel 2: Before/After (dark) ── */}
-      <div ref={fixRef} style={{ background: "#020201", display: "flex", flexWrap: "wrap", alignItems: "center", gap: "clamp(40px,5vw,72px)", padding: "clamp(64px,7vw,96px) clamp(24px,5vw,64px) clamp(32px,3.5vw,52px)" }}>
+      <div ref={fixRef} style={{
+        background: "#020201",
+        display: "flex",
+        flexWrap: "wrap",
+        alignItems: "center",
+        gap: isMobile ? "clamp(28px,7vw,48px)" : "clamp(40px,5vw,72px)",
+        padding: isMobile
+          ? "clamp(40px,9vw,64px) clamp(20px,5vw,40px) clamp(32px,7vw,52px)"
+          : "clamp(64px,7vw,96px) clamp(24px,5vw,64px) clamp(32px,3.5vw,52px)",
+      }}>
         {/* Slider */}
-        <div style={{ flex: "1 1 440px" }}>
+        <div style={{ flex: isMobile ? "0 0 100%" : "1 1 440px", width: isMobile ? "100%" : undefined }}>
           <ScrollFadeUp delay={0} scale>
             <BeforeAfterSlider />
           </ScrollFadeUp>
         </div>
 
         {/* Copy */}
-        <div style={{ flex: "1 1 380px" }}>
+        <div style={{ flex: isMobile ? "0 0 100%" : "1 1 380px", width: isMobile ? "100%" : undefined }}>
           <ScrollFadeUp delay={0}>
-            <span style={{ display: "block", fontFamily: "var(--font-anton)", fontWeight: 400, textTransform: "uppercase", color: "#ffffff", fontSize: "clamp(20px,2.86vw,38px)", lineHeight: 1.04, letterSpacing: ".2px", whiteSpace: "nowrap" }}>
+            <span style={{
+              display: "block",
+              fontFamily: "var(--font-anton)",
+              fontWeight: 400,
+              textTransform: "uppercase",
+              color: "#ffffff",
+              fontSize: isMobile ? "clamp(20px,5.5vw,32px)" : "clamp(20px,2.86vw,38px)",
+              lineHeight: 1.04,
+              letterSpacing: ".2px",
+              whiteSpace: isMobile ? "normal" : "nowrap",
+            }}>
               Your sheet music is not cutting it.
             </span>
           </ScrollFadeUp>
           <ScrollFadeUp delay={150} distance={32}>
-            <span style={{ display: "block", fontFamily: "var(--font-anton)", fontWeight: 400, textTransform: "uppercase", color: "#1254D9", fontSize: "clamp(54px,7.9vw,106px)", lineHeight: ".88", letterSpacing: "-2px", marginTop: 10 }}>
+            <span style={{
+              display: "block",
+              fontFamily: "var(--font-anton)",
+              fontWeight: 400,
+              textTransform: "uppercase",
+              color: "#1254D9",
+              fontSize: isMobile ? "clamp(54px,14vw,80px)" : "clamp(54px,7.9vw,106px)",
+              lineHeight: ".88",
+              letterSpacing: "-2px",
+              marginTop: 10,
+            }}>
               I can fix that
             </span>
           </ScrollFadeUp>
@@ -291,12 +358,18 @@ export default function HomeSection() {
             </p>
           </ScrollFadeUp>
           <ScrollFadeUp delay={700} rootMargin="0px 0px 200px 0px">
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 14, marginTop: 30 }}>
+            <div style={{
+              display: "flex",
+              flexWrap: "wrap",
+              flexDirection: isMobile ? "column" : "row",
+              gap: 14,
+              marginTop: 30,
+            }}>
               <button
                 onClick={goTo("/services")}
                 onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "#ffffff"; }}
                 onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = "rgba(255,255,255,.35)"; }}
-                style={{ background: "transparent", color: "#ffffff", border: "1.5px solid rgba(255,255,255,.35)", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "border-color .2s ease", fontFamily: "var(--font-inter)", borderRadius: 0 }}
+                style={{ background: "transparent", color: "#ffffff", border: "1.5px solid rgba(255,255,255,.35)", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "border-color .2s ease", fontFamily: "var(--font-inter)", borderRadius: 0, width: isMobile ? "100%" : undefined }}
               >
                 More About What I Do
               </button>
@@ -304,7 +377,7 @@ export default function HomeSection() {
                 onClick={goTo("/contact")}
                 onMouseEnter={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#0E45B5"; b.style.borderColor = "#0E45B5"; }}
                 onMouseLeave={(e) => { const b = e.currentTarget as HTMLButtonElement; b.style.background = "#1254D9"; b.style.borderColor = "#1254D9"; }}
-                style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "background-color .2s ease, border-color .2s ease", fontFamily: "var(--font-inter)", borderRadius: 0 }}
+                style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: "16px 24px", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase", cursor: "pointer", transition: "background-color .2s ease, border-color .2s ease", fontFamily: "var(--font-inter)", borderRadius: 0, width: isMobile ? "100%" : undefined }}
               >
                 Get In Touch
               </button>
