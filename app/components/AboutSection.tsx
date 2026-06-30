@@ -79,7 +79,7 @@ function LogoItem({ src, alt, label, lines }: typeof LOGOS[0]) {
         src={src}
         alt={alt}
         style={{
-          height: 175,
+          height: "clamp(80px,23vw,175px)",
           width: "auto",
           display: "block",
           transition: "opacity .35s ease",
@@ -232,7 +232,7 @@ export default function AboutSection() {
             : "clamp(80px,10.4vw,150px) clamp(20px,2.2vw,36px) clamp(48px,5vw,72px)",
           display: "flex",
           flexDirection: isMobile ? "row" : "column",
-          justifyContent: isMobile ? "space-around" : "flex-start",
+          justifyContent: "flex-start",
           order: isMobile ? 2 : undefined,
           background: isMobile ? "#F7F6F4" : undefined,
         }}>
