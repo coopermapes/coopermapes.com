@@ -81,7 +81,7 @@ export default function Nav() {
               fontSize: 13,
               fontWeight: 500,
               position: "relative",
-              top: "-0.9em",
+              top: isMobile ? "-0.9em" : "-1.6em",
               marginLeft: 3,
               letterSpacing: 0,
             }}>©</span>

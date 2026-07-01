@@ -3,6 +3,7 @@ import { Anton, Inter } from "next/font/google";
 import "./globals.css";
 import Nav from "./components/Nav";
 import Footer from "./components/Footer";
+import { PostHogProvider } from "./components/PostHogProvider";
 
 const anton = Anton({
   weight: "400",
@@ -18,21 +19,21 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://coopermapes.com"),
-  title: "Cooper Mapes - Arranger",
+  title: "Home - Cooper Mapes",
   description:
     "Music editing, engraving, and arranging for performing ensembles.",
   openGraph: {
     type: "website",
     url: "https://coopermapes.com",
     siteName: "Cooper Mapes",
-    title: "Cooper Mapes - Arranger",
+    title: "Home - Cooper Mapes",
     description:
       "Music editing, engraving, and arranging for performing ensembles.",
     locale: "en_US",
   },
   twitter: {
     card: "summary",
-    title: "Cooper Mapes — Arranger, Composer, Educator",
+    title: "Home - Cooper Mapes",
     description:
       "Music editing, engraving, and arranging for performing ensembles.",
   },
@@ -58,12 +59,14 @@ export default function RootLayout({
       className={`${anton.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-white text-[#111111]">
+        <PostHogProvider>
           <a href="#main-content" className="skip-link">Skip to main content</a>
           <Nav />
           <main id="main-content">
             {children}
           </main>
           <Footer />
+        </PostHogProvider>
         </body>
     </html>
   );

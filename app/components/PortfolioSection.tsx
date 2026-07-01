@@ -52,30 +52,45 @@ function CaptionAnimate({ initialDelay, children }: { initialDelay: number; chil
 
 // ── Works data ────────────────────────────────────────────────────────────────
 const WORKS = [
-  { slot: "pf-spire",     index: "(01)", title: "Eternal Spire",     meta: "Olive Branch HS · 2026",                               badges: [], image: "/portfolio/images/pf-spire.jpeg",     audio: "/portfolio/audio/eternal-spire.mp3" },
-  { slot: "pf-escher",    index: "(02)", title: "Escher Sketch",     meta: "Olive Branch HS · 2025",                               badges: [{ src: "/boa-regional-2025.png", alt: "BOA Regional 2025" }, { src: "/mhsaa-state-2025.png", alt: "MHSAA State 2025" }], image: "/portfolio/images/pf-escher.jpeg",    audio: "/portfolio/audio/escher-sketch.mp3" },
-  { slot: "pf-calmstorm", index: "(03)", title: "In Calm and Storm", meta: "For Drum Corps · Mvmt. I & III sampled",               badges: [], image: "/portfolio/images/pf-calmstorm.jpeg", audio: "/portfolio/audio/in-calm-and-storm.mp3" },
-  { slot: "pf-ramayana",  index: "(04)", title: "Ramayana",          meta: "For Drum Corps · Mvmt. I sampled · Perc. Simon Edwards", badges: [], image: "/portfolio/images/pf-ramayana.jpeg",  audio: "/portfolio/audio/ramayana.mp3" },
-  { slot: "pf-ignite",    index: "(05)", title: "Ignite",            meta: "For Indoor Winds · Mvmt. I sampled",                  badges: [], image: "/portfolio/images/pf-ignite.jpeg",    audio: "/portfolio/audio/ignite-mvmt-i.mp3" },
-  { slot: "pf-grace",     index: "(06)", title: "Amazing Grace",     meta: "For Brass Ensemble · Hernando HS · 2024",             badges: [], image: "/portfolio/images/pf-grace.jpeg",     audio: "/portfolio/audio/amazing-grace.mp3" },
-  { slot: "pf-gospel",    index: "(07)", title: "Gospel",            meta: "Flow Chorale · Olive Branch HS · 2025",               badges: [], image: "/portfolio/images/pf-gospel.jpeg",    audio: "/portfolio/audio/gospel.mp3" },
-  { slot: "pf-horkstow",  index: "(08)", title: "Horkstow Grange",   meta: "Flow Chorale · Olive Branch HS · 2026",               badges: [], image: "/portfolio/images/pf-horkstow.jpeg",  audio: "/portfolio/audio/horkstow-grange.mp3" },
-  { slot: "pf-jurassic",  index: "(09)", title: "Jurassic Park",     meta: "Flow Chorale",                                        badges: [], image: "/portfolio/images/pf-jurassic.jpeg",  audio: "/portfolio/audio/jurassic-park.mp3" },
-  { slot: "pf-joy",       index: "(10)", title: "Joy to the World",  meta: "Parade Tune",                                         badges: [], image: "/portfolio/images/pf-joy.jpeg",       audio: "/portfolio/audio/joy-to-the-world.mp3" },
+  { slot: "pf-spire",     index: "(01)", title: "Coming Soon",       meta: "Olive Branch HS · 2026",                                badges: [], image: "/portfolio/images/pf-spire.jpeg",     audio: "/portfolio/audio/eternal-spire.mp3",    locked: true, posY: 50 },
+  { slot: "pf-escher",    index: "(02)", title: "Escher Sketch",     meta: "Olive Branch HS · 2025",                                badges: [{ src: "/boa-regional-2025.png", alt: "BOA Regional 2025" }, { src: "/mhsaa-state-2025.png", alt: "MHSAA State 2025" }], image: "/portfolio/images/pf-escher.jpeg",    audio: "/portfolio/audio/escher-sketch.mp3",    posY: 2  },
+  { slot: "pf-calmstorm", index: "(03)", title: "In Calm and Storm", meta: "For Drum Corps · Mvmt. I & III sampled",                badges: [], image: "/portfolio/images/pf-calmstorm.jpeg", audio: "/portfolio/audio/in-calm-and-storm.mp3", posY: 50 },
+  { slot: "pf-ramayana",  index: "(04)", title: "Ramayana",          meta: "For Drum Corps · Mvmt. I sampled · Perc. Simon Edwards", badges: [], image: "/portfolio/images/pf-ramayana.jpeg",  audio: "/portfolio/audio/ramayana.mp3",          posY: 16 },
+  { slot: "pf-ignite",    index: "(05)", title: "Ignite",            meta: "For Indoor Winds · Mvmt. I sampled",                   badges: [], image: "/portfolio/images/pf-ignite.jpeg",    audio: "/portfolio/audio/ignite-mvmt-i.mp3",    posY: 50 },
+  { slot: "pf-grace",     index: "(06)", title: "Amazing Grace",     meta: "For Brass Ensemble · Hernando HS · 2024",              badges: [], image: "/portfolio/images/pf-grace.jpeg",     audio: "/portfolio/audio/amazing-grace.mp3",    posY: 50 },
+  { slot: "pf-gospel",    index: "(07)", title: "Gospel",            meta: "Flow Chorale · Olive Branch HS · 2025",                badges: [], image: "/portfolio/images/pf-gospel.jpeg",    audio: "/portfolio/audio/gospel.mp3",            posY: 50 },
+  { slot: "pf-horkstow",  index: "(08)", title: "Horkstow Grange",   meta: "Flow Chorale · Olive Branch HS · 2026",                badges: [], image: "/portfolio/images/pf-horkstow.jpeg",  audio: "/portfolio/audio/horkstow-grange.mp3",  posY: 50 },
+  { slot: "pf-jurassic",  index: "(09)", title: "Jurassic Park",     meta: "Flow Chorale",                                         badges: [], image: "/portfolio/images/pf-jurassic.jpeg",  audio: "/portfolio/audio/jurassic-park.mp3",    posY: 48 },
+  { slot: "pf-joy",       index: "(10)", title: "Joy to the World",  meta: "Parade Tune",                                          badges: [], image: "/portfolio/images/pf-joy.jpeg",       audio: "/portfolio/audio/joy-to-the-world.mp3", posY: 78 },
 ];
 const N = WORKS.length;
 
 // ── Image slot ────────────────────────────────────────────────────────────────
-function PortfolioImageSlot({ image, title }: { image: string; title: string }) {
+function PortfolioImageSlot({ image, title, locked, objectPositionY = 50 }: { image: string; title: string; locked?: boolean; objectPositionY?: number }) {
   return (
     <div style={{ position: "relative", width: "100%", height: 380, background: "#141413", overflow: "hidden" }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={image}
-        alt={title}
-        loading="lazy"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }}
-      />
+      {locked ? (
+        <div
+          role="img"
+          aria-label={title}
+          style={{
+            position: "absolute", inset: 0,
+            backgroundImage: `url(${image})`,
+            backgroundSize: "cover",
+            backgroundPosition: `50% ${objectPositionY}%`,
+            filter: "blur(18px) brightness(0.5)",
+            transform: "scale(1.08)",
+          }}
+        />
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={image}
+          alt={title}
+          loading="lazy"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: `50% ${objectPositionY}%` }}
+        />
+      )}
     </div>
   );
 }
@@ -86,6 +101,7 @@ export default function PortfolioSection() {
   const [playing,  setPlaying]  = useState(false);
   const [wsReady,  setWsReady]  = useState(false);
   const [elapsed,  setElapsed]  = useState(0);
+  const [playPressed, setPlayPressed] = useState(false);
 
   const waveRef    = useRef<HTMLDivElement>(null);
   const wsRef      = useRef<WaveSurfer | null>(null);
@@ -142,7 +158,7 @@ export default function PortfolioSection() {
       ws.on("ready",       () => { if (!destroyed) setWsReady(true); });
       ws.on("finish",      () => { if (!destroyed) { setPlaying(false); setElapsed(0); } });
       ws.on("timeupdate",  (t: number) => { if (!destroyed) setElapsed(t); });
-      ws.load(WORKS[0].audio).catch((e: Error) => { if (e?.name !== "AbortError") console.error(e); });
+      if (!WORKS[0].locked) ws.load(WORKS[0].audio).catch((e: Error) => { if (e?.name !== "AbortError") console.error(e); });
     })();
     return () => { destroyed = true; stopFade(); wsRef.current?.destroy(); wsRef.current = null; };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,7 +172,7 @@ export default function PortfolioSection() {
       setPlaying(false);
       setWsReady(false);
       setElapsed(0);
-      ws.load(WORKS[pfIndex].audio).catch((e: Error) => { if (e?.name !== "AbortError") console.error(e); });
+      if (!WORKS[pfIndex].locked) ws.load(WORKS[pfIndex].audio).catch((e: Error) => { if (e?.name !== "AbortError") console.error(e); });
     });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pfIndex]);
@@ -242,31 +258,42 @@ export default function PortfolioSection() {
             }}>
               {/* Top row: circle button + track info + timestamp */}
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                <button
-                  onClick={handlePlayPause}
-                  aria-label={playing ? "Pause" : "Play"}
-                  style={{ width: 40, height: 40, borderRadius: "50%", border: `1.5px solid ${wsReady ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)"}`, background: "transparent", cursor: wsReady ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "border-color .3s ease" }}
-                >
-                  {playing
-                    ? <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#fff" : "#555"}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                    : <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#fff" : "#555"} style={{ marginLeft: 2 }}><polygon points="5,3 19,12 5,21"/></svg>}
-                </button>
+                {work.locked ? (
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="0"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                  </div>
+                ) : (
+                  <button
+                    onClick={handlePlayPause}
+                    aria-label={playing ? "Pause" : "Play"}
+                    onTouchStart={() => setPlayPressed(true)}
+                    onTouchEnd={() => setPlayPressed(false)}
+                    onTouchCancel={() => setPlayPressed(false)}
+                    style={{ width: 40, height: 40, borderRadius: "50%", border: `1.5px solid ${wsReady ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)"}`, background: "transparent", cursor: wsReady ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "border-color .3s ease, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && playPressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && playPressed ? 0.75 : 1 }}
+                  >
+                    {playing
+                      ? <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#fff" : "#555"}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                      : <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#fff" : "#555"} style={{ marginLeft: 2 }}><polygon points="5,3 19,12 5,21"/></svg>}
+                  </button>
+                )}
                 <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 700, letterSpacing: ".5px", textTransform: "uppercase", color: wsReady ? "#FFFFFF" : "#444", transition: "color .3s ease", lineHeight: 1.2 }}>
-                      {work.title}
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 700, letterSpacing: ".5px", textTransform: "uppercase", color: work.locked ? "#444" : wsReady ? "#FFFFFF" : "#444", transition: "color .3s ease", lineHeight: 1.2 }}>
+                      {work.locked ? "Audio Unavailable" : work.title}
                     </div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: wsReady ? "rgba(255,255,255,0.45)" : "#333", transition: "color .3s ease", marginTop: 3, lineHeight: 1.2 }}>
-                      {wsReady ? "Cooper Mapes" : "Loading…"}
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: work.locked ? "#333" : wsReady ? "rgba(255,255,255,0.45)" : "#333", transition: "color .3s ease", marginTop: 3, lineHeight: 1.2 }}>
+                      {work.locked ? "Coming Soon" : wsReady ? "Cooper Mapes" : "Loading…"}
                     </div>
                   </div>
-                  <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.4)", letterSpacing: ".5px", flexShrink: 0 }}>
-                    {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}
-                  </div>
+                  {!work.locked && (
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.4)", letterSpacing: ".5px", flexShrink: 0 }}>
+                      {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}
+                    </div>
+                  )}
                 </div>
               </div>
-              {/* Waveform */}
-              <div ref={waveRef} style={{ width: "100%", opacity: wsReady ? 1 : 0.15, transition: "opacity .4s ease" }} />
+              {/* Waveform — always in DOM so WaveSurfer keeps its container */}
+              <div ref={waveRef} style={{ width: "100%", opacity: work.locked ? 0.06 : wsReady ? 1 : 0.15, transition: "opacity .4s ease" }} />
             </div>
           </CaptionAnimate>
           </div>
@@ -321,7 +348,7 @@ export default function PortfolioSection() {
                     border: "1px solid #242422",
                     background: "#0A0A09",
                   }}>
-                    <PortfolioImageSlot image={w.image} title={w.title} />
+                    <PortfolioImageSlot image={w.image} title={w.title} locked={w.locked} objectPositionY={w.posY} />
 
                     <div style={{
                       overflow: "hidden",
@@ -353,8 +380,8 @@ export default function PortfolioSection() {
               );
             })}
 
-            <ArrowBtn direction="left"  onClick={() => navigate(-1)} />
-            <ArrowBtn direction="right" onClick={() => navigate(1)} />
+            <ArrowBtn direction="left"  onClick={() => navigate(-1)} isMobile={isMobile} />
+            <ArrowBtn direction="right" onClick={() => navigate(1)} isMobile={isMobile} />
           </div>
         </ScrollFadeUp>
 
@@ -363,23 +390,29 @@ export default function PortfolioSection() {
   );
 }
 
-function ArrowBtn({ direction, onClick }: { direction: "left" | "right"; onClick: () => void }) {
+function ArrowBtn({ direction, onClick, isMobile }: { direction: "left" | "right"; onClick: () => void; isMobile: boolean }) {
   const [hov, setHov] = useState(false);
+  const [pressed, setPressed] = useState(false);
   return (
     <button
       onClick={onClick}
       aria-label={direction === "left" ? "Previous work" : "Next work"}
       onPointerDown={e => e.stopPropagation()}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
+      onMouseEnter={isMobile ? undefined : () => setHov(true)}
+      onMouseLeave={isMobile ? undefined : () => setHov(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
       style={{
-        position: "absolute", top: "50%", transform: "translateY(-50%)",
+        position: "absolute", top: "50%",
+        transform: `translateY(-50%) ${isMobile && pressed ? "scale(0.96)" : "scale(1)"}`,
         [direction === "left" ? "left" : "right"]: 12,
         width: 48, height: 48, zIndex: 10,
-        border: `1px solid ${hov ? "#4A4A4A" : "#2E2E2C"}`,
-        background: hov ? "rgba(22,22,21,.95)" : "rgba(2,2,1,.72)",
+        border: `1px solid ${hov && !isMobile ? "#4A4A4A" : "#2E2E2C"}`,
+        background: hov && !isMobile ? "rgba(22,22,21,.95)" : "rgba(2,2,1,.72)",
         cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-        transition: "background .2s, border-color .2s",
+        transition: "background .2s, border-color .2s, opacity 0.1s ease",
+        opacity: isMobile && pressed ? 0.75 : 1,
       }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

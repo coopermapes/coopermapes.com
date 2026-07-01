@@ -1,7 +1,7 @@
 import ContactSection from "../components/ContactSection";
 
 export const metadata = {
-  title: "Contact — Cooper Mapes",
+  title: "Contact - Cooper Mapes",
   description: "Get in touch to discuss your marching band arranging and engraving needs.",
 };
 

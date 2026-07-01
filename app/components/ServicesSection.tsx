@@ -38,28 +38,35 @@ function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React
 }
 
 function ContactButton({ onClick }: { onClick: () => void }) {
+  const isMobile = useIsMobile();
   const [hovered, setHovered] = useState(false);
+  const [pressed, setPressed] = useState(false);
   return (
     <button
       type="button"
       onClick={onClick}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={isMobile ? undefined : () => setHovered(true)}
+      onMouseLeave={isMobile ? undefined : () => setHovered(false)}
+      onTouchStart={() => setPressed(true)}
+      onTouchEnd={() => setPressed(false)}
+      onTouchCancel={() => setPressed(false)}
       style={{
         marginTop: 28,
-        background: hovered ? "#0E45B5" : "#1254D9",
+        background: hovered && !isMobile ? "#0E45B5" : "#1254D9",
         color: "#fff",
-        border: `1.5px solid ${hovered ? "#0E45B5" : "#1254D9"}`,
+        border: `1.5px solid ${hovered && !isMobile ? "#0E45B5" : "#1254D9"}`,
         padding: "12px 24px",
         fontSize: 13,
         fontWeight: 600,
         letterSpacing: ".6px",
         textTransform: "uppercase",
         cursor: "pointer",
-        transition: "background .2s ease, border-color .2s ease",
+        transition: "background .2s ease, border-color .2s ease, transform 0.1s ease, opacity 0.1s ease",
         fontFamily: "var(--font-inter)",
         borderRadius: 0,
         display: "block",
+        transform: isMobile && pressed ? "scale(0.96)" : "scale(1)",
+        opacity: isMobile && pressed ? 0.75 : 1,
       }}
     >
       Get In Touch
@@ -143,7 +150,7 @@ export default function ServicesSection() {
           </div>
           <div style={{ flex: "1 1 380px" }}>
             <ScrollFadeUp delay={150}>
-              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#9A9A95", marginBottom: 16 }}>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", marginBottom: 16 }}>
                 What You Receive
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
@@ -184,7 +191,7 @@ export default function ServicesSection() {
           </div>
           <div style={{ flex: "1 1 380px" }}>
             <ScrollFadeUp delay={150}>
-              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#9A9A95", marginBottom: 16 }}>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", marginBottom: 16 }}>
                 What You Receive
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
@@ -229,7 +236,7 @@ export default function ServicesSection() {
           </div>
           <div style={{ flex: "1 1 380px" }}>
             <ScrollFadeUp delay={150}>
-              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#9A9A95", marginBottom: 16 }}>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", marginBottom: 16 }}>
                 What You Receive
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
