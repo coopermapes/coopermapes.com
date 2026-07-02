@@ -69,7 +69,7 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
   );
 }
 
-function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+function FooterLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
   const [hov, setHov] = useState(false);
   return (
     <Link
@@ -82,6 +82,7 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
         color: hov ? "#FFFFFF" : "#A0A09B",
         textDecoration: "none",
         transition: "color .2s ease",
+        ...style,
       }}
     >
       {children}
@@ -182,10 +183,12 @@ export default function Footer() {
             <span style={{ color: "#3A3A3A" }}>|</span>
             {" "}Arranger · Composer · Educator
           </span>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <FooterLink href="/terms">Terms of Service</FooterLink>
-            <FooterLink href="/privacy">Privacy Policy</FooterLink>
-          </div>
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <FooterLink href="/terms">Terms of Service</FooterLink>
+              <FooterLink href="/privacy">Privacy Policy</FooterLink>
+            </div>
+          )}
         </div>
 
         <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined }}>
@@ -209,6 +212,13 @@ export default function Footer() {
             contact@coopermapes.com
           </a>
         </div>
+
+        {isMobile && (
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, width: "100%" }}>
+            <FooterLink href="/terms" style={{ fontSize: 10 }}>Terms of Service</FooterLink>
+            <FooterLink href="/privacy" style={{ fontSize: 10 }}>Privacy Policy</FooterLink>
+          </div>
+        )}
       </div>
     </footer>
   );
