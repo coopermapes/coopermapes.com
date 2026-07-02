@@ -27,6 +27,7 @@ if (typeof window !== "undefined") {
     api_host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     capture_pageview: false,
     capture_pageleave: true,
+    disable_session_recording: true,
   });
 }
 
