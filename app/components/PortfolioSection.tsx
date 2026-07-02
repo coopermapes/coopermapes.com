@@ -66,9 +66,9 @@ const WORKS = [
 const N = WORKS.length;
 
 // ── Image slot ────────────────────────────────────────────────────────────────
-function PortfolioImageSlot({ image, title, locked, objectPositionY = 50 }: { image: string; title: string; locked?: boolean; objectPositionY?: number }) {
+function PortfolioImageSlot({ image, title, locked, objectPositionY = 50, height = 380 }: { image: string; title: string; locked?: boolean; objectPositionY?: number; height?: number | string }) {
   return (
-    <div style={{ position: "relative", width: "100%", height: 380, background: "#141413", overflow: "hidden" }}>
+    <div style={{ position: "relative", width: "100%", height, background: "#141413", overflow: "hidden" }}>
       {locked ? (
         <div
           role="img"
@@ -306,7 +306,7 @@ export default function PortfolioSection() {
               position: "relative",
               overflow: "hidden",
               width: "100%",
-              height: isMobile ? "clamp(380px,85vw,480px)" : "clamp(520px,46vw,660px)",
+              height: isMobile ? "clamp(420px,100vw,480px)" : "clamp(520px,46vw,660px)",
               marginTop: 8,
             }}
           >
@@ -348,7 +348,7 @@ export default function PortfolioSection() {
                     border: "1px solid #242422",
                     background: "#0A0A09",
                   }}>
-                    <PortfolioImageSlot image={w.image} title={w.title} locked={w.locked} objectPositionY={w.posY} />
+                    <PortfolioImageSlot image={w.image} title={w.title} locked={w.locked} objectPositionY={w.posY} height={isMobile ? "clamp(200px,55vw,250px)" : 380} />
 
                     <div style={{
                       overflow: "hidden",
