@@ -190,7 +190,7 @@ export default function AboutSection() {
           justifyContent: "center",
           order: isMobile ? 1 : undefined,
         }}>
-          <ScrollFadeUp delay={150}>
+          <ScrollFadeUp delay={100}>
             <h1 style={{
               fontFamily: "var(--font-anton)",
               fontWeight: 400,
@@ -205,24 +205,24 @@ export default function AboutSection() {
             </h1>
           </ScrollFadeUp>
 
-          <ScrollFadeUp delay={500}>
+          <ScrollFadeUp delay={150}>
             <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 28, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
               At the age of 12 I downloaded MuseScore&apos;s notation software for the first time. What has come from that is over a decade of developing my arranging skills and forming a deep-seated passion for music.
             </p>
           </ScrollFadeUp>
-          <ScrollFadeUp delay={650}>
+          <ScrollFadeUp delay={200}>
             <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
               My name is Cooper Mapes and I am a marching band arranger.
             </p>
           </ScrollFadeUp>
-          <ScrollFadeUp delay={800}>
+          <ScrollFadeUp delay={250}>
             <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
               Whether you&apos;re a first-time marching director looking for basic resources, or part of an established program seeking in-depth show analysis, my services can help your band take the next step as an ensemble.
             </p>
           </ScrollFadeUp>
 
           {/* Logo row */}
-          <ScrollFadeUp delay={950}>
+          <ScrollFadeUp delay={300}>
             <div style={{
               marginTop: 40,
               paddingTop: 32,
@@ -253,9 +253,9 @@ export default function AboutSection() {
           background: isMobile ? "#F7F6F4" : undefined,
         }}>
           {[
-            { label: "Years Arranging with Music Notation Software", value: "13", initialDelay: 1050 },
-            { label: "Years Teaching Competitive Marching Band", value: "7", initialDelay: 1150 },
-            { label: "Years of Collegiate Music Experience", value: "7", initialDelay: 1250 },
+            { label: "Years Arranging with Music Notation Software", value: "13", initialDelay: 0 },
+            { label: "Years Teaching Competitive Marching Band", value: "7", initialDelay: 100 },
+            { label: "Years of Collegiate Music Experience", value: "7", initialDelay: 200 },
           ].map((stat, i, arr) => (
             <ScrollFadeUp key={i} delay={stat.initialDelay}>
             <div
