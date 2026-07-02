@@ -230,7 +230,7 @@ export default function PortfolioSection() {
                   <div style={{ display: "flex", alignItems: isMobile ? "flex-end" : "center", flexShrink: 0 }}>
                     {work.badges.map((b, i) => (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img key={b.src} src={b.src} alt={b.alt} style={{ height: isMobile ? (i > 0 ? 40 : 48) : 90, width: "auto", display: "block", marginLeft: i > 0 ? (isMobile ? 10 : -18) : 0 }} />
+                      <img key={b.src} src={b.src} alt={b.alt} style={{ height: isMobile ? (i > 0 ? 40 : 48) : (i > 0 ? 78 : 90), width: "auto", display: "block", marginLeft: i > 0 ? (isMobile ? 10 : 14) : 0 }} />
                     ))}
                   </div>
                 )}
