@@ -89,7 +89,6 @@ function Bullet({ text, html }: { text?: string; html?: string }) {
 export default function ServicesSection() {
   const router = useRouter();
   const scrollToContact = () => { router.push("/contact"); };
-  const scrollToInquiry = () => { router.push("/contact#inquiry"); };
   const isMobile = useIsMobile();
 
   return (
@@ -244,7 +243,7 @@ export default function ServicesSection() {
                 <Bullet html="Pacing spreadsheet and score analysis for design efficiency<br/>and easy-to-teach musical intent" />
                 <Bullet text="Rewrites and edits on request to match your ensemble&apos;s strengths and weaknesses" />
               </div>
-              <ContactButton onClick={scrollToInquiry} />
+              <ContactButton onClick={scrollToContact} />
             </ScrollFadeUp>
           </div>
         </div>
