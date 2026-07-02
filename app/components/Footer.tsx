@@ -182,13 +182,15 @@ export default function Footer() {
             <span style={{ color: "#3A3A3A" }}>|</span>
             {" "}Arranger · Composer · Educator
           </span>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-            <FooterLink href="/terms">Terms of Service</FooterLink>
-            <FooterLink href="/privacy">Privacy Policy</FooterLink>
-          </div>
+          {!isMobile && (
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              <FooterLink href="/terms">Terms of Service</FooterLink>
+              <FooterLink href="/privacy">Privacy Policy</FooterLink>
+            </div>
+          )}
         </div>
 
-        <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined }}>
+        <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined, flexWrap: isMobile ? "wrap" : undefined }}>
           {SOCIAL.map(s => (
             <SocialLink key={s.key} href={s.href} label={s.label} icon={s.icon} />
           ))}
@@ -208,6 +210,15 @@ export default function Footer() {
           >
             contact@coopermapes.com
           </a>
+          {isMobile && (
+            <>
+              <span style={{ color: "#3A3A3A" }}>|</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 2, alignItems: "flex-end" }}>
+                <FooterLink href="/terms">Terms of Service</FooterLink>
+                <FooterLink href="/privacy">Privacy Policy</FooterLink>
+              </div>
+            </>
+          )}
         </div>
       </div>
     </footer>
