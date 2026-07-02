@@ -4,15 +4,17 @@ export default function TermsSection() {
       <div style={{ maxWidth: 760, margin: "0 auto", padding: "64px 24px 96px" }}>
         <h1 style={{
           fontFamily: "var(--font-anton)",
-          fontSize: "clamp(36px, 5vw, 56px)",
+          fontSize: "clamp(44px, 6.5vw, 80px)",
           fontWeight: 400,
+          letterSpacing: "-1.5px",
+          textTransform: "uppercase",
           color: "#111111",
           margin: "0 0 8px",
         }}>
           Terms of Service
         </h1>
         <p style={{ fontSize: 13, color: "#9A9A95", margin: "0 0 40px" }}>
-          Effective Date: July 2, 2026
+          Effective Date: July 1, 2026
         </p>
 
         <p style={{ fontSize: 16, lineHeight: 1.7, color: "#3A3A3A", margin: "0 0 32px" }}>
@@ -71,7 +73,7 @@ export default function TermsSection() {
             }}>
               {s.heading}
             </h2>
-            <p style={{ fontSize: 15, lineHeight: 1.7, color: "#5A5A5A", margin: 0 }}>
+            <p style={{ fontSize: 16, lineHeight: 1.7, color: "#5A5A5A", margin: 0 }}>
               {s.body}
             </p>
           </div>
