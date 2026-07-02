@@ -1,7 +1,7 @@
 export default function TermsSection() {
   return (
     <section style={{ background: "#ffffff", paddingTop: "98px" }}>
-      <div style={{ maxWidth: 760, margin: "0 auto", padding: "64px 24px 96px" }}>
+      <div style={{ maxWidth: 760, margin: "0 auto", padding: "64px 24px clamp(32px, 3.5vw, 52px)" }}>
         <h1 style={{
           fontFamily: "var(--font-anton)",
           fontSize: "clamp(44px, 6.5vw, 80px)",
