@@ -172,6 +172,18 @@ function OutlineButton({ onClick, children }: { onClick: () => void; children: R
   );
 }
 
+// ── Consent notice (shared between inquiry form and wizard final step) ────────
+function ConsentNotice({ style }: { style?: React.CSSProperties }) {
+  return (
+    <p style={{ fontSize: 12, color: "#9A9A95", margin: "0 0 12px", lineHeight: 1.5, ...style }}>
+      By submitting, you agree to the{" "}
+      <Link href="/terms" style={{ color: "#1254D9", textDecoration: "underline" }}>Terms of Service</Link>
+      {" "}and{" "}
+      <Link href="/privacy" style={{ color: "#1254D9", textDecoration: "underline" }}>Privacy Policy</Link>.
+    </p>
+  );
+}
+
 // ── Contact card (landing) ────────────────────────────────────────────────────
 function ContactCard({ icon, title, description, cta, onClick, active, locked }: {
   icon: React.ReactNode; title: string; description: string; cta: string;
@@ -579,12 +591,7 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
               )}
 
               <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginTop: 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
-                <p style={{ fontSize: 12, color: "#9A9A95", margin: "0 0 12px", lineHeight: 1.5 }}>
-                  By submitting, you agree to the{" "}
-                  <Link href="/terms" style={{ color: "#1254D9", textDecoration: "underline" }}>Terms of Service</Link>
-                  {" "}and{" "}
-                  <Link href="/privacy" style={{ color: "#1254D9", textDecoration: "underline" }}>Privacy Policy</Link>.
-                </p>
+                <ConsentNotice />
                 <button
                   type="submit" disabled={!isValid || iSubmitting}
                   onMouseEnter={isMobile ? undefined : e => { if (isValid && !iSubmitting) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
@@ -1051,14 +1058,7 @@ export default function ContactSection() {
                     </div>
                   )}
 
-                  {isFinalStep && (
-                    <p style={{ fontSize: 12, color: "#9A9A95", margin: "24px 0 0", lineHeight: 1.5 }}>
-                      By submitting, you agree to the{" "}
-                      <Link href="/terms" style={{ color: "#1254D9", textDecoration: "underline" }}>Terms of Service</Link>
-                      {" "}and{" "}
-                      <Link href="/privacy" style={{ color: "#1254D9", textDecoration: "underline" }}>Privacy Policy</Link>.
-                    </p>
-                  )}
+                  {isFinalStep && <ConsentNotice style={{ margin: "24px 0 0" }} />}
 
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: isFinalStep ? 12 : 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
                     {wizardStep > 1 ? (
