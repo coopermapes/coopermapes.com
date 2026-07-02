@@ -306,7 +306,7 @@ export default function PortfolioSection() {
               position: "relative",
               overflow: "hidden",
               width: "100%",
-              height: isMobile ? "clamp(420px,100vw,480px)" : "clamp(520px,46vw,660px)",
+              height: isMobile ? "clamp(550px,145vw,580px)" : "clamp(520px,46vw,660px)",
               marginTop: 8,
             }}
           >
@@ -348,7 +348,7 @@ export default function PortfolioSection() {
                     border: "1px solid #242422",
                     background: "#0A0A09",
                   }}>
-                    <PortfolioImageSlot image={w.image} title={w.title} locked={w.locked} objectPositionY={w.posY} height={isMobile ? "clamp(200px,55vw,250px)" : 380} />
+                    <PortfolioImageSlot image={w.image} title={w.title} locked={w.locked} objectPositionY={w.posY} />
 
                     <div style={{
                       overflow: "hidden",
