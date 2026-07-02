@@ -66,9 +66,9 @@ const WORKS = [
 const N = WORKS.length;
 
 // ── Image slot ────────────────────────────────────────────────────────────────
-function PortfolioImageSlot({ image, title, locked, objectPositionY = 50, height = 380 }: { image: string; title: string; locked?: boolean; objectPositionY?: number; height?: number | string }) {
+function PortfolioImageSlot({ image, title, locked, objectPositionY = 50 }: { image: string; title: string; locked?: boolean; objectPositionY?: number }) {
   return (
-    <div style={{ position: "relative", width: "100%", height, background: "#141413", overflow: "hidden" }}>
+    <div style={{ position: "relative", width: "100%", height: 380, background: "#141413", overflow: "hidden" }}>
       {locked ? (
         <div
           role="img"

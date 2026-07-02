@@ -215,8 +215,8 @@ export default function Footer() {
 
         {isMobile && (
           <div style={{ display: "flex", justifyContent: "center", gap: 16, width: "100%" }}>
-            <FooterLink href="/terms" style={{ fontSize: 10 }}>Terms of Service</FooterLink>
-            <FooterLink href="/privacy" style={{ fontSize: 10 }}>Privacy Policy</FooterLink>
+            <FooterLink href="/terms" style={{ fontSize: 12 }}>Terms of Service</FooterLink>
+            <FooterLink href="/privacy" style={{ fontSize: 12 }}>Privacy Policy</FooterLink>
           </div>
         )}
       </div>

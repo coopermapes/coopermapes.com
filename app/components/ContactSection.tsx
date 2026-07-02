@@ -173,13 +173,27 @@ function OutlineButton({ onClick, children }: { onClick: () => void; children: R
 }
 
 // ── Consent notice (shared between inquiry form and wizard final step) ────────
+function ConsentLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{ color: hov ? "#0E45B5" : "#1254D9", textDecoration: "underline", transition: "color .2s ease" }}
+    >
+      {children}
+    </Link>
+  );
+}
+
 function ConsentNotice({ style }: { style?: React.CSSProperties }) {
   return (
     <p style={{ fontSize: 12, color: "#9A9A95", margin: "0 0 12px", lineHeight: 1.5, ...style }}>
       By submitting, you agree to the{" "}
-      <Link href="/terms" style={{ color: "#1254D9", textDecoration: "underline" }}>Terms of Service</Link>
+      <ConsentLink href="/terms">Terms of Service</ConsentLink>
       {" "}and{" "}
-      <Link href="/privacy" style={{ color: "#1254D9", textDecoration: "underline" }}>Privacy Policy</Link>.
+      <ConsentLink href="/privacy">Privacy Policy</ConsentLink>.
     </p>
   );
 }
