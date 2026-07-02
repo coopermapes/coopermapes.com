@@ -5,6 +5,7 @@ import AboutGridPattern from "./AboutGridPattern";
 import { useIsMobile } from "../hooks/useIsMobile";
 
 function ScrollFadeUp({ delay = 0, children, style }: { delay?: number; children: React.ReactNode; style?: React.CSSProperties }) {
+  const isMobile = useIsMobile();
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
@@ -13,11 +14,13 @@ function ScrollFadeUp({ delay = 0, children, style }: { delay?: number; children
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setTimeout(() => setVisible(true), delay); observer.disconnect(); } },
-      { threshold: 0.05, rootMargin: "0px 0px -40px 0px" }
+      isMobile
+        ? { threshold: 0.1, rootMargin: "0px 0px -80px 0px" }
+        : { threshold: 0.05, rootMargin: "0px 0px -40px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, [delay]);
+  }, [delay, isMobile]);
   return (
     <div ref={ref} style={{
       opacity: visible ? 1 : 0,
