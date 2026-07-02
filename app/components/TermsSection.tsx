@@ -60,8 +60,8 @@ export default function TermsSection() {
             heading: "Contact",
             body: "Questions about these terms can be sent to contact@coopermapes.com.",
           },
-        ].map((s) => (
-          <div key={s.heading} style={{ marginBottom: 28 }}>
+        ].map((s, index) => (
+          <div key={`terms-${index}`} style={{ marginBottom: 28 }}>
             <h2 style={{
               fontFamily: "var(--font-inter)",
               fontSize: 15,
