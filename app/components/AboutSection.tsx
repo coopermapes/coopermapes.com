@@ -141,7 +141,7 @@ export default function AboutSection() {
     setActiveLogo(prev => prev === src ? null : src);
   };
   return (
-    <div style={{ position: "relative", overflow: "hidden", minHeight: "calc(100vh - 98px)" }}>
+    <div style={{ position: "relative", overflow: "hidden", minHeight: "calc(100vh - 98px)", background: "#FFFFFF" }}>
       {!isMobile && <AboutGridPattern />}
 
       <div style={{
