@@ -69,6 +69,26 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
   );
 }
 
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <Link
+      href={href}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontFamily: "var(--font-inter)",
+        fontSize: 11,
+        color: hov ? "#FFFFFF" : "#A0A09B",
+        textDecoration: "none",
+        transition: "color .2s ease",
+      }}
+    >
+      {children}
+    </Link>
+  );
+}
+
 export default function Footer() {
   const [emailHov, setEmailHov] = useState(false);
   const isMobile = useIsMobile();
@@ -162,13 +182,9 @@ export default function Footer() {
             <span style={{ color: "#3A3A3A" }}>|</span>
             {" "}Arranger · Composer · Educator
           </span>
-          <div style={{ display: "flex", gap: 12 }}>
-            <Link href="/terms" style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#A0A09B", textDecoration: "none" }}>
-              Terms of Service
-            </Link>
-            <Link href="/privacy" style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#A0A09B", textDecoration: "none" }}>
-              Privacy Policy
-            </Link>
+          <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+            <FooterLink href="/terms">Terms of Service</FooterLink>
+            <FooterLink href="/privacy">Privacy Policy</FooterLink>
           </div>
         </div>
 
