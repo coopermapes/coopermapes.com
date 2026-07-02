@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 import { Chats, Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import clsx from "clsx";
@@ -577,7 +578,13 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
                 </div>
               )}
 
-              <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
+              <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", marginTop: 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
+                <p style={{ fontSize: 12, color: "#9A9A95", margin: "0 0 12px", lineHeight: 1.5 }}>
+                  By submitting, you agree to the{" "}
+                  <Link href="/terms" style={{ color: "#1254D9", textDecoration: "underline" }}>Terms of Service</Link>
+                  {" "}and{" "}
+                  <Link href="/privacy" style={{ color: "#1254D9", textDecoration: "underline" }}>Privacy Policy</Link>.
+                </p>
                 <button
                   type="submit" disabled={!isValid || iSubmitting}
                   onMouseEnter={isMobile ? undefined : e => { if (isValid && !iSubmitting) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
@@ -1044,7 +1051,16 @@ export default function ContactSection() {
                     </div>
                   )}
 
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
+                  {isFinalStep && (
+                    <p style={{ fontSize: 12, color: "#9A9A95", margin: "24px 0 0", lineHeight: 1.5 }}>
+                      By submitting, you agree to the{" "}
+                      <Link href="/terms" style={{ color: "#1254D9", textDecoration: "underline" }}>Terms of Service</Link>
+                      {" "}and{" "}
+                      <Link href="/privacy" style={{ color: "#1254D9", textDecoration: "underline" }}>Privacy Policy</Link>.
+                    </p>
+                  )}
+
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: isFinalStep ? 12 : 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
                     {wizardStep > 1 ? (
                       <button
                         onClick={handleBack}
