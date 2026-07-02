@@ -306,7 +306,7 @@ export default function PortfolioSection() {
               position: "relative",
               overflow: "hidden",
               width: "100%",
-              height: isMobile ? "clamp(550px,145vw,580px)" : "clamp(520px,46vw,660px)",
+              height: isMobile ? "clamp(510px,135vw,540px)" : "clamp(520px,46vw,660px)",
               marginTop: 8,
             }}
           >
