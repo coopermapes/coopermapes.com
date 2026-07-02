@@ -224,10 +224,10 @@ export default function PortfolioSection() {
               <div style={{ fontFamily: "var(--font-anton)", fontSize: "clamp(22px,2.6vw,34px)", color: "#1254D9", letterSpacing: "-1px" }}>{work.index}</div>
             </CaptionAnimate>
             <CaptionAnimate initialDelay={650}>
-              <div style={{ display: "flex", alignItems: "center", gap: 14, height: "clamp(28px,4vw,56px)" }}>
+              <div style={{ display: "flex", alignItems: isMobile ? "flex-end" : "center", gap: 14, height: "clamp(28px,4vw,56px)" }}>
                 <div style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(28px,4vw,56px)", textTransform: "uppercase", color: "#FFFFFF", letterSpacing: "-1px", lineHeight: 1, flexShrink: 0 }}>{work.title}</div>
                 {work.badges.length > 0 && (
-                  <div style={{ display: "flex", alignItems: "center", flexShrink: 0 }}>
+                  <div style={{ display: "flex", alignItems: isMobile ? "flex-end" : "center", flexShrink: 0 }}>
                     {work.badges.map((b, i) => (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img key={b.src} src={b.src} alt={b.alt} style={{ height: 90, width: "auto", display: "block", marginLeft: i > 0 ? -18 : 0 }} />
