@@ -147,20 +147,30 @@ export default function Footer() {
         borderTop: "1px solid #242422",
         paddingTop: 24,
       }}>
-        <span ref={copyrightRef} style={{
-          fontFamily: "var(--font-inter)",
-          fontSize: isMobile ? (copyrightFontSize ?? 10) : 12,
-          fontWeight: 500,
-          letterSpacing: isMobile ? "0.5px" : "1.2px",
-          textTransform: "uppercase",
-          color: "#A0A09B",
-          whiteSpace: isMobile ? "nowrap" : undefined,
-          width: isMobile ? "100%" : undefined,
-        }}>
-          © Cooper Mapes 2026{" "}
-          <span style={{ color: "#3A3A3A" }}>|</span>
-          {" "}Arranger · Composer · Educator
-        </span>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 6 : 14 }}>
+          <span ref={copyrightRef} style={{
+            fontFamily: "var(--font-inter)",
+            fontSize: isMobile ? (copyrightFontSize ?? 10) : 12,
+            fontWeight: 500,
+            letterSpacing: isMobile ? "0.5px" : "1.2px",
+            textTransform: "uppercase",
+            color: "#A0A09B",
+            whiteSpace: isMobile ? "nowrap" : undefined,
+            width: isMobile ? "100%" : undefined,
+          }}>
+            © Cooper Mapes 2026{" "}
+            <span style={{ color: "#3A3A3A" }}>|</span>
+            {" "}Arranger · Composer · Educator
+          </span>
+          <div style={{ display: "flex", gap: 12 }}>
+            <Link href="/terms" style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#A0A09B", textDecoration: "none" }}>
+              Terms of Service
+            </Link>
+            <Link href="/privacy" style={{ fontFamily: "var(--font-inter)", fontSize: 11, color: "#A0A09B", textDecoration: "none" }}>
+              Privacy Policy
+            </Link>
+          </div>
+        </div>
 
         <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined }}>
           {SOCIAL.map(s => (
