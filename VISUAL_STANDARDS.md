@@ -133,7 +133,7 @@ Always load both via Google Fonts in the `<head>`:
 
 **Section Blocks**
 - Vertical section padding: `clamp(48px, 6vw, 96px)` typical; up to `clamp(64px, 7vw, 96px)` for hero-weight sections
-- Max content width: `1180px` (standard), `1320px` (portfolio), `1100px` (contact)
+- Max content width: `1180px` (standard), `1320px` (portfolio), `1100px` (contact), `760px` (Terms/Privacy — narrower deliberately, for readable line-length on dense legal paragraphs)
 - Hero top padding max: `384px`
 
 ---
