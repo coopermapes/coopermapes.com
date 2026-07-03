@@ -1,36 +1,86 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# coopermapes.com
 
-## Getting Started
+Marketing and portfolio site for **Cooper Mapes** — a marching-band arranger, composer, and educator. The site presents his services (flip-folder conversion, part editing & revoicing, custom arranging), a portfolio of selected works with audio playback, an about page, and a multi-step contact/quote flow.
 
-First, run the development server:
+## Tech stack
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- **[Next.js 16](https://nextjs.org)** (App Router, React 19) with Turbopack
+- **TypeScript**
+- **Tailwind CSS v4** (theme tokens in `app/globals.css`; most component styling is inline)
+- **[WaveSurfer.js](https://wavesurfer.xyz)** — waveform audio player on the portfolio page
+- **[PostHog](https://posthog.com)** — privacy-conscious analytics (pageviews only; session recording disabled)
+- **[Phosphor Icons](https://phosphoricons.com)** — iconography
+- **[Formspree](https://formspree.io)** — form delivery for the contact and quote-wizard submissions
+- Deployed on **[Vercel](https://vercel.com)**
+
+> ⚠️ See `AGENTS.md` — this project pins a Next.js build with breaking changes from stock Next.js. Consult `node_modules/next/dist/docs/` before relying on framework APIs from memory.
+
+## Project structure
+
+```
+app/
+  layout.tsx              Root layout: fonts (Anton + Inter), Nav, Footer, PostHog, skip-link
+  page.tsx                Home route
+  {services,portfolio,about,contact,terms,privacy}/page.tsx   Route wrappers + metadata
+  robots.ts, sitemap.ts   SEO
+  globals.css             Tailwind @theme brand tokens, resets, animations
+  hooks/useIsMobile.ts    matchMedia-based mobile breakpoint hook
+  components/
+    Nav.tsx               Fixed nav + full-screen mobile overlay
+    Footer.tsx
+    HomeSection.tsx       Hero + interactive before/after score slider
+    ServicesSection.tsx
+    PortfolioSection.tsx  3D carousel of works + WaveSurfer audio player
+    AboutSection.tsx
+    ContactSection.tsx    Landing → branching multi-step quote wizard / inquiry form
+    EmailLink.tsx         mailto link with clipboard fallback
+    GridPattern.tsx       Decorative interactive SVG background
+    TermsSection.tsx, PrivacySection.tsx, LegalPage.tsx
+    PostHogProvider.tsx   Client-side analytics provider
+    ui/button.tsx         CVA-based button primitive
+lib/utils.ts              cn() — clsx + tailwind-merge
+public/                   Images, audio, favicons; portfolio assets under public/portfolio/
+VISUAL_STANDARDS.md       Design system: typography, color, spacing, components
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Getting started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Open [http://localhost:3000](http://localhost:3000).
 
-## Learn More
+### Scripts
 
-To learn more about Next.js, take a look at the following resources:
+| Command | Description |
+|---|---|
+| `npm run dev` | Start the dev server (Turbopack) |
+| `npm run build` | Production build |
+| `npm run start` | Serve the production build |
+| `npm run lint` | Run ESLint |
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Environment variables
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Analytics is optional — the app runs fine without it (PostHog is only initialized when a key is present). To enable it, create a `.env.local` in the project root (gitignored):
 
-## Deploy on Vercel
+```bash
+NEXT_PUBLIC_POSTHOG_KEY=phc_your_project_key
+NEXT_PUBLIC_POSTHOG_HOST=https://us.i.posthog.com   # or https://eu.i.posthog.com
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+For production, set the same variables in the Vercel project settings.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Forms
+
+Contact submissions post directly to Formspree endpoints (no backend):
+
+- **Inquiry form** — general contact
+- **Quote wizard** — the multi-step flip-folder / revoicing request flow
+
+Both live in `app/components/ContactSection.tsx`.
+
+## Design system
+
+Visual conventions — typography (Anton for display, Inter for text), the `#1254D9` blue accent, spacing scale, near-zero border radius, and dark-section overrides — are documented in [`VISUAL_STANDARDS.md`](./VISUAL_STANDARDS.md). Keep it in sync when changing shared styles.
