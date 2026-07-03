@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
+import EmailLink from "./EmailLink";
 
 const SOCIAL = [
   {
@@ -91,7 +92,6 @@ function FooterLink({ href, children, style }: { href: string; children: React.R
 }
 
 export default function Footer() {
-  const [emailHov, setEmailHov] = useState(false);
   const isMobile = useIsMobile();
   const bottomRowRef = useRef<HTMLDivElement>(null);
   const copyrightRef = useRef<HTMLSpanElement>(null);
@@ -196,21 +196,13 @@ export default function Footer() {
             <SocialLink key={s.key} href={s.href} label={s.label} icon={s.icon} />
           ))}
           <span style={{ color: "#3A3A3A" }}>|</span>
-          <a
-            href="mailto:contact@coopermapes.com"
-            onMouseEnter={() => setEmailHov(true)}
-            onMouseLeave={() => setEmailHov(false)}
-            style={{
-              fontFamily: "var(--font-inter)",
-              fontSize: 12,
-              fontWeight: 500,
-              color: emailHov ? "#FFFFFF" : "#A0A09B",
-              textDecoration: "none",
-              transition: "color .2s ease",
-            }}
+          <EmailLink
+            color="#A0A09B"
+            hoverColor="#FFFFFF"
+            style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500 }}
           >
             contact@coopermapes.com
-          </a>
+          </EmailLink>
         </div>
 
         {isMobile && (
