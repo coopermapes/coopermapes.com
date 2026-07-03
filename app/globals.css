@@ -123,3 +123,25 @@ body {
     transform: none;
   }
 }
+
+/* Mobile menu → page crossfade (native View Transitions API).
+   Replaces the hard cut between the hamburger overlay closing and the new
+   page's own entrance animation starting — see Nav.tsx's navigateAfterClose.
+   Exit is faster than enter so the old screen gets out of the way quickly
+   without competing for attention with the incoming page. */
+::view-transition-old(root) {
+  animation-duration: 140ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(root),
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+}

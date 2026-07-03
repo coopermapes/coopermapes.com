@@ -7,7 +7,7 @@ import GridPattern from "./GridPattern";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useIsMobile } from "../hooks/useIsMobile";
-import EmailLink from "./EmailLink";
+import EmailLink, { PhoneLink } from "./EmailLink";
 
 // ── Fade-up animation (matches homepage stagger) ─────────────────────────────
 function FadeUp({ delay, instant = false, children, style }: { delay: number; instant?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -333,6 +333,52 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
 }
 
 // ── Left panel (dark sidebar shared across all sub-screens) ───────────────────
+// ── Social text link (hover color, matches FooterLink in Footer.tsx) ─────────
+function SocialTextLink({ href, children }: { href: string; children: React.ReactNode }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        display: "block",
+        fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500,
+        color: hov ? "#FFFFFF" : "#D8D8D0",
+        textDecoration: "none",
+        transition: "color .2s ease",
+      }}
+    >
+      {children}
+    </a>
+  );
+}
+
+// ── Back link (hover color, matches FooterLink in Footer.tsx) ────────────────
+function BackLink({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600,
+        letterSpacing: "1.2px", textTransform: "uppercase",
+        color: hov ? "#FFFFFF" : "#909088",
+        background: "none", border: "none",
+        cursor: "pointer", padding: 0, marginBottom: 48,
+        display: "flex", alignItems: "center", gap: 6,
+        transition: "color .2s ease",
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
 function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll get back to you within 1–2 business days." }: { onBack: () => void; subtitle?: string }) {
   return (
     <div className="contact-left-panel" style={{
@@ -358,18 +404,12 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll
       {/* Top content */}
       <div style={{ position: "relative", zIndex: 1 }}>
         <FadeUp delay={60}>
-          <button onClick={onBack} style={{
-            fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600,
-            letterSpacing: "1.2px", textTransform: "uppercase",
-            color: "#909088", background: "none", border: "none",
-            cursor: "pointer", padding: 0, marginBottom: 48,
-            display: "flex", alignItems: "center", gap: 6,
-          }}>
+          <BackLink onClick={onBack}>
             <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <polyline points="15 18 9 12 15 6"/>
             </svg>
             All Options
-          </button>
+          </BackLink>
         </FadeUp>
         <FadeUp delay={140}>
           <p style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#6B8FE8", margin: "0 0 16px" }}>
@@ -398,27 +438,28 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll
       <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
         <div>
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Social Media</div>
-          {[
-            { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
-            { label: "Facebook",  href: "https://www.facebook.com/ctmapes/" },
-            { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
-            { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
-          ].map(s => (
-            <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-              style={{ display: "block", fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none", marginBottom: 10 }}>
-              {s.label}
-            </a>
-          ))}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {[
+              { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
+              { label: "Facebook",  href: "https://www.facebook.com/ctmapes/" },
+              { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
+              { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
+            ].map(s => (
+              <SocialTextLink key={s.label} href={s.href}>{s.label}</SocialTextLink>
+            ))}
+          </div>
         </div>
         <div>
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Email</div>
-          <EmailLink color="#D8D8D0" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
+          <EmailLink color="#D8D8D0" hoverColor="#FFFFFF" align="left" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
             contact@coopermapes.com
           </EmailLink>
         </div>
         <div>
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Phone</div>
-          <a href="tel:6629859780" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>662-985-9780</a>
+          <PhoneLink color="#D8D8D0" hoverColor="#FFFFFF" align="left" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
+            662-985-9780
+          </PhoneLink>
         </div>
       </div>
       </FadeUp>
@@ -429,21 +470,43 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll
 // ── Horizontal step progress bar ──────────────────────────────────────────────
 function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; currentStep: number }) {
   const isMobile = useIsMobile();
-  const pct = ((currentStep - 1) / (steps.length - 1)) * 100;
+
+  // Crossfade the whole stepper when switching between the Flip (5-step) and
+  // Revoice (6-step) paths — `steps` is a stable module-level array reference,
+  // so identity changes only on a real path switch, not on every step forward/back.
+  const [displaySteps, setDisplaySteps] = useState(steps);
+  const [fading, setFading] = useState(false);
+  const prevStepsRef = useRef(steps);
+
+  useEffect(() => {
+    if (steps === prevStepsRef.current) return;
+    prevStepsRef.current = steps;
+    setFading(true);
+    const t = setTimeout(() => {
+      setDisplaySteps(steps);
+      setFading(false);
+    }, 170);
+    return () => clearTimeout(t);
+  }, [steps]);
+
+  const pct = ((currentStep - 1) / (displaySteps.length - 1)) * 100;
+  const fadeStyle: React.CSSProperties = { opacity: fading ? 0 : 1, transition: "opacity 0.17s ease" };
 
   if (isMobile) {
     return (
       <div style={{ background: "#F7F6F4", borderBottom: "1px solid #E4E3DE", padding: "16px 20px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-          <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", color: "#1254D9" }}>
-            {steps[currentStep - 1].name}
-          </span>
-          <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: "#9A9A95" }}>
-            {currentStep} / {steps.length}
-          </span>
-        </div>
-        <div style={{ height: 3, background: "#E4E3DE", borderRadius: 2, overflow: "hidden" }}>
-          <div style={{ height: "100%", background: "#1254D9", width: `${pct}%`, transition: "width 0.38s cubic-bezier(0.4,0,0.2,1)", borderRadius: 2 }} />
+        <div style={fadeStyle}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 600, letterSpacing: "1px", textTransform: "uppercase", color: "#1254D9" }}>
+              {displaySteps[currentStep - 1].name}
+            </span>
+            <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: "#9A9A95" }}>
+              {currentStep} / {displaySteps.length}
+            </span>
+          </div>
+          <div style={{ height: 3, background: "#E4E3DE", borderRadius: 2, overflow: "hidden" }}>
+            <div style={{ height: "100%", background: "#1254D9", width: `${pct}%`, transition: "width 0.38s cubic-bezier(0.4,0,0.2,1)", borderRadius: 2 }} />
+          </div>
         </div>
       </div>
     );
@@ -451,14 +514,14 @@ function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; c
 
   return (
     <div style={{
-      display: "flex", alignItems: "flex-start",
       padding: "24px clamp(32px,4vw,64px)",
       background: "#F7F6F4", borderBottom: "1px solid #E4E3DE",
     }}>
-      {steps.map((s, i) => {
+      <div style={{ display: "flex", alignItems: "flex-start", ...fadeStyle }}>
+      {displaySteps.map((s, i) => {
         const state = i + 1 < currentStep ? "completed" : i + 1 === currentStep ? "active" : "upcoming";
         return (
-          <div key={i} style={{ display: "flex", alignItems: "flex-start", flex: i < steps.length - 1 ? 1 : undefined }}>
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", flex: i < displaySteps.length - 1 ? 1 : undefined }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 7, flexShrink: 0 }}>
               <div style={{
                 width: 24, height: 24, borderRadius: "50%",
@@ -484,7 +547,7 @@ function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; c
                 {s.name}
               </div>
             </div>
-            {i < steps.length - 1 && (
+            {i < displaySteps.length - 1 && (
               <div style={{
                 flex: 1, height: 1, background: "#E4E3DE",
                 marginTop: 12, marginLeft: 8, marginRight: 8,
@@ -501,6 +564,7 @@ function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; c
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
@@ -744,12 +808,12 @@ function MobileContactStrip() {
       <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#6B8FE8" }}>
         Contact
       </div>
-      <EmailLink color="#D8D8D0" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
+      <EmailLink color="#D8D8D0" hoverColor="#FFFFFF" align="left" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
         contact@coopermapes.com
       </EmailLink>
-      <a href="tel:6629859780" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+      <PhoneLink color="#D8D8D0" hoverColor="#FFFFFF" align="left" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
         662-985-9780
-      </a>
+      </PhoneLink>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[
           { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
@@ -757,10 +821,7 @@ function MobileContactStrip() {
           { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
           { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
         ].map(s => (
-          <a key={s.label} href={s.href} target="_blank" rel="noopener noreferrer"
-            style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
-            {s.label}
-          </a>
+          <SocialTextLink key={s.label} href={s.href}>{s.label}</SocialTextLink>
         ))}
       </div>
     </div>

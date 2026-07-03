@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
 import { useIsMobile } from "../hooks/useIsMobile";
@@ -15,13 +15,73 @@ const LINKS = [
   { label: "Contact",   href: "/contact" },
 ];
 
+// Matches the overlay's own opacity transition duration below — navigation
+// waits for the overlay to fully fade out before the new page mounts, so its
+// entrance animations never play underneath the still-closing menu.
+const OVERLAY_CLOSE_MS = 75;
+
 export default function Nav() {
   const pathname = usePathname();
+  const router = useRouter();
   const isMobile = useIsMobile();
   const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
+  const pendingNavResolveRef = useRef<(() => void) | null>(null);
+
+  // `router.push()` doesn't finish instantly — Next.js keeps the old page's
+  // content mounted and visible until the new page is actually ready, so it
+  // never has to show a blank screen mid-navigation. That's normally a good
+  // thing, but it means the View Transition below can't just call router.push
+  // and assume the swap already happened: `pathname` only updates once the
+  // new route has actually committed, so that's the real "navigation is done"
+  // signal — resolve the pending transition then, not the instant push() is called.
+  useEffect(() => {
+    if (pendingNavResolveRef.current) {
+      pendingNavResolveRef.current();
+      pendingNavResolveRef.current = null;
+    }
+  }, [pathname]);
+
+  // Navigate from the mobile menu to `href`. If the menu isn't open (e.g.
+  // tapping the wordmark on a normal page), there's nothing special to do —
+  // let the link navigate immediately as usual.
+  //
+  // Where supported, the close + navigation is wrapped in the browser's
+  // native View Transitions API. Without it, closing the menu and swapping
+  // in the new page are two unrelated, separately-timed events — a hard cut
+  // that reads as a stutter no matter how well the individual timings are
+  // tuned. `startViewTransition` has the browser snapshot the screen before
+  // and after the update and crossfade between them itself (composited, off
+  // the main thread), so the handoff is smooth regardless of exactly how
+  // long the route swap takes. Duration/easing are set in globals.css.
+  // Falls back to the old fixed-delay approach on browsers without support
+  // (e.g. Safari < 18) — see the Next.js view-transitions guide in
+  // node_modules/next/dist/docs/01-app/02-guides/view-transitions.md.
+  const navigateAfterClose = (e: React.MouseEvent, href: string) => {
+    if (!menuOpen) return;
+    e.preventDefault();
+    if (pathname === href) { setMenuOpen(false); return; }
+
+    if (typeof document.startViewTransition === "function") {
+      document.startViewTransition(() => {
+        setMenuOpen(false);
+        router.push(href);
+        // Tell the browser to hold off snapshotting "new" until the route
+        // has actually swapped in — see the effect above. A timeout backstop
+        // guarantees this can never hang if something prevents pathname from
+        // ever updating (e.g. navigation gets cancelled).
+        return new Promise<void>((resolve) => {
+          pendingNavResolveRef.current = resolve;
+          setTimeout(resolve, 600);
+        });
+      });
+    } else {
+      setMenuOpen(false);
+      setTimeout(() => router.push(href), OVERLAY_CLOSE_MS);
+    }
+  };
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -47,6 +107,18 @@ export default function Nav() {
     }
   }, [menuOpen]);
 
+  // Explicitly drop focus when the menu closes. `inert` is supposed to do
+  // this automatically, but browser support for auto-blurring an inert
+  // subtree is inconsistent — especially mid-transition, while the overlay
+  // is still visually fading out. Without this, the just-focused link (Home,
+  // since it's always focused first) can keep the browser's focus outline
+  // and have it flash back into view later, seemingly at random.
+  useEffect(() => {
+    if (!menuOpen && overlayRef.current?.contains(document.activeElement)) {
+      (document.activeElement as HTMLElement | null)?.blur();
+    }
+  }, [menuOpen]);
+
   const isHome = pathname === "/";
   const solid = !isHome || scrolled || menuOpen || isMobile;
 
@@ -65,7 +137,7 @@ export default function Nav() {
           {/* Wordmark */}
           <Link
             href="/"
-            onClick={() => setMenuOpen(false)}
+            onClick={(e) => navigateAfterClose(e, "/")}
             style={{
               fontFamily: "var(--font-anton)",
               fontSize: "clamp(24px,5vw,38px)",
@@ -170,24 +242,18 @@ export default function Nav() {
             alignItems: "center",
             opacity: menuOpen ? 1 : 0,
             pointerEvents: menuOpen ? "auto" : "none",
-            transition: "opacity 0.32s cubic-bezier(.4,0,.2,1)",
+            transition: `opacity ${OVERLAY_CLOSE_MS}ms cubic-bezier(.4,0,.2,1)`,
           }}
         >
           <ul style={{ listStyle: "none", textAlign: "center", display: "flex", flexDirection: "column", gap: 4 }}>
-            {LINKS.map(({ label, href }, i) => {
+            {LINKS.map(({ label, href }) => {
               const isActive = pathname === href;
               return (
-                <li key={href} style={{
-                  opacity: menuOpen ? 1 : 0,
-                  transform: menuOpen ? "translateY(0)" : "translateY(16px)",
-                  transition: menuOpen
-                    ? `opacity 0.32s ease ${i * 48 + 80}ms, transform 0.32s cubic-bezier(.4,0,.2,1) ${i * 48 + 80}ms`
-                    : "none",
-                }}>
+                <li key={href}>
                   <Link
                     href={href}
                     aria-current={isActive ? "page" : undefined}
-                    onClick={() => setMenuOpen(false)}
+                    onClick={(e) => navigateAfterClose(e, href)}
                     style={{
                       fontFamily: "var(--font-anton)",
                       fontSize: "clamp(40px,10vw,56px)",
