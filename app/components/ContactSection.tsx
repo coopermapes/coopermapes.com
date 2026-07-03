@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useId } from "react";
 import Link from "next/link";
 import { Chats, Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 import { useIsMobile } from "../hooks/useIsMobile";
+import EmailLink from "./EmailLink";
 
 // ── Fade-up animation (matches homepage stagger) ─────────────────────────────
 function FadeUp({ delay, instant = false, children, style }: { delay: number; instant?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
@@ -68,6 +69,76 @@ const inputStyle: React.CSSProperties = {
   fontFamily: "inherit",
   borderRadius: 0,
 };
+
+// ── Number field ──────────────────────────────────────────────────────────────
+// Whole positive numbers only. Negatives, decimals, and "e" are blocked at the
+// keyboard and stripped from paste/spinner input. When the value is invalid, an
+// anchored popup explains what needs fixing.
+function NumberField({ value, onChange, placeholder, ariaLabel }: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  ariaLabel: string;
+}) {
+  const rawId = useId();
+  const warnId = "num-warn-" + rawId.replace(/:/g, "");
+  const [touched, setTouched] = useState(false);
+  const [focused, setFocused] = useState(false);
+
+  let warning = "";
+  if (value === "") {
+    if (touched) warning = "This field is required.";
+  } else if (!/^\d+$/.test(value) || Number(value) < 1) {
+    warning = "Please enter a whole number of 1 or more.";
+  }
+  const show = warning !== "" && (focused || touched);
+
+  const borderColor = show ? "#CC3333" : focused ? "#1254D9" : "#CFCEC9";
+
+  return (
+    <div style={{ position: "relative" }}>
+      <input
+        aria-label={ariaLabel}
+        aria-invalid={show || undefined}
+        aria-describedby={show ? warnId : undefined}
+        type="number"
+        min={1}
+        step={1}
+        inputMode="numeric"
+        style={{ ...inputStyle, borderColor }}
+        placeholder={placeholder}
+        value={value}
+        // Block the keys that would produce a negative/decimal/exponent value.
+        onKeyDown={e => { if (["-", "+", "e", "E", "."].includes(e.key)) e.preventDefault(); }}
+        // Strip anything that isn't a digit (covers paste and spinner edge cases).
+        onChange={e => onChange(e.target.value.replace(/[^0-9]/g, ""))}
+        onFocus={() => setFocused(true)}
+        onBlur={() => { setFocused(false); setTouched(true); }}
+      />
+      {show && (
+        <div
+          id={warnId}
+          role="alert"
+          style={{
+            position: "absolute", top: "calc(100% + 8px)", left: 0, zIndex: 5,
+            background: "#FEF2F2", border: "1px solid #FECACA",
+            padding: "8px 12px", maxWidth: "100%",
+            fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 500,
+            color: "#CC3333", lineHeight: 1.4,
+            boxShadow: "0 4px 12px rgba(0,0,0,0.10)",
+          }}
+        >
+          <span aria-hidden="true" style={{
+            position: "absolute", top: -5, left: 18, width: 9, height: 9,
+            background: "#FEF2F2", borderLeft: "1px solid #FECACA", borderTop: "1px solid #FECACA",
+            transform: "rotate(45deg)",
+          }} />
+          {warning}
+        </div>
+      )}
+    </div>
+  );
+}
 
 // ── Step dot ──────────────────────────────────────────────────────────────────
 function StepDot({ state }: { state: "completed" | "active" | "upcoming" }) {
@@ -341,9 +412,9 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll
         </div>
         <div>
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Email</div>
-          <a href="mailto:contact@coopermapes.com" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+          <EmailLink color="#D8D8D0" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
             contact@coopermapes.com
-          </a>
+          </EmailLink>
         </div>
         <div>
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Phone</div>
@@ -673,9 +744,9 @@ function MobileContactStrip() {
       <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#6B8FE8" }}>
         Contact
       </div>
-      <a href="mailto:contact@coopermapes.com" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
+      <EmailLink color="#D8D8D0" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500 }}>
         contact@coopermapes.com
-      </a>
+      </EmailLink>
       <a href="tel:6629859780" style={{ fontFamily: "var(--font-inter)", fontSize: 15, fontWeight: 500, color: "#D8D8D0", textDecoration: "none" }}>
         662-985-9780
       </a>
@@ -741,7 +812,8 @@ export default function ContactSection() {
     if (wizardStep === 1) return wizardPath !== null;
     if (wizardStep === 2) return !!(wName.trim() && wEmail.trim() && wEmail.includes("@") && wSchool.trim());
     if (wizardStep === 3) {
-      const base = !!(wShowName.trim() && wMovements.trim() && wNumParts.trim());
+      const isPositiveInt = (v: string) => /^\d+$/.test(v) && Number(v) >= 1;
+      const base = !!(wShowName.trim() && isPositiveInt(wMovements) && isPositiveInt(wNumParts));
       if (wizardPath === "flip") return base && !!wCurrentFormat;
       return base && !!wSources.trim();
     }
@@ -1000,8 +1072,8 @@ export default function ContactSection() {
                     {wizardStep === 3 && wizardPath === "flip" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                         <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={wShowName} onChange={e => setWShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <input aria-label="Number of movements" style={inputStyle} type="number" min={1} placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={e => setWMovements(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <input aria-label="Total number of instrument parts" style={inputStyle} type="number" min={1} placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={e => setWNumParts(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <NumberField ariaLabel="Number of movements" placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={setWMovements} />
+                        <NumberField ariaLabel="Total number of instrument parts" placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={setWNumParts} />
                         <select aria-label="Current format" style={{ ...inputStyle, color: wCurrentFormat ? "#141414" : "#A6A5A0" }} value={wCurrentFormat} onChange={e => setWCurrentFormat(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
                           <option value="" disabled>Current Format of Your Parts *</option>
                           <option value="8.5×11 PDF parts">8.5×11 PDF parts</option>
@@ -1014,8 +1086,8 @@ export default function ContactSection() {
                     {wizardStep === 3 && wizardPath === "revoice" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
                         <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={wShowName} onChange={e => setWShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <input aria-label="Number of movements" style={inputStyle} type="number" min={1} placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={e => setWMovements(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <input aria-label="Total number of instrument parts" style={inputStyle} type="number" min={1} placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={e => setWNumParts(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <NumberField ariaLabel="Number of movements" placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={setWMovements} />
+                        <NumberField ariaLabel="Total number of instrument parts" placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={setWNumParts} />
                         <textarea aria-label="Source pieces" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={3} placeholder="Source Pieces * — List the pieces included in your show" value={wSources} onChange={e => setWSources(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                       </div>
                     )}
