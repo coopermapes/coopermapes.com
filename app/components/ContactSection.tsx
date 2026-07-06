@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useId } from "react";
 import Link from "next/link";
-import { Chats, Envelope, ArrowRight } from "@phosphor-icons/react";
+import { Chats, Envelope, ArrowRight, Megaphone } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -46,6 +46,26 @@ const REVOICE_STEPS = [
   { name: "Files",      desc: "Assets and delivery" },
   { name: "Review",     desc: "Confirm and send" },
 ];
+
+// Promo path: Flip Folder Conversion is pre-selected, so there's no "Service" step.
+const PROMO_STEPS = [
+  { name: "About You", desc: "Your contact info" },
+  { name: "Your Show", desc: "About the movement" },
+  { name: "Files",     desc: "Assets and delivery" },
+  { name: "Review",    desc: "Confirm and send" },
+];
+
+function promoStepContent(step: number) {
+  if (step === 1) return { title: "About You", sub: "Tell me who you are and where you're from." };
+  if (step === 2) return { title: "Your Show", sub: "Tell me about the movement you'd like converted." };
+  if (step === 3) return { title: "Files & Timeline", sub: "Share your files and let me know when you need this done." };
+  return { title: "Review & Submit", sub: "Make sure everything looks right before you send." };
+}
+
+// Promo submission fields: Service, Name, Email, School, How did you hear about me?,
+// Show Name, Movement (1-6), Source Music, Parts Count, Current Format, Has XML File,
+// Timeline (Strict - <date> / No strict timeline), Express Delivery (strict path only), Parts Link.
+const PROMO_FORMSPREE_ENDPOINT = "https://formspree.io/f/mvzjygqe";
 
 function stepContent(step: number, path: "flip" | "revoice" | null) {
   if (step === 1) return { title: "How Can I Help?", sub: "Select the service that best fits your situation." };
@@ -215,7 +235,7 @@ function ReviewGroup({ title, rows, onEdit }: { title: string; rows: { label: st
       {rows.map((r, i) => (
         <div key={i} style={{ display: "flex", gap: 16, padding: "9px 16px", borderBottom: i < rows.length - 1 ? "1px solid #F5F4F0" : "none" }}>
           <span style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", color: "#9A9A95", width: 120, flexShrink: 0, paddingTop: 2 }}>{r.label}</span>
-          <span style={{ fontFamily: "var(--font-inter)", fontSize: 14, color: "#111111", lineHeight: 1.5, flex: 1, wordBreak: "break-word" }}>{r.value || "—"}</span>
+          <span style={{ fontFamily: "var(--font-inter)", fontSize: 14, color: "#111111", lineHeight: 1.5, flex: 1, wordBreak: "break-word" }}>{r.value || "-"}</span>
         </div>
       ))}
     </div>
@@ -270,9 +290,9 @@ function ConsentNotice({ style }: { style?: React.CSSProperties }) {
 }
 
 // ── Contact card (landing) ────────────────────────────────────────────────────
-function ContactCard({ icon, title, description, cta, onClick, active, locked }: {
+function ContactCard({ icon, title, description, cta, onClick, active, locked, badge }: {
   icon: React.ReactNode; title: string; description: string; cta: string;
-  onClick: () => void; active?: boolean; locked?: boolean;
+  onClick: () => void; active?: boolean; locked?: boolean; badge?: string;
 }) {
   const isMobile = useIsMobile();
   const [hov, setHov] = useState(false);
@@ -302,6 +322,18 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
         padding: 0,
       }}
     >
+      {badge && (
+        <div style={{
+          position: "absolute", top: 22, right: -50, width: 220,
+          transform: "rotate(45deg)", pointerEvents: "none",
+          background: "#1254D9", color: "#fff", textAlign: "center",
+          fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600,
+          letterSpacing: "0.8px", textTransform: "uppercase", lineHeight: 1.3,
+          whiteSpace: "pre-line", padding: "11px 0",
+        }}>
+          {badge.replace(" ", "\n")}
+        </div>
+      )}
       <div style={{
         padding: isMobile ? "clamp(32px,8vw,48px) 24px" : "44px 44px calc(44px + 72px)",
         display: "flex", flexDirection: "column", gap: 24,
@@ -312,6 +344,7 @@ function ContactCard({ icon, title, description, cta, onClick, active, locked }:
           {icon}
         </div>
         <div>
+
           <div style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: 34, textTransform: "uppercase", letterSpacing: "0px", color: "#111111", marginBottom: 10 }}>{title}</div>
           <p style={{ fontFamily: "var(--font-inter)", fontSize: 18, color: "#5A5A5A", lineHeight: 1.6, margin: 0 }}>{description}</p>
         </div>
@@ -379,7 +412,7 @@ function BackLink({ onClick, children }: { onClick: () => void; children: React.
   );
 }
 
-function LeftPanel({ onBack, subtitle = "Tell me what your show needs — I’ll get back to you within 1–2 business days." }: { onBack: () => void; subtitle?: string }) {
+function LeftPanel({ onBack, subtitle = "Tell me what your show needs - I’ll get back to you within 1–2 business days." }: { onBack: () => void; subtitle?: React.ReactNode }) {
   return (
     <div className="contact-left-panel" style={{
       width: "30%", flexShrink: 0, background: "#111111",
@@ -770,6 +803,275 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
   );
 }
 
+// ── Promo screen (Free Conversion Promo — Flip Folder path, no Service step) ──
+function PromoScreen({ transitioning, onBack, initialDone = false }: { transitioning: boolean; onBack: () => void; initialDone?: boolean }) {
+  const isMobile = useIsMobile();
+  const [pStep, setPStep] = useState(1);
+  const [pStepTransitioning, setPStepTransitioning] = useState(false);
+  const [pName, setPName] = useState("");
+  const [pEmail, setPEmail] = useState("");
+  const [pSchool, setPSchool] = useState("");
+  const [pHear, setPHear] = useState("");
+  const [pShowName, setPShowName] = useState("");
+  const [pMovementNumber, setPMovementNumber] = useState("");
+  const [pSourceMusic, setPSourceMusic] = useState("");
+  const [pNumParts, setPNumParts] = useState("");
+  const [pCurrentFormat, setPCurrentFormat] = useState("");
+  const [pPartsLink, setPPartsLink] = useState("");
+  const [pHasXml, setPHasXml] = useState<"yes" | "arranger" | "no" | "">("");
+  const [pTimeline, setPTimeline] = useState<"strict" | "flexible" | "">("");
+  const [pDeadline, setPDeadline] = useState("");
+  const [pExpress, setPExpress] = useState(false);
+  const [pDone, setPDone] = useState(initialDone);
+  const [pError, setPError] = useState("");
+  const [pSubmitting, setPSubmitting] = useState(false);
+  const [pBackPressed, setPBackPressed] = useState(false);
+  const [pContinuePressed, setPContinuePressed] = useState(false);
+  const pDoneHeadingRef = useRef<HTMLHeadingElement>(null);
+
+  useEffect(() => {
+    if (pDone) pDoneHeadingRef.current?.focus();
+  }, [pDone]);
+
+  const totalSteps = PROMO_STEPS.length;
+  const isFilesStep = pStep === 3;
+  const isFinalStep = pStep === totalSteps;
+
+  function isStepValid(): boolean {
+    if (pStep === 1) return !!(pName.trim() && pEmail.trim() && pEmail.includes("@") && pSchool.trim() && pHear);
+    if (pStep === 2) {
+      const isPositiveInt = (v: string) => /^\d+$/.test(v) && Number(v) >= 1;
+      return !!(pShowName.trim() && pMovementNumber && pSourceMusic.trim() && isPositiveInt(pNumParts) && pCurrentFormat);
+    }
+    if (isFilesStep) return !!pHasXml && (pTimeline === "flexible" || (pTimeline === "strict" && !!pDeadline));
+    return true;
+  }
+  const valid = isStepValid();
+
+  function animateToStep(n: number) {
+    setPStepTransitioning(true);
+    setTimeout(() => {
+      setPStep(n);
+      setPStepTransitioning(false);
+    }, 210);
+  }
+
+  function handleContinue() {
+    if (!isStepValid()) { setPError("Please fill in all required fields before continuing."); return; }
+    setPError("");
+    if (isFinalStep) { handleSubmit(); } else { animateToStep(pStep + 1); }
+  }
+  function handleBack() { setPError(""); animateToStep(pStep - 1); }
+  function goToStep(n: number) { setPError(""); animateToStep(n); }
+
+  async function handleSubmit() {
+    setPSubmitting(true);
+    setPError("");
+    const payload: Record<string, string> = {
+      Service: "Free Conversion Promo - Flip Folder Conversion",
+      Name: pName, Email: pEmail, School: pSchool,
+      "How did you hear about me?": pHear,
+      "Show Name": pShowName, Movement: `Movement ${pMovementNumber}`, "Source Music": pSourceMusic,
+      "Parts Count": pNumParts, "Current Format": pCurrentFormat,
+      "Has XML File": pHasXml === "yes" ? "Yes - will send after quote" : pHasXml === "arranger" ? "No - can get from arranger" : "No - does not have access",
+      Timeline: pTimeline === "strict" ? `Strict - ${pDeadline}` : "No strict timeline",
+    };
+    if (pTimeline === "strict") payload["Express Delivery"] = pExpress ? "Yes - 48-hour turnaround" : "No";
+    if (pPartsLink.trim()) payload["Parts Link"] = pPartsLink;
+    try {
+      const res = await fetch(PROMO_FORMSPREE_ENDPOINT, {
+        method: "POST",
+        headers: { Accept: "application/json", "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.ok) { setPDone(true); } else { setPError("Something went wrong. Please try again or email me directly."); }
+    } catch { setPError("Network error. Please try again or email me directly."); }
+    finally { setPSubmitting(false); }
+  }
+
+  const { title, sub } = promoStepContent(pStep);
+
+  return (
+    <div style={{
+      display: "flex", minHeight: isMobile ? "auto" : "calc(100vh - 98px)",
+      opacity: transitioning ? 0 : 1,
+      transition: "opacity 0.32s ease",
+    }}>
+      <LeftPanel onBack={onBack} subtitle={<>Let me <em>refine</em>, <em>rebuild</em>, and <em>redefine</em> your ensemble&apos;s music for <em>free</em>. Fill out this form to get started.</>} />
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", background: "#FFFFFF", overflow: "hidden" }}>
+        {pDone ? (
+          <div role="status" aria-live="polite" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: isMobile ? "flex-start" : "center", padding: isMobile ? "clamp(60px,15vw,100px) clamp(40px,5vw,80px)" : "clamp(48px,6vw,96px) clamp(40px,5vw,80px)" }}>
+            <div style={{ textAlign: "center", maxWidth: 480 }}>
+              <div style={{ width: 56, height: 56, borderRadius: "50%", background: "#1254D9", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12l6 6 10-10" />
+                </svg>
+              </div>
+              {/* tabIndex -1 + outline:none: programmatic focus target for screen readers only, not a tab stop */}
+              <h2 ref={pDoneHeadingRef} tabIndex={-1} style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(36px,3.6vw,52px)", textTransform: "uppercase", letterSpacing: "-1px", margin: "0 0 16px", outline: "none" }}>
+                You&apos;re In!
+              </h2>
+              <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", maxWidth: 420, margin: "0 auto 32px", lineHeight: 1.6 }}>
+                Thanks for applying! Expect an email from me confirming your spot in this promotion, and I&apos;ll be getting to work on your music soon.
+              </p>
+              <OutlineButton onClick={onBack}>Back to Contact</OutlineButton>
+            </div>
+          </div>
+        ) : (
+          <>
+            <FadeUp delay={200}>
+              <HorizontalStepper steps={PROMO_STEPS} currentStep={pStep} />
+            </FadeUp>
+            <FadeUp delay={360} style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+              <div style={{
+                flex: 1, display: "flex", flexDirection: "column",
+                padding: isMobile
+                  ? "clamp(28px,7vw,48px) clamp(20px,5vw,36px)"
+                  : "clamp(36px,4.5vw,56px) clamp(40px,5vw,80px)",
+                opacity: pStepTransitioning ? 0 : 1,
+                transform: pStepTransitioning ? "translateY(8px)" : "translateY(0)",
+                transition: pStepTransitioning
+                  ? "opacity 0.18s ease, transform 0.18s ease"
+                  : "opacity 0.24s ease, transform 0.24s ease",
+              }}>
+                <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: "1.8px", textTransform: "uppercase", color: "#1254D9", marginBottom: 16 }}>
+                  Step {pStep} of {totalSteps}
+                </div>
+                <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(36px,3.6vw,52px)", lineHeight: .95, letterSpacing: "-.5px", textTransform: "uppercase", color: "#111111", margin: "0 0 12px" }}>
+                  {title}
+                </h2>
+                <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#6A6A6A", margin: "0 0 44px", lineHeight: 1.5 }}>
+                  {sub}
+                </p>
+
+                <div style={{ flex: isMobile ? undefined : 1, maxWidth: 840 }}>
+                  {pStep === 1 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                      <input aria-label="Name" style={inputStyle} placeholder="Name *" value={pName} onChange={e => setPName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <input aria-label="Email address" style={inputStyle} type="email" placeholder="Email *" value={pEmail} onChange={e => setPEmail(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <input aria-label="School or organization" style={inputStyle} placeholder="School / Organization *" value={pSchool} onChange={e => setPSchool(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <select
+                        aria-label="How did you hear about me"
+                        style={{ ...inputStyle, color: pHear ? "#141414" : "#A6A5A0" }}
+                        value={pHear} onChange={e => setPHear(e.target.value)}
+                        onFocus={e => (e.target.style.borderColor = "#1254D9")}
+                        onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
+                      >
+                        <option value="" disabled>How did you hear about me? *</option>
+                        <option value="Word of mouth">Word of mouth</option>
+                        <option value="Instagram">Instagram</option>
+                        <option value="Facebook">Facebook</option>
+                        <option value="YouTube">YouTube</option>
+                        <option value="LinkedIn">LinkedIn</option>
+                        <option value="Google search">Google search</option>
+                        <option value="AI">AI</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  )}
+                  {pStep === 2 && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
+                      <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={pShowName} onChange={e => setPShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <select aria-label="Which movement" style={{ ...inputStyle, color: pMovementNumber ? "#141414" : "#A6A5A0" }} value={pMovementNumber} onChange={e => setPMovementNumber(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
+                        <option value="" disabled>Which Movement Do You Want Converted? *</option>
+                        {["1", "2", "3", "4", "5", "6"].map(n => (
+                          <option key={n} value={n}>Movement {n}</option>
+                        ))}
+                      </select>
+                      <input aria-label="Source music" style={inputStyle} placeholder="Source Music and Composer for This Movement *" value={pSourceMusic} onChange={e => setPSourceMusic(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <NumberField ariaLabel="Total number of instrument parts for this movement" placeholder="Total Number of Instrument Parts *" value={pNumParts} onChange={setPNumParts} />
+                      <select aria-label="Current format" style={{ ...inputStyle, color: pCurrentFormat ? "#141414" : "#A6A5A0" }} value={pCurrentFormat} onChange={e => setPCurrentFormat(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
+                        <option value="" disabled>Current Format of Your Parts *</option>
+                        <option value="8.5×11 PDF parts">8.5×11 PDF parts</option>
+                        <option value="7x5 PDF parts">7x5 PDF parts</option>
+                        <option value="Director's Score Only">Director&apos;s Score Only</option>
+                        <option value="Other">Other</option>
+                      </select>
+                    </div>
+                  )}
+                  {isFilesStep && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                      <input aria-label="Link to your parts" style={inputStyle} type="url" placeholder="Link to Your Parts - Google Drive or OneDrive (optional)" value={pPartsLink} onChange={e => setPPartsLink(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <div>
+                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Do you currently have access to an XML file for your show music? *</div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                          <RadioCard selected={pHasXml === "yes"} onClick={() => setPHasXml("yes")} size="sm">Yes. I can send it in an email once I receive my quote.</RadioCard>
+                          <RadioCard selected={pHasXml === "arranger"} onClick={() => setPHasXml("arranger")} size="sm">No. But I am able to get this from my arranger.</RadioCard>
+                          <RadioCard selected={pHasXml === "no"} onClick={() => setPHasXml("no")} size="sm">No. I do not have access to an XML file.</RadioCard>
+                        </div>
+                      </div>
+                      <div>
+                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Do you have a strict timeline? *</div>
+                        <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                          <RadioCard selected={pTimeline === "strict"} onClick={() => setPTimeline("strict")} size="sm">I have a strict timeline</RadioCard>
+                          <RadioCard selected={pTimeline === "flexible"} onClick={() => { setPTimeline("flexible"); setPDeadline(""); setPExpress(false); }} size="sm">I do not have a strict timeline</RadioCard>
+                        </div>
+                      </div>
+                      {pTimeline === "strict" && (
+                        <>
+                          <input aria-label="Deadline" style={inputStyle} type="date" value={pDeadline} onChange={e => setPDeadline(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                          <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", padding: 16, border: "1px solid #DCDBD7", background: "#F7F6F4" }}>
+                            <input type="checkbox" checked={pExpress} onChange={e => setPExpress(e.target.checked)} style={{ width: 16, height: 16, accentColor: "#1254D9", marginTop: 3, cursor: "pointer" }} />
+                            <span style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#2A2A2A", lineHeight: 1.5 }}>
+                              <strong>Express Delivery:</strong> I need my parts delivered within 48 hours. <em>($50 rush fee applied)</em>
+                            </span>
+                          </label>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {isFinalStep && (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                      <ReviewGroup title="About You" rows={[{ label: "Name", value: pName }, { label: "Email", value: pEmail }, { label: "School", value: pSchool }, { label: "Heard Via", value: pHear }]} onEdit={() => goToStep(1)} />
+                      <ReviewGroup title="Your Show" rows={[{ label: "Show Name", value: pShowName }, { label: "Movement", value: pMovementNumber ? `Movement ${pMovementNumber}` : "" }, { label: "Source Music", value: pSourceMusic }, { label: "Parts Count", value: pNumParts }, { label: "Current Format", value: pCurrentFormat }]} onEdit={() => goToStep(2)} />
+                      <ReviewGroup title="Files & Timeline" rows={[{ label: "Parts Link", value: pPartsLink }, { label: "XML File", value: pHasXml === "yes" ? "Yes - will send after quote" : pHasXml === "arranger" ? "No - can get from arranger" : pHasXml === "no" ? "No - does not have access" : "" }, { label: "Timeline", value: pTimeline === "strict" ? `Strict - ${pDeadline}` : "No strict timeline" }, ...(pTimeline === "strict" ? [{ label: "Express", value: pExpress ? "Yes - 48-hour turnaround" : "No" }] : [])]} onEdit={() => goToStep(3)} />
+                    </div>
+                  )}
+                </div>
+
+                {pError && (
+                  <div style={{ marginTop: 16, background: "#FEF2F2", border: "1px solid #FECACA", padding: "12px 16px" }}>
+                    <span style={{ fontFamily: "var(--font-inter)", fontSize: 14, fontWeight: 500, color: "#CC3333" }}>{pError}</span>
+                  </div>
+                )}
+
+                {isFinalStep && <ConsentNotice style={{ margin: "24px 0 0" }} />}
+
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: isFinalStep ? 12 : 40, paddingTop: 24, borderTop: "1px solid #E4E3DE" }}>
+                  {pStep > 1 ? (
+                    <button
+                      onClick={handleBack}
+                      onMouseEnter={isMobile ? undefined : e => (e.currentTarget.style.borderColor = "#111111")}
+                      onMouseLeave={isMobile ? undefined : e => (e.currentTarget.style.borderColor = "#DCDBD7")}
+                      onTouchStart={() => setPBackPressed(true)}
+                      onTouchEnd={() => setPBackPressed(false)}
+                      onTouchCancel={() => setPBackPressed(false)}
+                      style={{ background: "transparent", color: "#111111", border: "1.5px solid #DCDBD7", padding: isMobile ? "14px 24px" : "12px 24px", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", cursor: "pointer", transition: "border-color 0.2s ease, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && pBackPressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && pBackPressed ? 0.75 : 1 }}
+                    >
+                      Back
+                    </button>
+                  ) : <div style={{ width: 1 }} />}
+                  <button
+                    onClick={handleContinue} disabled={!valid || pSubmitting}
+                    onMouseEnter={isMobile ? undefined : e => { if (valid && !pSubmitting) { e.currentTarget.style.background = "#0E45B5"; e.currentTarget.style.borderColor = "#0E45B5"; } }}
+                    onMouseLeave={isMobile ? undefined : e => { e.currentTarget.style.background = "#1254D9"; e.currentTarget.style.borderColor = "#1254D9"; }}
+                    onTouchStart={() => { if (valid && !pSubmitting) setPContinuePressed(true); }}
+                    onTouchEnd={() => setPContinuePressed(false)}
+                    onTouchCancel={() => setPContinuePressed(false)}
+                    style={{ background: "#1254D9", color: "#fff", border: "1.5px solid #1254D9", padding: isMobile ? "14px 28px" : "12px 28px", fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase", cursor: valid && !pSubmitting ? "pointer" : "default", opacity: !valid || pSubmitting ? 0.38 : isMobile && pContinuePressed ? 0.75 : 1, pointerEvents: valid && !pSubmitting ? "auto" : "none", transition: "background .15s, border-color .15s, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && pContinuePressed ? "scale(0.96)" : "scale(1)" }}
+                  >
+                    {isFinalStep ? (pSubmitting ? "Submitting…" : "Submit") : "Continue"}
+                  </button>
+                </div>
+              </div>
+            </FadeUp>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Coming Soon screen ────────────────────────────────────────────────────────
 function ComingSoonScreen({ title, subtitle, transitioning, onBack }: {
   title: string; subtitle: string; transitioning: boolean; onBack: () => void;
@@ -834,9 +1136,10 @@ export default function ContactSection() {
   const [wizardPath, setWizardPath] = useState<"flip" | "revoice" | null>(null);
   const [wizardDone, setWizardDone] = useState(false);
   const [wizardError, setWizardError] = useState("");
-  const [contactView, setContactView] = useState<"landing" | "wizard" | "inquiry">("landing");
+  const [contactView, setContactView] = useState<"landing" | "wizard" | "inquiry" | "promo">("landing");
   const [transitioning, setTransitioning] = useState(false);
   const [inquiryInitDone, setInquiryInitDone] = useState(false);
+  const [promoInitDone, setPromoInitDone] = useState(false);
   const [stepTransitioning, setStepTransitioning] = useState(false);
   const [backPressed, setBackPressed] = useState(false);
   const [continuePressed, setContinuePressed] = useState(false);
@@ -850,6 +1153,7 @@ export default function ContactSection() {
   const [wName, setWName] = useState("");
   const [wEmail, setWEmail] = useState("");
   const [wSchool, setWSchool] = useState("");
+  const [wHear, setWHear] = useState("");
   const [wShowName, setWShowName] = useState("");
   const [wMovements, setWMovements] = useState("");
   const [wNumParts, setWNumParts] = useState("");
@@ -871,7 +1175,7 @@ export default function ContactSection() {
 
   function isStepValid(): boolean {
     if (wizardStep === 1) return wizardPath !== null;
-    if (wizardStep === 2) return !!(wName.trim() && wEmail.trim() && wEmail.includes("@") && wSchool.trim());
+    if (wizardStep === 2) return !!(wName.trim() && wEmail.trim() && wEmail.includes("@") && wSchool.trim() && wHear);
     if (wizardStep === 3) {
       const isPositiveInt = (v: string) => /^\d+$/.test(v) && Number(v) >= 1;
       const base = !!(wShowName.trim() && isPositiveInt(wMovements) && isPositiveInt(wNumParts));
@@ -906,7 +1210,7 @@ export default function ContactSection() {
 
   function resetWizard() {
     setWizardStep(1); setWizardPath(null); setWizardDone(false); setWizardError("");
-    setWName(""); setWEmail(""); setWSchool("");
+    setWName(""); setWEmail(""); setWSchool(""); setWHear("");
     setWShowName(""); setWMovements(""); setWNumParts(""); setWCurrentFormat(""); setWSources("");
     setWPartsNeedWork(""); setWSpecificInstruments(""); setWIssuesDescription(""); setWShowType("");
     setWPartsLink(""); setWDeadline(""); setWExpress(false);
@@ -928,6 +1232,14 @@ export default function ContactSection() {
       setTimeout(() => setTransitioning(false), 16);
     }, 280);
   }
+  function goToPromo() {
+    window.history.pushState({ contactView: "promo" }, "");
+    setTransitioning(true);
+    setTimeout(() => {
+      setContactView("promo");
+      setTimeout(() => setTransitioning(false), 16);
+    }, 280);
+  }
   function goToLanding() { window.history.back(); }
 
   useEffect(() => {
@@ -943,6 +1255,10 @@ export default function ContactSection() {
       window.history.replaceState({ contactView: "wizard" }, "");
       setContactView("wizard");
       setWizardDone(true);
+    } else if (hash === "#promo-success") {
+      window.history.replaceState({ contactView: "promo" }, "");
+      setContactView("promo");
+      setPromoInitDone(true);
     } else {
       window.history.replaceState({ contactView: "landing" }, "");
     }
@@ -966,8 +1282,9 @@ export default function ContactSection() {
       Service: wizardPath === "flip" ? "Flip Folder Conversion" : "Part Editing & Revoicing",
       service_path: wizardPath === "flip" ? "flip_folder" : "revoicing",
       Name: wName, Email: wEmail, School: wSchool,
+      "How did you hear about me?": wHear,
       "Show Name": wShowName, Movements: wMovements, "Parts Count": wNumParts,
-      Deadline: wDeadline, "Express Delivery": wExpress ? "Yes — 48-hour turnaround" : "No",
+      Deadline: wDeadline, "Express Delivery": wExpress ? "Yes - 48-hour turnaround" : "No",
     };
     if (wizardPath === "flip") {
       payload["Current Format"] = wCurrentFormat;
@@ -1036,9 +1353,9 @@ export default function ContactSection() {
             </FadeUp>
           </div>
           <div style={{
-            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2, minmax(0, 400px))",
+            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 400px))",
             justifyContent: "center",
-            gap: 24, width: "100%", maxWidth: 1080, position: "relative", zIndex: 1,
+            gap: 24, width: "100%", maxWidth: 1248, position: "relative", zIndex: 1,
           }}>
             <FadeUp delay={440} instant={fromBack.current}>
               <ContactCard
@@ -1052,6 +1369,14 @@ export default function ContactSection() {
                 icon={<Chats size={40} weight="light" color="#1254D9" />}
                 title="Send an Inquiry" cta="Send a Message" onClick={goToInquiry} active
                 description="Have questions before committing to a service? Shoot a message to me, and we can talk it out."
+              />
+            </FadeUp>
+            <FadeUp delay={760} instant={fromBack.current}>
+              <ContactCard
+                icon={<Megaphone size={40} weight="light" color="#1254D9" />}
+                title="Free Parts Promo" cta="I'm In!" onClick={goToPromo} active
+                badge="Limited Availability!"
+                description="Be one of the first 10 applicants to receive professional-grade parts, completely free of charge."
               />
             </FadeUp>
           </div>
@@ -1128,6 +1453,23 @@ export default function ContactSection() {
                         <input aria-label="Name" style={inputStyle} placeholder="Name *" value={wName} onChange={e => setWName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <input aria-label="Email address" style={inputStyle} type="email" placeholder="Email *" value={wEmail} onChange={e => setWEmail(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <input aria-label="School or organization" style={inputStyle} placeholder="School / Organization *" value={wSchool} onChange={e => setWSchool(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <select
+                          aria-label="How did you hear about me"
+                          style={{ ...inputStyle, color: wHear ? "#141414" : "#A6A5A0" }}
+                          value={wHear} onChange={e => setWHear(e.target.value)}
+                          onFocus={e => (e.target.style.borderColor = "#1254D9")}
+                          onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
+                        >
+                          <option value="" disabled>How did you hear about me? *</option>
+                          <option value="Word of mouth">Word of mouth</option>
+                          <option value="Instagram">Instagram</option>
+                          <option value="Facebook">Facebook</option>
+                          <option value="YouTube">YouTube</option>
+                          <option value="LinkedIn">LinkedIn</option>
+                          <option value="Google search">Google search</option>
+                          <option value="AI">AI</option>
+                          <option value="Other">Other</option>
+                        </select>
                       </div>
                     )}
                     {wizardStep === 3 && wizardPath === "flip" && (
@@ -1138,8 +1480,8 @@ export default function ContactSection() {
                         <select aria-label="Current format" style={{ ...inputStyle, color: wCurrentFormat ? "#141414" : "#A6A5A0" }} value={wCurrentFormat} onChange={e => setWCurrentFormat(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
                           <option value="" disabled>Current Format of Your Parts *</option>
                           <option value="8.5×11 PDF parts">8.5×11 PDF parts</option>
-                          <option value="Concert score only (no individual parts)">Concert score only (no individual parts)</option>
-                          <option value="No parts provided at all">No parts provided at all</option>
+                          <option value="7x5 PDF parts">7x5 PDF parts</option>
+                          <option value="Director's Score Only">Director&apos;s Score Only</option>
                           <option value="Other">Other</option>
                         </select>
                       </div>
@@ -1149,13 +1491,13 @@ export default function ContactSection() {
                         <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={wShowName} onChange={e => setWShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <NumberField ariaLabel="Number of movements" placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={setWMovements} />
                         <NumberField ariaLabel="Total number of instrument parts" placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={setWNumParts} />
-                        <textarea aria-label="Source pieces" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={3} placeholder="Source Pieces * — List the pieces included in your show" value={wSources} onChange={e => setWSources(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <textarea aria-label="Source pieces" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={3} placeholder="Source Pieces * - List the pieces included in your show" value={wSources} onChange={e => setWSources(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                       </div>
                     )}
                     {wizardStep === 4 && wizardPath === "revoice" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                         <div>
-                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, color: "#111111", marginBottom: 10 }}>Which parts need work? *</div>
+                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Which parts need work? *</div>
                           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                             <RadioCard selected={wPartsNeedWork === "all"} onClick={() => setWPartsNeedWork("all")} size="sm">All parts</RadioCard>
                             <RadioCard selected={wPartsNeedWork === "specific"} onClick={() => setWPartsNeedWork("specific")} size="sm">Specific instruments</RadioCard>
@@ -1166,7 +1508,7 @@ export default function ContactSection() {
                         )}
                         <textarea aria-label="Describe the issues" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={4} placeholder="Describe the issues you're experiencing *" value={wIssuesDescription} onChange={e => setWIssuesDescription(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <div>
-                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, color: "#111111", marginBottom: 10 }}>Is this a stock show or custom arrangement? *</div>
+                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Is this a stock show or custom arrangement? *</div>
                           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                             <RadioCard selected={wShowType === "stock"} onClick={() => setWShowType("stock")} size="sm">Stock show <span style={{ fontWeight: 400, color: "#5A5A5A" }}>(JW Pepper / Hal Leonard)</span></RadioCard>
                             <RadioCard selected={wShowType === "custom"} onClick={() => setWShowType("custom")} size="sm">Custom arrangement</RadioCard>
@@ -1176,12 +1518,12 @@ export default function ContactSection() {
                     )}
                     {isFilesStep && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                        <input aria-label="Google Drive link" style={inputStyle} type="url" placeholder="Google Drive Link to Your Parts (optional)" value={wPartsLink} onChange={e => setWPartsLink(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <input aria-label="Link to your parts" style={inputStyle} type="url" placeholder="Link to Your Parts - Google Drive or OneDrive (optional)" value={wPartsLink} onChange={e => setWPartsLink(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <input aria-label="Deadline" style={inputStyle} type="date" value={wDeadline} onChange={e => setWDeadline(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", padding: 16, border: "1px solid #DCDBD7", background: "#F7F6F4" }}>
                           <input type="checkbox" checked={wExpress} onChange={e => setWExpress(e.target.checked)} style={{ width: 16, height: 16, accentColor: "#1254D9", marginTop: 3, cursor: "pointer" }} />
                           <span style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#2A2A2A", lineHeight: 1.5 }}>
-                            <strong>Express Delivery:</strong> I need my parts delivered within 48 hours. <em>(Rush fee applied)</em>
+                            <strong>Express Delivery:</strong> I need my parts delivered within 48 hours. <em>($50 rush fee applied)</em>
                           </span>
                         </label>
                       </div>
@@ -1189,12 +1531,12 @@ export default function ContactSection() {
                     {isFinalStep && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                         <ReviewGroup title="How Can I Help?" rows={[{ label: "Service", value: wizardPath === "flip" ? "Flip Folder Conversion" : "Part Editing & Revoicing" }]} onEdit={() => goToStep(1)} />
-                        <ReviewGroup title="About You" rows={[{ label: "Name", value: wName }, { label: "Email", value: wEmail }, { label: "School", value: wSchool }]} onEdit={() => goToStep(2)} />
+                        <ReviewGroup title="About You" rows={[{ label: "Name", value: wName }, { label: "Email", value: wEmail }, { label: "School", value: wSchool }, { label: "Heard Via", value: wHear }]} onEdit={() => goToStep(2)} />
                         <ReviewGroup title="Your Show" rows={[{ label: "Show Name", value: wShowName }, { label: "Movements", value: wMovements }, { label: "Parts Count", value: wNumParts }, ...(wizardPath === "flip" ? [{ label: "Current Format", value: wCurrentFormat }] : [{ label: "Source Pieces", value: wSources }])]} onEdit={() => goToStep(3)} />
                         {wizardPath === "revoice" && (
                           <ReviewGroup title="What Needs to Change?" rows={[{ label: "Parts", value: wPartsNeedWork === "all" ? "All parts" : "Specific instruments" }, ...(wPartsNeedWork === "specific" ? [{ label: "Instruments", value: wSpecificInstruments }] : []), { label: "Issues", value: wIssuesDescription }, { label: "Show Type", value: wShowType === "stock" ? "Stock show (JW Pepper / Hal Leonard)" : "Custom arrangement" }]} onEdit={() => goToStep(4)} />
                         )}
-                        <ReviewGroup title="Files & Timeline" rows={[{ label: "Drive Link", value: wPartsLink }, { label: "Deadline", value: wDeadline }, { label: "Express", value: wExpress ? "Yes — 48-hour turnaround" : "No" }]} onEdit={() => goToStep(wizardPath === "flip" ? 4 : 5)} />
+                        <ReviewGroup title="Files & Timeline" rows={[{ label: "Parts Link", value: wPartsLink }, { label: "Deadline", value: wDeadline }, { label: "Express", value: wExpress ? "Yes - 48-hour turnaround" : "No" }]} onEdit={() => goToStep(wizardPath === "flip" ? 4 : 5)} />
                       </div>
                     )}
                   </div>
@@ -1247,6 +1589,14 @@ export default function ContactSection() {
       {contactView === "inquiry" && (
         <>
           <InquiryScreen transitioning={transitioning} onBack={goToLanding} initialDone={inquiryInitDone} />
+          {isMobile && <MobileContactStrip />}
+        </>
+      )}
+
+      {/* ── Screen 4: Free Conversion Promo ── */}
+      {contactView === "promo" && (
+        <>
+          <PromoScreen transitioning={transitioning} onBack={goToLanding} initialDone={promoInitDone} />
           {isMobile && <MobileContactStrip />}
         </>
       )}
