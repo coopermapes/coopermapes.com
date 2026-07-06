@@ -140,10 +140,10 @@ export default function ServicesSection() {
                 Flip Folder Conversion
               </h2>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#1254D9", margin: "22px 0 8px" }}>
-                Who This Is For
+                Who Is This For?
               </div>
               <p style={{ fontSize: 16, lineHeight: 1.65, color: "#4A4A4A", margin: 0, maxWidth: 430, textAlign: "left" }}>
-                Directors who purchase scores and arrangements without access to flip folder parts, whether the parts are in 8.5x11 style or are not provided as individual parts at all.
+                Directors who purchase scores and arrangements without access to flip folder parts - whether the parts are in 8.5x11 style or are not provided as individual parts at all.
               </p>
             </ScrollFadeUp>
           </div>
@@ -153,8 +153,15 @@ export default function ServicesSection() {
                 What You Receive
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-                <Bullet text="All parts and all movements in 7x5 flip folder formatting" />
+                <Bullet text="Parts for all movements in 7x5 flip folder formatting" />
+                <Bullet text="School/show-specific text customization" />
                 <Bullet text="Parts organized by movement for efficient printing inside of Google Drive" />
+              </div>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", margin: "24px 0 16px" }}>
+                Pricing
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+                <Bullet text="$50-$200 (based on project scope)" />
               </div>
               <ContactButton onClick={scrollToContact} />
             </ScrollFadeUp>
@@ -181,10 +188,10 @@ export default function ServicesSection() {
                 Part Editing &amp; Revoicing
               </h2>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#1254D9", margin: "22px 0 8px" }}>
-                Who This Is For
+                Who Is This For?
               </div>
               <p style={{ fontSize: 16, lineHeight: 1.65, color: "#4A4A4A", margin: 0, maxWidth: 430, textAlign: "left" }}>
-                Directors who need thorough edits made to their music. Have notes out of playable range, sections struggling with their parts, or chords completely out of balance? This is your fix.
+                Directors who need thorough edits made to their music: have notes out of playable range, sections struggling with their parts, or chords completely out of balance... this is your fix.
               </p>
             </ScrollFadeUp>
           </div>
@@ -195,8 +202,14 @@ export default function ServicesSection() {
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
                 <Bullet text="New parts and scores with all edits or revoicings made" />
-                <Bullet text="Formatting is included" />
-                <Bullet text="Parts and scores organized by movement for efficient printing inside of Google Drive" />
+                <Bullet text="Files organized by movement for efficient printing inside of Google Drive" />
+                <Bullet text="Formatting offered at a discounted rate" />
+              </div>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", margin: "24px 0 16px" }}>
+                Pricing
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+                <Bullet text="$100-$500 (based on project scope)" />
               </div>
               <ContactButton onClick={scrollToContact} />
             </ScrollFadeUp>
@@ -226,10 +239,10 @@ export default function ServicesSection() {
                 Custom Arranging
               </h2>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#1254D9", margin: "22px 0 8px" }}>
-                Who This Is For
+                Who Is This For?
               </div>
               <p style={{ fontSize: 16, lineHeight: 1.65, color: "#4A4A4A", margin: 0, maxWidth: 430, textAlign: "left" }}>
-                Directors seeking a fully custom winds arrangement for their fall marching production. Designed specifically for your ensemble&apos;s competitive and long-term growth goals.
+                Directors seeking a fully custom winds arrangement for their fall marching production, designed specifically for your ensemble&apos;s competitive and long-term growth goals.
               </p>
             </ScrollFadeUp>
           </div>
@@ -239,9 +252,15 @@ export default function ServicesSection() {
                 What You Receive
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-                <Bullet text="Full winds arrangement for marching band, includes professional-grade scores and parts" />
+                <Bullet text="Full winds arrangement for marching band, including professional-grade scores and parts" />
                 <Bullet html="Pacing spreadsheet and score analysis for design efficiency<br/>and easy-to-teach musical intent" />
                 <Bullet text="Rewrites and edits on request to match your ensemble&apos;s strengths and weaknesses" />
+              </div>
+              <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", margin: "24px 0 16px" }}>
+                Pricing
+              </div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+                <Bullet text="$2,000-$3,000 (based on show length and complexity)" />
               </div>
               <ContactButton onClick={scrollToContact} />
             </ScrollFadeUp>

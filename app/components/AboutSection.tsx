@@ -123,9 +123,9 @@ function LogoItem({ src, alt, label, lines, active, onActivate }: typeof LOGOS[0
           {label}
         </div>
         {lines.map((l, i) => (
-          <div key={i} style={{ fontFamily: "var(--font-inter)", fontSize: 13, lineHeight: 1.5, color: "#111111" }}>
-            {l.text}{" "}
-            <span style={{ color: "#6A6A6A" }}>{l.year}</span>
+          <div key={i} style={{ fontFamily: "var(--font-inter)", fontSize: 13, lineHeight: 1.5, color: "#111111", marginBottom: i === lines.length - 1 ? 0 : 6 }}>
+            <div>{l.text}</div>
+            <div style={{ color: "#6A6A6A" }}>{l.year}</div>
           </div>
         ))}
       </div>
@@ -207,22 +207,27 @@ export default function AboutSection() {
 
           <ScrollFadeUp delay={isMobile ? 150 : 500}>
             <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 28, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
-              At the age of 12 I downloaded MuseScore&apos;s notation software for the first time. What has come from that is over a decade of developing my arranging skills and forming a deep-seated passion for music.
+              At the age of 12, I downloaded MuseScore&apos;s notation software for the first time. From this, I have developed my arranging skills and have formed a deep-seated passion for music for over a decade.
             </p>
           </ScrollFadeUp>
           <ScrollFadeUp delay={isMobile ? 200 : 650}>
             <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
-              My name is Cooper Mapes and I am a marching band arranger.
+              My name is Cooper Mapes; I am a freelance musician, specializing in marching band arranging and software-based music engraving.
             </p>
           </ScrollFadeUp>
           <ScrollFadeUp delay={isMobile ? 250 : 800}>
             <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
-              Whether you&apos;re a first-time marching director looking for basic resources, or part of an established program seeking in-depth show analysis, my services can help your band take the next step as an ensemble.
+              I hold a Bachelor of Arts in Music from the University of Mississippi and a Master of Music Composition from the University of Memphis. I am currently furthering my education at the University of Memphis, pursuing a Doctor of Musical Arts in Music Composition.
+            </p>
+          </ScrollFadeUp>
+          <ScrollFadeUp delay={isMobile ? 300 : 950}>
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
+              Whether you are a first-time marching director looking for basic resources or part of an established organization seeking in-depth show analysis, my services can help your program advance as an ensemble.
             </p>
           </ScrollFadeUp>
 
           {/* Logo row */}
-          <ScrollFadeUp delay={isMobile ? 300 : 950}>
+          <ScrollFadeUp delay={isMobile ? 350 : 1100}>
             <div style={{
               marginTop: 40,
               paddingTop: 32,
@@ -253,9 +258,9 @@ export default function AboutSection() {
           background: isMobile ? "#F7F6F4" : undefined,
         }}>
           {[
-            { label: "Years Arranging with Music Notation Software", value: "13", initialDelay: isMobile ? 0 : 1050 },
-            { label: "Years Teaching Competitive Marching Band", value: "7", initialDelay: isMobile ? 100 : 1150 },
-            { label: "Years of Collegiate Music Experience", value: "7", initialDelay: isMobile ? 200 : 1250 },
+            { label: "Years Arranging with Music Notation Software", value: "13", initialDelay: isMobile ? 0 : 1200 },
+            { label: "Years Teaching Competitive Marching Band", value: "7", initialDelay: isMobile ? 100 : 1300 },
+            { label: "Years of Collegiate Music Experience", value: "7", initialDelay: isMobile ? 200 : 1400 },
           ].map((stat, i, arr) => (
             <ScrollFadeUp key={i} delay={stat.initialDelay}>
             <div

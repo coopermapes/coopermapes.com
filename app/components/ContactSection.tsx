@@ -1044,14 +1044,14 @@ export default function ContactSection() {
               <ContactCard
                 icon={<Envelope size={40} weight="light" color="#1254D9" />}
                 title="Get a Quote" cta="Start Your Quote" onClick={goToWizard} active
-                description="Ready for me to take a look at your music? Fill out this quick form to receive a quote from me."
+                description="Ready for me to take a look at your music? Fill out this quick form to receive a quote."
               />
             </FadeUp>
             <FadeUp delay={600} instant={fromBack.current}>
               <ContactCard
                 icon={<Chats size={40} weight="light" color="#1254D9" />}
                 title="Send an Inquiry" cta="Send a Message" onClick={goToInquiry} active
-                description="Have questions before committing to a service? Shoot me a message and we can talk it out."
+                description="Have questions before committing to a service? Shoot a message to me, and we can talk it out."
               />
             </FadeUp>
           </div>
