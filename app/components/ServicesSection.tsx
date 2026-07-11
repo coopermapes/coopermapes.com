@@ -233,7 +233,7 @@ export default function ServicesSection() {
             <ScrollFadeUp>
               <div style={{ fontFamily: "var(--font-anton)", fontSize: isMobile ? "clamp(36px,9vw,56px)" : "clamp(48px,5.5vw,96px)", lineHeight: ".9", color: "#B6B5AD", letterSpacing: "-2px", marginBottom: 14 }}>03</div>
               <div style={{ display: "inline-block", background: "#1254D9", color: "#fff", fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1px", textTransform: "uppercase", padding: "4px 12px", borderRadius: 0, marginBottom: 14 }}>
-                Accepting Fall 2027 Clients Soon
+                Accepting 2027 Clients Soon
               </div>
               <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)", lineHeight: 1.02, letterSpacing: "-.5px", textTransform: "uppercase", margin: 0 }}>
                 Custom Arranging
