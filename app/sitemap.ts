@@ -50,5 +50,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "yearly",
       priority: 0.3,
     },
+    // Self-contained tool apps served from public/ — listed so search engines
+    // discover them (they're only reachable via the Projects page otherwise).
+    {
+      url: "https://coopermapes.com/tuning-tool.html",
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.5,
+    },
+    {
+      url: "https://coopermapes.com/dci-historical-performance.html",
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.5,
+    },
   ];
 }

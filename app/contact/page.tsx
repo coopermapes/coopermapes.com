@@ -1,8 +1,10 @@
 import ContactSection from "../components/ContactSection";
 
 export const metadata = {
-  title: "Contact - Cooper Mapes",
-  description: "Get in touch to discuss your marching band arranging and engraving needs.",
+  title: "Contact: Get in Touch",
+  description:
+    "Request a quote for flip folder conversion, part editing & revoicing, or custom marching band arranging, or send a general inquiry.",
+  alternates: { canonical: "/contact" },
 };
 
 export default function ContactPage() {

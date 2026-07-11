@@ -1,8 +1,9 @@
 import PrivacySection from "../components/PrivacySection";
 
 export const metadata = {
-  title: "Privacy Policy - Cooper Mapes",
+  title: "Privacy Policy",
   description: "Privacy Policy for coopermapes.com.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {
