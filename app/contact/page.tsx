@@ -3,7 +3,7 @@ import ContactSection from "../components/ContactSection";
 export const metadata = {
   title: "Contact: Get in Touch",
   description:
-    "Request a quote for flip folder conversion, part editing & revoicing, or custom marching band arranging, or send a general inquiry.",
+    "Request a quote for a custom arrangement, part editing & revoicing, or fall show arranging, or send a general inquiry.",
   alternates: { canonical: "/contact" },
 };
 

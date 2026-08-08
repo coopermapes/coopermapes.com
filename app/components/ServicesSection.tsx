@@ -1,8 +1,17 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Info, X } from "@phosphor-icons/react";
 import { useIsMobile } from "../hooks/useIsMobile";
+
+const CUSTOM_ARRANGEMENT_PRICING = [
+  { duration: ":30", price: "$100" },
+  { duration: ":45", price: "$125" },
+  { duration: "1:00", price: "$150" },
+  { duration: "1:30", price: "$175" },
+  { duration: "2:00", price: "$200" },
+];
 
 function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -74,6 +83,28 @@ function ContactButton({ onClick }: { onClick: () => void }) {
   );
 }
 
+function PricingInfoButton({ onClick, buttonRef }: { onClick: () => void; buttonRef: React.RefObject<HTMLButtonElement | null> }) {
+  const isMobile = useIsMobile();
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      ref={buttonRef}
+      type="button"
+      onClick={onClick}
+      onMouseEnter={isMobile ? undefined : () => setHovered(true)}
+      onMouseLeave={isMobile ? undefined : () => setHovered(false)}
+      aria-label="View Custom Arrangement pricing by duration"
+      style={{
+        width: 16, height: 16, border: "none", background: "transparent", color: hovered ? "#1254D9" : "#111111",
+        display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer",
+        flexShrink: 0, padding: 0, opacity: hovered ? 1 : 0.5, transition: "opacity .15s ease, color .15s ease",
+      }}
+    >
+      <Info size={16} weight="regular" />
+    </button>
+  );
+}
+
 function Bullet({ text, html }: { text?: string; html?: string }) {
   return (
     <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
@@ -86,10 +117,83 @@ function Bullet({ text, html }: { text?: string; html?: string }) {
   );
 }
 
+function PricingInfoModal({ open, onClose, triggerRef }: { open: boolean; onClose: () => void; triggerRef: React.RefObject<HTMLButtonElement | null> }) {
+  const isMobile = useIsMobile();
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const headingId = useId();
+
+  useEffect(() => {
+    if (!open) return;
+    const trigger = triggerRef.current;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    dialogRef.current?.focus();
+    const onKeyDown = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      trigger?.focus();
+    };
+  }, [open, onClose, triggerRef]);
+
+  if (!open) return null;
+
+  return (
+    <div
+      onClick={onClose}
+      style={{ position: "fixed", inset: 0, background: "rgba(17,17,17,0.55)", zIndex: 1000, display: "flex", alignItems: "center", justifyContent: "center", padding: isMobile ? 20 : 24 }}
+    >
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={headingId}
+        tabIndex={-1}
+        onClick={e => e.stopPropagation()}
+        style={{ background: "#fff", border: "1px solid #DCDBD7", maxWidth: 420, width: "100%", padding: isMobile ? "28px 24px" : "36px 32px", position: "relative", outline: "none" }}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close pricing details"
+          style={{ position: "absolute", top: 16, right: 16, background: "transparent", border: "none", cursor: "pointer", padding: 4, display: "flex", color: "#767672" }}
+        >
+          <X size={20} weight="bold" />
+        </button>
+        <h3 id={headingId} style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(22px,3vw,28px)", textTransform: "uppercase", letterSpacing: "-.5px", margin: "0 0 20px", color: "#111111" }}>
+          Custom Arrangement Pricing
+        </h3>
+        <table style={{ width: "100%", borderCollapse: "collapse", fontFamily: "var(--font-inter)" }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: "left", fontSize: 11, fontWeight: 500, letterSpacing: "1.2px", textTransform: "uppercase", color: "#767672", paddingBottom: 10, borderBottom: "1px solid #DCDBD7" }}>Duration</th>
+              <th style={{ textAlign: "right", fontSize: 11, fontWeight: 500, letterSpacing: "1.2px", textTransform: "uppercase", color: "#767672", paddingBottom: 10, borderBottom: "1px solid #DCDBD7" }}>Price</th>
+            </tr>
+          </thead>
+          <tbody>
+            {CUSTOM_ARRANGEMENT_PRICING.map(row => (
+              <tr key={row.duration}>
+                <td style={{ padding: "10px 0", fontSize: 15, color: "#2A2A2A", borderBottom: "1px solid #EDECE8" }}>{row.duration}</td>
+                <td style={{ padding: "10px 0", fontSize: 15, color: "#111111", fontWeight: 600, textAlign: "right", borderBottom: "1px solid #EDECE8" }}>{row.price}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p style={{ fontFamily: "var(--font-inter)", fontSize: 13, lineHeight: 1.6, color: "#5A5A5A", margin: "20px 0 0" }}>
+          This arrangement is written and licensed for your group, but it&apos;s non-exclusive: it may also be listed on Hal Leonard&apos;s Arrange Me for other ensembles to purchase.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function ServicesSection() {
   const router = useRouter();
   const scrollToContact = () => { router.push("/contact"); };
   const isMobile = useIsMobile();
+  const [pricingModalOpen, setPricingModalOpen] = useState(false);
+  const pricingInfoButtonRef = useRef<HTMLButtonElement>(null);
 
   return (
     <section id="services" style={{ background: "#ffffff", paddingTop: "98px" }}>
@@ -121,7 +225,7 @@ export default function ServicesSection() {
         </ScrollFadeUp>
       </div>
 
-      {/* ── Service 1: Flip Folder Conversion ── */}
+      {/* ── Service 1: Custom Arrangement ── */}
       <div style={{ background: "#EAEAEA", borderTop: "1px solid #DCDBD7" }}>
         <div style={{
           maxWidth: 1180,
@@ -137,13 +241,13 @@ export default function ServicesSection() {
             <ScrollFadeUp>
               <div style={{ fontFamily: "var(--font-anton)", fontSize: isMobile ? "clamp(36px,9vw,56px)" : "clamp(48px,5.5vw,96px)", lineHeight: ".9", color: "#B6B5AD", letterSpacing: "-2px", marginBottom: 14 }}>01</div>
               <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)", lineHeight: 1.02, letterSpacing: "-.5px", textTransform: "uppercase", margin: 0 }}>
-                Flip Folder Conversion
+                Custom Arrangement
               </h2>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#1254D9", margin: "22px 0 8px" }}>
                 Who Is This For?
               </div>
               <p style={{ fontSize: 16, lineHeight: 1.65, color: "#4A4A4A", margin: 0, maxWidth: 430, textAlign: "left" }}>
-                Directors who purchase scores and arrangements without access to flip folder parts - whether the parts are in 8.5x11 style or are not provided as individual parts at all.
+                Directors who want a custom-written arrangement of a specific song for a stands routine or parade performance, without commissioning a full competitive show.
               </p>
             </ScrollFadeUp>
           </div>
@@ -153,21 +257,25 @@ export default function ServicesSection() {
                 What You Receive
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-                <Bullet text="Parts for all movements in 7x5 flip folder formatting" />
-                <Bullet text="School/show-specific text customization" />
-                <Bullet text="Parts organized by movement for efficient printing inside of Google Drive" />
+                <Bullet text="Director's score for your custom arrangement" />
+                <Bullet text="Custom parts for your ensemble's instrumentation" />
+                <Bullet text="MP3 audio render of the finished arrangement" />
               </div>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#767672", margin: "24px 0 16px" }}>
                 Pricing
               </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
-                <Bullet text="$50-$200 (based on project scope)" />
+                <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                  <Bullet text="$100-$200 (based on duration)" />
+                  <PricingInfoButton onClick={() => setPricingModalOpen(true)} buttonRef={pricingInfoButtonRef} />
+                </div>
               </div>
               <ContactButton onClick={scrollToContact} />
             </ScrollFadeUp>
           </div>
         </div>
       </div>
+      <PricingInfoModal open={pricingModalOpen} onClose={() => setPricingModalOpen(false)} triggerRef={pricingInfoButtonRef} />
 
       {/* ── Service 2: Part Editing & Revoicing ── */}
       <div style={{ background: "#FFFFFF", borderTop: "1px solid #DCDBD7" }}>
@@ -217,7 +325,7 @@ export default function ServicesSection() {
         </div>
       </div>
 
-      {/* ── Service 3: Custom Arranging ── */}
+      {/* ── Service 3: Fall Show Arranging ── */}
       <div style={{ background: "#EAEAEA", borderTop: "1px solid #DCDBD7" }}>
         <div style={{
           maxWidth: 1180,
@@ -236,7 +344,7 @@ export default function ServicesSection() {
                 Accepting 2027 Clients Soon
               </div>
               <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)", lineHeight: 1.02, letterSpacing: "-.5px", textTransform: "uppercase", margin: 0 }}>
-                Custom Arranging
+                Fall Show Arranging
               </h2>
               <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: "1.4px", textTransform: "uppercase", color: "#1254D9", margin: "22px 0 8px" }}>
                 Who Is This For?

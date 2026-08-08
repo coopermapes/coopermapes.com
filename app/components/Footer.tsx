@@ -9,7 +9,7 @@ const SOCIAL = [
   {
     key: "instagram",
     label: "Instagram",
-    href: "https://www.instagram.com/coopermapes",
+    href: "https://www.instagram.com/coopermapesmusic/",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="currentColor" strokeWidth="2"/>

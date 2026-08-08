@@ -155,7 +155,7 @@ export default function PortfolioSection() {
         interact: true,
       });
       wsRef.current = ws;
-      ws.on("ready",       () => { if (!destroyed) setWsReady(true); });
+      ws.on("ready",       () => { if (!destroyed) { setWsReady(true); ws.setTime(0); } });
       ws.on("finish",      () => { if (!destroyed) { setPlaying(false); setElapsed(0); } });
       ws.on("timeupdate",  (t: number) => { if (!destroyed) setElapsed(t); });
       if (!WORKS[0].locked) ws.load(WORKS[0].audio).catch((e: Error) => { if (e?.name !== "AbortError") console.error(e); });

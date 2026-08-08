@@ -5,11 +5,11 @@ export default function TermsSection() {
     <LegalPage
       title="Terms of Service"
       effectiveDate="July 1, 2026"
-      intro={'Cooper Mapes ("Cooper Mapes," "I," "me," or "my") provides marching band arranging, part editing, and flip folder conversion services. By using this website or engaging these services, you agree to the terms below.'}
+      intro={'Cooper Mapes ("Cooper Mapes," "I," "me," or "my") provides marching band arranging, part editing and revoicing, and custom arrangement services. By using this website or engaging these services, you agree to the terms below.'}
       sections={[
         {
           heading: "Services",
-          body: "Services are offered on a per-project, quote basis: Flip Folder Conversion, Part Editing & Revoicing, and Custom Arranging. Pricing is determined per project after a quote request and is not published on this site.",
+          body: "Services are offered on a per-project, quote basis: Custom Arrangement, Part Editing & Revoicing, and Fall Show Arranging. Pricing is determined per project after a quote request and is not published on this site.",
         },
         {
           heading: "Payment Terms",
@@ -25,11 +25,15 @@ export default function TermsSection() {
         },
         {
           heading: "Ownership",
-          body: "Full rights to delivered arrangements and files transfer to the client only upon receipt of final payment in full.",
+          body: "Full rights to delivered arrangements and files transfer to the client only upon receipt of final payment in full, except for Custom Arrangement commissions, which are licensed as described in the Arrange Me Licensing section below.",
+        },
+        {
+          heading: "Arrange Me Licensing (Custom Arrangement)",
+          body: "Custom Arrangement commissions are written and licensed for the commissioning group, but the license is non-exclusive. Cooper Mapes retains the right to publish and sell the resulting arrangement to other ensembles through third-party platforms, including Hal Leonard's Arrange Me. This section applies only to Custom Arrangement; it does not apply to Fall Show Arranging or Part Editing & Revoicing.",
         },
         {
           heading: "Source Material & Licensing",
-          body: "Clients are responsible for ensuring they hold the necessary rights, licenses, or permissions for any copyrighted music supplied for arranging, editing, or conversion. Cooper Mapes is not responsible for verifying third-party copyright ownership of client-supplied material.",
+          body: "Clients are responsible for ensuring they hold the necessary rights, licenses, or permissions for any copyrighted music supplied for arranging, editing, or conversion. This does not apply to Custom Arrangement commissions, for which Cooper Mapes handles all necessary licensing directly. Cooper Mapes is not responsible for verifying third-party copyright ownership of client-supplied material.",
         },
         {
           heading: "Limitation of Liability",

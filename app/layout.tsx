@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 const SITE_DESCRIPTION =
-  "Custom marching band arrangements, part editing & revoicing, and flip folder conversion by Cooper Mapes, an arranger, composer, and educator in Hernando, Mississippi.";
+  "Custom marching band show arrangements, part editing & revoicing, and custom stands and parade tune arrangements by Cooper Mapes, an arranger, composer, and educator in Hernando, Mississippi.";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://coopermapes.com"),
@@ -68,7 +68,7 @@ const ENTITY_JSONLD = {
       url: "https://coopermapes.com",
       jobTitle: ["Marching Band Arranger", "Composer", "Music Educator"],
       description:
-        "Cooper Mapes is a marching band arranger, composer, and music educator based in Hernando, Mississippi. He offers custom marching band arrangements, part editing and revoicing, and flip folder conversion for school band programs.",
+        "Cooper Mapes is a marching band arranger, composer, and music educator based in Hernando, Mississippi. He offers custom marching band show arrangements, part editing and revoicing, and custom stands and parade tune arrangements for school band programs.",
       email: "mailto:contact@coopermapes.com",
       address: {
         "@type": "PostalAddress",
@@ -93,12 +93,12 @@ const ENTITY_JSONLD = {
         "music composition",
         "music theory",
         "music engraving",
-        "flip folder conversion",
+        "stands tune arranging",
       ],
       sameAs: [
         "https://www.linkedin.com/in/coopermapes/",
         "https://youtube.com/@coopermapes",
-        "https://www.instagram.com/coopermapes",
+        "https://www.instagram.com/coopermapesmusic/",
         "https://www.facebook.com/ctmapes/",
       ],
     },

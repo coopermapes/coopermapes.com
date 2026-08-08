@@ -9,6 +9,10 @@ import { twMerge } from "tailwind-merge";
 import { useIsMobile } from "../hooks/useIsMobile";
 import EmailLink, { PhoneLink } from "./EmailLink";
 
+// Free Parts Promo archived (not currently offered) — flip back to true to restore the landing card.
+// Routing/state/hash-deep-linking for the promo flow is left intact below, just unreachable from the landing UI.
+const PROMO_ARCHIVED = true;
+
 // ── Fade-up animation (matches homepage stagger) ─────────────────────────────
 function FadeUp({ delay, instant = false, children, style }: { delay: number; instant?: boolean; children: React.ReactNode; style?: React.CSSProperties }) {
   const [visible, setVisible] = useState(instant);
@@ -31,12 +35,22 @@ function FadeUp({ delay, instant = false, children, style }: { delay: number; in
 }
 
 // ── Step definitions ──────────────────────────────────────────────────────────
-const FLIP_STEPS = [
-  { name: "Service",    desc: "Choose your service" },
-  { name: "About You",  desc: "Your contact info" },
-  { name: "Your Show",  desc: "About the show music" },
-  { name: "Files",      desc: "Assets and delivery" },
-  { name: "Review",     desc: "Confirm and send" },
+// Custom Arrangement pricing tiers, keyed by duration. Mirrors the table shown
+// in the Pricing Info Modal on the services page (ServicesSection.tsx) — keep both in sync.
+const ARRANGEMENT_TIERS: { value: string; label: string; price: string }[] = [
+  { value: ":30",  label: ":30",  price: "$100" },
+  { value: ":45",  label: ":45",  price: "$125" },
+  { value: "1:00", label: "1:00", price: "$150" },
+  { value: "1:30", label: "1:30", price: "$175" },
+  { value: "2:00", label: "2:00", price: "$200" },
+];
+
+const ARRANGEMENT_STEPS = [
+  { name: "Service",         desc: "Choose your service" },
+  { name: "About You",       desc: "Your contact info" },
+  { name: "Arrangement",      desc: "About the song" },
+  { name: "Files",           desc: "Assets and delivery" },
+  { name: "Review",          desc: "Confirm and send" },
 ];
 const REVOICE_STEPS = [
   { name: "Service",    desc: "Choose your service" },
@@ -67,12 +81,13 @@ function promoStepContent(step: number) {
 // Timeline (Strict - <date> / No strict timeline), Express Delivery (strict path only), Parts Link.
 const PROMO_FORMSPREE_ENDPOINT = "https://formspree.io/f/mvzjygqe";
 
-function stepContent(step: number, path: "flip" | "revoice" | null) {
+function stepContent(step: number, path: "arrangement" | "revoice" | null) {
   if (step === 1) return { title: "How Can I Help?", sub: "Select the service that best fits your situation." };
   if (step === 2) return { title: "About You", sub: "Tell me who you are and where you're from." };
+  if (step === 3 && path === "arrangement") return { title: "Your Arrangement", sub: "Tell me about the piece you'd like arranged." };
   if (step === 3) return { title: "Your Show", sub: "Tell me about the music you're working with." };
   if (step === 4 && path === "revoice") return { title: "What Needs to Change?", sub: "Help me understand what you're dealing with." };
-  const isFilesStep = (path === "flip" && step === 4) || (path === "revoice" && step === 5);
+  const isFilesStep = (path === "arrangement" && step === 4) || (path === "revoice" && step === 5);
   if (isFilesStep) return { title: "Files & Timeline", sub: "Share your files and let me know when you need this done." };
   return { title: "Review & Submit", sub: "Make sure everything looks right before you send." };
 }
@@ -88,6 +103,22 @@ const inputStyle: React.CSSProperties = {
   boxSizing: "border-box",
   fontFamily: "inherit",
   borderRadius: 0,
+};
+
+// Native <select> chrome (internal padding, arrow, vertical centering) renders
+// inconsistently vs. a plain <input> across browsers even with identical CSS —
+// strip it entirely and draw our own chevron so selects match inputs exactly.
+const selectStyle: React.CSSProperties = {
+  ...inputStyle,
+  appearance: "none",
+  WebkitAppearance: "none",
+  MozAppearance: "none",
+  backgroundImage:
+    "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%23767672' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E\")",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "right 18px center",
+  backgroundSize: "12px 8px",
+  paddingRight: 44,
 };
 
 // ── Number field ──────────────────────────────────────────────────────────────
@@ -182,7 +213,7 @@ function StepDot({ state }: { state: "completed" | "active" | "upcoming" }) {
 
 // ── Radio card ────────────────────────────────────────────────────────────────
 function RadioCard({ selected, onClick, children, size = "lg" }: {
-  selected: boolean; onClick: () => void; children: React.ReactNode; size?: "lg" | "sm";
+  selected: boolean; onClick: () => void; children: React.ReactNode; size?: "lg" | "sm" | "xs";
 }) {
   const isMobile = useIsMobile();
   const [pressed, setPressed] = useState(false);
@@ -195,11 +226,11 @@ function RadioCard({ selected, onClick, children, size = "lg" }: {
       flex: 1,
       border: `2px solid ${selected ? "#1254D9" : "#DCDBD7"}`,
       background: selected ? "#EEF3FD" : "#FFFFFF",
-      padding: size === "lg" ? "18px 24px" : "14px 16px",
-      cursor: "pointer", display: "flex", gap: 14, alignItems: "center",
+      padding: size === "lg" ? "18px 24px" : size === "sm" ? "14px 16px" : "10px 14px",
+      cursor: "pointer", display: "flex", gap: size === "xs" ? 10 : 14, alignItems: "center",
       transition: "border-color .15s ease, background-color .15s ease, transform 0.1s ease, opacity 0.1s ease",
       width: size === "lg" ? "100%" : undefined,
-      minWidth: size === "sm" ? 160 : undefined,
+      minWidth: size === "sm" ? 160 : size === "xs" ? 110 : undefined,
       textAlign: "left",
       transform: isMobile && pressed ? "scale(0.96)" : "scale(1)",
       opacity: isMobile && pressed ? 0.75 : 1,
@@ -211,7 +242,7 @@ function RadioCard({ selected, onClick, children, size = "lg" }: {
         ))}
         aria-hidden="true"
       />
-      <div style={{ fontFamily: "var(--font-inter)", fontSize: 17, fontWeight: 600, color: "#111111", lineHeight: 1.55 }}>
+      <div style={{ fontFamily: "var(--font-inter)", fontSize: size === "xs" ? 15 : 17, fontWeight: 600, color: "#111111", lineHeight: 1.55, whiteSpace: "nowrap" }}>
         {children}
       </div>
     </button>
@@ -473,7 +504,7 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs - I’ll g
           <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 700, letterSpacing: "1.6px", textTransform: "uppercase", color: "#8A8A82", marginBottom: 14 }}>Social Media</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {[
-              { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
+              { label: "Instagram", href: "https://www.instagram.com/coopermapesmusic/" },
               { label: "Facebook",  href: "https://www.facebook.com/ctmapes/" },
               { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
               { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
@@ -501,10 +532,10 @@ function LeftPanel({ onBack, subtitle = "Tell me what your show needs - I’ll g
 }
 
 // ── Horizontal step progress bar ──────────────────────────────────────────────
-function HorizontalStepper({ steps, currentStep }: { steps: typeof FLIP_STEPS; currentStep: number }) {
+function HorizontalStepper({ steps, currentStep }: { steps: typeof ARRANGEMENT_STEPS; currentStep: number }) {
   const isMobile = useIsMobile();
 
-  // Crossfade the whole stepper when switching between the Flip (5-step) and
+  // Crossfade the whole stepper when switching between the Arrangement (5-step) and
   // Revoice (6-step) paths — `steps` is a stable module-level array reference,
   // so identity changes only on a real path switch, not on every step forward/back.
   const [displaySteps, setDisplaySteps] = useState(steps);
@@ -696,13 +727,13 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
                 {/* Row 1: Name + Email */}
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
-                    aria-label="Name" style={inputStyle} placeholder="Name *"
+                    aria-label="Name" style={inputStyle} placeholder="Name*"
                     value={iName} onChange={e => setIName(e.target.value)}
                     onFocus={e => (e.target.style.borderColor = "#1254D9")}
                     onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
                   />
                   <input
-                    aria-label="Email address" style={inputStyle} type="email" placeholder="Email *"
+                    aria-label="Email address" style={inputStyle} type="email" placeholder="Email*"
                     value={iEmail} onChange={e => setIEmail(e.target.value)}
                     onFocus={e => (e.target.style.borderColor = "#1254D9")}
                     onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
@@ -711,22 +742,22 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
                 {/* Row 2: School + Service */}
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 18 }}>
                   <input
-                    aria-label="School or organization" style={inputStyle} placeholder="School / Organization *"
+                    aria-label="School or organization" style={inputStyle} placeholder="School / Organization*"
                     value={iSchool} onChange={e => setISchool(e.target.value)}
                     onFocus={e => (e.target.style.borderColor = "#1254D9")}
                     onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
                   />
                   <select
                     aria-label="Service of interest"
-                    style={{ ...inputStyle, color: iService ? "#141414" : "#A6A5A0" }}
+                    style={{ ...selectStyle, color: iService ? "#141414" : "#A6A5A0" }}
                     value={iService} onChange={e => setIService(e.target.value)}
                     onFocus={e => (e.target.style.borderColor = "#1254D9")}
                     onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
                   >
-                    <option value="" disabled>Service of Interest *</option>
-                    <option value="Flip Folder Conversion">Flip Folder Conversion</option>
+                    <option value="" disabled>Service of Interest*</option>
+                    <option value="Custom Arrangement">Custom Arrangement</option>
                     <option value="Part Editing & Revoicing">Part Editing &amp; Revoicing</option>
-                    <option value="Custom Arranging">Custom Arranging</option>
+                    <option value="Fall Show Arranging">Fall Show Arranging</option>
                     <option value="General Question">General Question</option>
                   </select>
                 </div>
@@ -740,12 +771,12 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
                   />
                   <select
                     aria-label="How did you hear about me"
-                    style={{ ...inputStyle, color: iHear ? "#141414" : "#A6A5A0" }}
+                    style={{ ...selectStyle, color: iHear ? "#141414" : "#A6A5A0" }}
                     value={iHear} onChange={e => setIHear(e.target.value)}
                     onFocus={e => (e.target.style.borderColor = "#1254D9")}
                     onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
                   >
-                    <option value="" disabled>How did you hear about me? *</option>
+                    <option value="" disabled>How did you hear about me? *</option>
                     <option value="Word of mouth">Word of mouth</option>
                     <option value="Instagram">Instagram</option>
                     <option value="Facebook">Facebook</option>
@@ -759,7 +790,7 @@ function InquiryScreen({ transitioning, onBack, initialDone = false }: { transit
                 {/* Message */}
                 <textarea
                   aria-label="Message" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
-                  rows={6} placeholder="Message *"
+                  rows={6} placeholder="Message*"
                   value={iMessage} onChange={e => setIMessage(e.target.value)}
                   onFocus={e => (e.target.style.borderColor = "#1254D9")}
                   onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
@@ -947,17 +978,17 @@ function PromoScreen({ transitioning, onBack, initialDone = false }: { transitio
                 <div style={{ flex: isMobile ? undefined : 1, maxWidth: 840 }}>
                   {pStep === 1 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                      <input aria-label="Name" style={inputStyle} placeholder="Name *" value={pName} onChange={e => setPName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                      <input aria-label="Email address" style={inputStyle} type="email" placeholder="Email *" value={pEmail} onChange={e => setPEmail(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                      <input aria-label="School or organization" style={inputStyle} placeholder="School / Organization *" value={pSchool} onChange={e => setPSchool(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <input aria-label="Name" style={inputStyle} placeholder="Name*" value={pName} onChange={e => setPName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <input aria-label="Email address" style={inputStyle} type="email" placeholder="Email*" value={pEmail} onChange={e => setPEmail(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <input aria-label="School or organization" style={inputStyle} placeholder="School / Organization*" value={pSchool} onChange={e => setPSchool(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                       <select
                         aria-label="How did you hear about me"
-                        style={{ ...inputStyle, color: pHear ? "#141414" : "#A6A5A0" }}
+                        style={{ ...selectStyle, color: pHear ? "#141414" : "#A6A5A0" }}
                         value={pHear} onChange={e => setPHear(e.target.value)}
                         onFocus={e => (e.target.style.borderColor = "#1254D9")}
                         onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
                       >
-                        <option value="" disabled>How did you hear about me? *</option>
+                        <option value="" disabled>How did you hear about me? *</option>
                         <option value="Word of mouth">Word of mouth</option>
                         <option value="Instagram">Instagram</option>
                         <option value="Facebook">Facebook</option>
@@ -971,17 +1002,17 @@ function PromoScreen({ transitioning, onBack, initialDone = false }: { transitio
                   )}
                   {pStep === 2 && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                      <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={pShowName} onChange={e => setPShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                      <select aria-label="Which movement" style={{ ...inputStyle, color: pMovementNumber ? "#141414" : "#A6A5A0" }} value={pMovementNumber} onChange={e => setPMovementNumber(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
-                        <option value="" disabled>Which Movement Do You Want Converted? *</option>
+                      <input aria-label="Show name" style={inputStyle} placeholder="Show Name*" value={pShowName} onChange={e => setPShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <select aria-label="Which movement" style={{ ...selectStyle, color: pMovementNumber ? "#141414" : "#A6A5A0" }} value={pMovementNumber} onChange={e => setPMovementNumber(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
+                        <option value="" disabled>Which Movement Do You Want Converted? *</option>
                         {["1", "2", "3", "4", "5", "6"].map(n => (
                           <option key={n} value={n}>Movement {n}</option>
                         ))}
                       </select>
-                      <input aria-label="Source music" style={inputStyle} placeholder="Source Music and Composer for This Movement *" value={pSourceMusic} onChange={e => setPSourceMusic(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                      <NumberField ariaLabel="Total number of instrument parts for this movement" placeholder="Total Number of Instrument Parts *" value={pNumParts} onChange={setPNumParts} />
-                      <select aria-label="Current format" style={{ ...inputStyle, color: pCurrentFormat ? "#141414" : "#A6A5A0" }} value={pCurrentFormat} onChange={e => setPCurrentFormat(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
-                        <option value="" disabled>Current Format of Your Parts *</option>
+                      <input aria-label="Source music" style={inputStyle} placeholder="Source Music and Composer for This Movement*" value={pSourceMusic} onChange={e => setPSourceMusic(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                      <NumberField ariaLabel="Total number of instrument parts for this movement" placeholder="Total Number of Instrument Parts*" value={pNumParts} onChange={setPNumParts} />
+                      <select aria-label="Current format" style={{ ...selectStyle, color: pCurrentFormat ? "#141414" : "#A6A5A0" }} value={pCurrentFormat} onChange={e => setPCurrentFormat(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
+                        <option value="" disabled>Current Format of Your Parts*</option>
                         <option value="8.5×11 PDF parts">8.5×11 PDF parts</option>
                         <option value="7x5 PDF parts">7x5 PDF parts</option>
                         <option value="Director's Score Only">Director&apos;s Score Only</option>
@@ -993,7 +1024,7 @@ function PromoScreen({ transitioning, onBack, initialDone = false }: { transitio
                     <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                       <input aria-label="Link to your parts" style={inputStyle} type="url" placeholder="Link to Your Parts - Google Drive or OneDrive (optional)" value={pPartsLink} onChange={e => setPPartsLink(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                       <div>
-                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Do you currently have access to an XML file for your show music? *</div>
+                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Do you currently have access to an XML file for your show music? *</div>
                         <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                           <RadioCard selected={pHasXml === "yes"} onClick={() => setPHasXml("yes")} size="sm">Yes. I can send it in an email once I receive my quote.</RadioCard>
                           <RadioCard selected={pHasXml === "arranger"} onClick={() => setPHasXml("arranger")} size="sm">No. But I am able to get this from my arranger.</RadioCard>
@@ -1001,7 +1032,7 @@ function PromoScreen({ transitioning, onBack, initialDone = false }: { transitio
                         </div>
                       </div>
                       <div>
-                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Do you have a strict timeline? *</div>
+                        <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Do you have a strict timeline? *</div>
                         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                           <RadioCard selected={pTimeline === "strict"} onClick={() => setPTimeline("strict")} size="sm">I have a strict timeline</RadioCard>
                           <RadioCard selected={pTimeline === "flexible"} onClick={() => { setPTimeline("flexible"); setPDeadline(""); setPExpress(false); }} size="sm">I do not have a strict timeline</RadioCard>
@@ -1118,7 +1149,7 @@ function MobileContactStrip() {
       </PhoneLink>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {[
-          { label: "Instagram", href: "https://www.instagram.com/coopermapes" },
+          { label: "Instagram", href: "https://www.instagram.com/coopermapesmusic/" },
           { label: "Facebook",  href: "https://www.facebook.com/ctmapes/" },
           { label: "LinkedIn",  href: "https://www.linkedin.com/in/coopermapes/" },
           { label: "YouTube",   href: "https://youtube.com/@coopermapes/videos" },
@@ -1133,7 +1164,7 @@ function MobileContactStrip() {
 // ── Main component ────────────────────────────────────────────────────────────
 export default function ContactSection() {
   const [wizardStep, setWizardStep] = useState(1);
-  const [wizardPath, setWizardPath] = useState<"flip" | "revoice" | null>(null);
+  const [wizardPath, setWizardPath] = useState<"arrangement" | "revoice" | null>(null);
   const [wizardDone, setWizardDone] = useState(false);
   const [wizardError, setWizardError] = useState("");
   const [contactView, setContactView] = useState<"landing" | "wizard" | "inquiry" | "promo">("landing");
@@ -1157,30 +1188,35 @@ export default function ContactSection() {
   const [wShowName, setWShowName] = useState("");
   const [wMovements, setWMovements] = useState("");
   const [wNumParts, setWNumParts] = useState("");
-  const [wCurrentFormat, setWCurrentFormat] = useState("");
   const [wSources, setWSources] = useState("");
   const [wPartsNeedWork, setWPartsNeedWork] = useState<"all" | "specific" | "">("");
   const [wSpecificInstruments, setWSpecificInstruments] = useState("");
   const [wIssuesDescription, setWIssuesDescription] = useState("");
   const [wShowType, setWShowType] = useState<"stock" | "custom" | "">("");
+  const [wSourceSong, setWSourceSong] = useState("");
+  const [wUseCase, setWUseCase] = useState<"stands" | "parade" | "other" | "">("");
+  const [wDurationTier, setWDurationTier] = useState("");
+  const [wInstrumentation, setWInstrumentation] = useState("");
+  const [wArrangeMeConsent, setWArrangeMeConsent] = useState(false);
   const [wPartsLink, setWPartsLink] = useState("");
   const [wDeadline, setWDeadline] = useState("");
   const [wExpress, setWExpress] = useState(false);
 
   const isMobile = useIsMobile();
-  const steps = wizardPath === "revoice" ? REVOICE_STEPS : FLIP_STEPS;
+  const steps = wizardPath === "revoice" ? REVOICE_STEPS : ARRANGEMENT_STEPS;
   const totalSteps = steps.length;
-  const isFilesStep = wizardPath === "flip" ? wizardStep === 4 : wizardStep === 5;
+  const isFilesStep = wizardPath === "arrangement" ? wizardStep === 4 : wizardStep === 5;
   const isFinalStep = wizardStep === totalSteps;
 
   function isStepValid(): boolean {
     if (wizardStep === 1) return wizardPath !== null;
     if (wizardStep === 2) return !!(wName.trim() && wEmail.trim() && wEmail.includes("@") && wSchool.trim() && wHear);
+    if (wizardStep === 3 && wizardPath === "arrangement") {
+      return !!(wSourceSong.trim() && wUseCase && wDurationTier && wInstrumentation.trim());
+    }
     if (wizardStep === 3) {
       const isPositiveInt = (v: string) => /^\d+$/.test(v) && Number(v) >= 1;
-      const base = !!(wShowName.trim() && isPositiveInt(wMovements) && isPositiveInt(wNumParts));
-      if (wizardPath === "flip") return base && !!wCurrentFormat;
-      return base && !!wSources.trim();
+      return !!(wShowName.trim() && isPositiveInt(wMovements) && isPositiveInt(wNumParts) && wSources.trim());
     }
     if (wizardStep === 4 && wizardPath === "revoice") {
       if (!wPartsNeedWork) return false;
@@ -1188,6 +1224,7 @@ export default function ContactSection() {
       return !!(wIssuesDescription.trim() && wShowType);
     }
     if (isFilesStep) return !!wDeadline;
+    if (isFinalStep && wizardPath === "arrangement") return wArrangeMeConsent;
     return true;
   }
 
@@ -1211,8 +1248,9 @@ export default function ContactSection() {
   function resetWizard() {
     setWizardStep(1); setWizardPath(null); setWizardDone(false); setWizardError("");
     setWName(""); setWEmail(""); setWSchool(""); setWHear("");
-    setWShowName(""); setWMovements(""); setWNumParts(""); setWCurrentFormat(""); setWSources("");
+    setWShowName(""); setWMovements(""); setWNumParts(""); setWSources("");
     setWPartsNeedWork(""); setWSpecificInstruments(""); setWIssuesDescription(""); setWShowType("");
+    setWSourceSong(""); setWUseCase(""); setWDurationTier(""); setWInstrumentation(""); setWArrangeMeConsent(false);
     setWPartsLink(""); setWDeadline(""); setWExpress(false);
   }
 
@@ -1279,23 +1317,30 @@ export default function ContactSection() {
 
   async function handleSubmit() {
     const payload: Record<string, string> = {
-      Service: wizardPath === "flip" ? "Flip Folder Conversion" : "Part Editing & Revoicing",
-      service_path: wizardPath === "flip" ? "flip_folder" : "revoicing",
+      Service: wizardPath === "arrangement" ? "Custom Arrangement" : "Part Editing & Revoicing",
+      service_path: wizardPath === "arrangement" ? "custom_arrangement" : "revoicing",
       Name: wName, Email: wEmail, School: wSchool,
       "How did you hear about me?": wHear,
-      "Show Name": wShowName, Movements: wMovements, "Parts Count": wNumParts,
       Deadline: wDeadline, "Express Delivery": wExpress ? "Yes - 48-hour turnaround" : "No",
     };
-    if (wizardPath === "flip") {
-      payload["Current Format"] = wCurrentFormat;
+    if (wizardPath === "arrangement") {
+      payload["Source Music"] = wSourceSong;
+      payload["Use Case"] = wUseCase === "stands" ? "Stands Tune" : wUseCase === "parade" ? "Parade Tune" : "Other";
+      const tier = ARRANGEMENT_TIERS.find(t => t.value === wDurationTier);
+      payload["Duration"] = tier ? `${tier.label} (${tier.price})` : "";
+      payload["Instrumentation"] = wInstrumentation;
+      payload["Arrange Me Consent"] = wArrangeMeConsent ? "Yes" : "No";
     } else {
+      payload["Show Name"] = wShowName;
+      payload["Movements"] = wMovements;
+      payload["Parts Count"] = wNumParts;
       payload["Source Pieces"] = wSources;
       payload["Parts Need Work"] = wPartsNeedWork === "all" ? "All parts" : "Specific instruments";
       if (wPartsNeedWork === "specific") payload["Specific Instruments"] = wSpecificInstruments;
       payload["Issues"] = wIssuesDescription;
       payload["Show Type"] = wShowType === "stock" ? "Stock show (JW Pepper / Hal Leonard)" : "Custom arrangement";
     }
-    if (wPartsLink.trim()) payload["Parts Link"] = wPartsLink;
+    if (wPartsLink.trim()) payload[wizardPath === "arrangement" ? "Reference Link" : "Parts Link"] = wPartsLink;
     try {
       const res = await fetch("https://formspree.io/f/xnjknkab", {
         method: "POST",
@@ -1348,12 +1393,12 @@ export default function ContactSection() {
             </FadeUp>
             <FadeUp delay={260} instant={fromBack.current}>
               <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#5A5A5A", maxWidth: 480, margin: "24px auto 0", lineHeight: 1.55 }}>
-                The first step to better sheet music. Get a quote or send an inquiry to start our work together.
+                The first step to get your custom arrangement. Get a quote or send an inquiry to start our work together.
               </p>
             </FadeUp>
           </div>
           <div style={{
-            display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3, minmax(0, 400px))",
+            display: "grid", gridTemplateColumns: isMobile ? "1fr" : `repeat(${PROMO_ARCHIVED ? 2 : 3}, minmax(0, 400px))`,
             justifyContent: "center",
             gap: 24, width: "100%", maxWidth: 1248, position: "relative", zIndex: 1,
           }}>
@@ -1371,14 +1416,16 @@ export default function ContactSection() {
                 description="Have questions before committing to a service? Shoot a message to me, and we can talk it out."
               />
             </FadeUp>
-            <FadeUp delay={760} instant={fromBack.current}>
-              <ContactCard
-                icon={<Megaphone size={40} weight="light" color="#1254D9" />}
-                title="Free Parts Promo" cta="I'm In!" onClick={goToPromo} active
-                badge="Limited Availability!"
-                description="Be one of the first 10 applicants to receive professional-grade parts, completely free of charge."
-              />
-            </FadeUp>
+            {!PROMO_ARCHIVED && (
+              <FadeUp delay={760} instant={fromBack.current}>
+                <ContactCard
+                  icon={<Megaphone size={40} weight="light" color="#1254D9" />}
+                  title="Free Parts Promo" cta="I'm In!" onClick={goToPromo} active
+                  badge="Limited Availability!"
+                  description="Be one of the first 10 applicants to receive professional-grade parts, completely free of charge."
+                />
+              </FadeUp>
+            )}
           </div>
         </div>
       )}
@@ -1444,23 +1491,23 @@ export default function ContactSection() {
                   <div style={{ flex: isMobile ? undefined : 1, maxWidth: 840 }}>
                     {wizardStep === 1 && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 18, width: "fit-content" }}>
-                        <RadioCard selected={wizardPath === "flip"} onClick={() => setWizardPath("flip")}>My parts need reformatting or organizing.</RadioCard>
+                        <RadioCard selected={wizardPath === "arrangement"} onClick={() => setWizardPath("arrangement")}>I need a custom arrangement for my ensemble.</RadioCard>
                         <RadioCard selected={wizardPath === "revoice"} onClick={() => setWizardPath("revoice")}>My music needs rewrites or revoicings.</RadioCard>
                       </div>
                     )}
                     {wizardStep === 2 && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                        <input aria-label="Name" style={inputStyle} placeholder="Name *" value={wName} onChange={e => setWName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <input aria-label="Email address" style={inputStyle} type="email" placeholder="Email *" value={wEmail} onChange={e => setWEmail(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <input aria-label="School or organization" style={inputStyle} placeholder="School / Organization *" value={wSchool} onChange={e => setWSchool(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <input aria-label="Name" style={inputStyle} placeholder="Name*" value={wName} onChange={e => setWName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <input aria-label="Email address" style={inputStyle} type="email" placeholder="Email*" value={wEmail} onChange={e => setWEmail(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <input aria-label="School or organization" style={inputStyle} placeholder="School / Organization*" value={wSchool} onChange={e => setWSchool(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <select
                           aria-label="How did you hear about me"
-                          style={{ ...inputStyle, color: wHear ? "#141414" : "#A6A5A0" }}
+                          style={{ ...selectStyle, color: wHear ? "#141414" : "#A6A5A0" }}
                           value={wHear} onChange={e => setWHear(e.target.value)}
                           onFocus={e => (e.target.style.borderColor = "#1254D9")}
                           onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
                         >
-                          <option value="" disabled>How did you hear about me? *</option>
+                          <option value="" disabled>How did you hear about me? *</option>
                           <option value="Word of mouth">Word of mouth</option>
                           <option value="Instagram">Instagram</option>
                           <option value="Facebook">Facebook</option>
@@ -1472,43 +1519,53 @@ export default function ContactSection() {
                         </select>
                       </div>
                     )}
-                    {wizardStep === 3 && wizardPath === "flip" && (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                        <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={wShowName} onChange={e => setWShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <NumberField ariaLabel="Number of movements" placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={setWMovements} />
-                        <NumberField ariaLabel="Total number of instrument parts" placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={setWNumParts} />
-                        <select aria-label="Current format" style={{ ...inputStyle, color: wCurrentFormat ? "#141414" : "#A6A5A0" }} value={wCurrentFormat} onChange={e => setWCurrentFormat(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}>
-                          <option value="" disabled>Current Format of Your Parts *</option>
-                          <option value="8.5×11 PDF parts">8.5×11 PDF parts</option>
-                          <option value="7x5 PDF parts">7x5 PDF parts</option>
-                          <option value="Director's Score Only">Director&apos;s Score Only</option>
-                          <option value="Other">Other</option>
-                        </select>
+                    {wizardStep === 3 && wizardPath === "arrangement" && (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                        <input aria-label="Source music" style={inputStyle} placeholder="Source Music* (title and artist)" value={wSourceSong} onChange={e => setWSourceSong(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <div>
+                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Arrangement Type*</div>
+                          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                            <RadioCard selected={wUseCase === "stands"} onClick={() => setWUseCase("stands")} size="xs">Stands Tune</RadioCard>
+                            <RadioCard selected={wUseCase === "parade"} onClick={() => setWUseCase("parade")} size="xs">Parade Tune</RadioCard>
+                            <RadioCard selected={wUseCase === "other"} onClick={() => setWUseCase("other")} size="xs">Other</RadioCard>
+                          </div>
+                        </div>
+                        <div>
+                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Desired length*</div>
+                          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                            {ARRANGEMENT_TIERS.map(tier => (
+                              <RadioCard key={tier.value} selected={wDurationTier === tier.value} onClick={() => setWDurationTier(tier.value)} size="xs">
+                                {tier.label} <span style={{ fontWeight: 400, color: "#5A5A5A" }}>({tier.price})</span>
+                              </RadioCard>
+                            ))}
+                          </div>
+                        </div>
+                        <input aria-label="Instrumentation" style={inputStyle} placeholder="Instrumentation/Part Numbers*" value={wInstrumentation} onChange={e => setWInstrumentation(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                       </div>
                     )}
                     {wizardStep === 3 && wizardPath === "revoice" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                        <input aria-label="Show name" style={inputStyle} placeholder="Show Name *" value={wShowName} onChange={e => setWShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
-                        <NumberField ariaLabel="Number of movements" placeholder="Number of Movements * (e.g. 3)" value={wMovements} onChange={setWMovements} />
-                        <NumberField ariaLabel="Total number of instrument parts" placeholder="Total Number of Instrument Parts *" value={wNumParts} onChange={setWNumParts} />
-                        <textarea aria-label="Source pieces" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={3} placeholder="Source Pieces * - List the pieces included in your show" value={wSources} onChange={e => setWSources(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <input aria-label="Show name" style={inputStyle} placeholder="Show Name*" value={wShowName} onChange={e => setWShowName(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <NumberField ariaLabel="Number of movements" placeholder="Number of Movements* (e.g. 3)" value={wMovements} onChange={setWMovements} />
+                        <NumberField ariaLabel="Total number of instrument parts" placeholder="Total Number of Instrument Parts*" value={wNumParts} onChange={setWNumParts} />
+                        <textarea aria-label="Source pieces" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={3} placeholder="Source Pieces* - List the pieces included in your show" value={wSources} onChange={e => setWSources(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                       </div>
                     )}
                     {wizardStep === 4 && wizardPath === "revoice" && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
                         <div>
-                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Which parts need work? *</div>
+                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Which parts need work? *</div>
                           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                             <RadioCard selected={wPartsNeedWork === "all"} onClick={() => setWPartsNeedWork("all")} size="sm">All parts</RadioCard>
                             <RadioCard selected={wPartsNeedWork === "specific"} onClick={() => setWPartsNeedWork("specific")} size="sm">Specific instruments</RadioCard>
                           </div>
                         </div>
                         {wPartsNeedWork === "specific" && (
-                          <input aria-label="Which instruments" style={inputStyle} placeholder="Which instruments? * (e.g. Trumpet 1, Alto Sax 2)" value={wSpecificInstruments} onChange={e => setWSpecificInstruments(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                          <input aria-label="Which instruments" style={inputStyle} placeholder="Which instruments? * (e.g. Trumpet 1, Alto Sax 2)" value={wSpecificInstruments} onChange={e => setWSpecificInstruments(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         )}
-                        <textarea aria-label="Describe the issues" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={4} placeholder="Describe the issues you're experiencing *" value={wIssuesDescription} onChange={e => setWIssuesDescription(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <textarea aria-label="Describe the issues" style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }} rows={4} placeholder="Describe the issues you're experiencing*" value={wIssuesDescription} onChange={e => setWIssuesDescription(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <div>
-                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Is this a stock show or custom arrangement? *</div>
+                          <div style={{ fontFamily: "var(--font-inter)", fontSize: 18, fontWeight: 600, color: "#111111", marginBottom: 12 }}>Is this a stock show or custom arrangement? *</div>
                           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
                             <RadioCard selected={wShowType === "stock"} onClick={() => setWShowType("stock")} size="sm">Stock show <span style={{ fontWeight: 400, color: "#5A5A5A" }}>(JW Pepper / Hal Leonard)</span></RadioCard>
                             <RadioCard selected={wShowType === "custom"} onClick={() => setWShowType("custom")} size="sm">Custom arrangement</RadioCard>
@@ -1518,25 +1575,47 @@ export default function ContactSection() {
                     )}
                     {isFilesStep && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-                        <input aria-label="Link to your parts" style={inputStyle} type="url" placeholder="Link to Your Parts - Google Drive or OneDrive (optional)" value={wPartsLink} onChange={e => setWPartsLink(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
+                        <input
+                          aria-label={wizardPath === "arrangement" ? "Link to reference material" : "Link to your parts"}
+                          style={inputStyle} type="url"
+                          placeholder={wizardPath === "arrangement" ? "Link to Reference Material - sheet music or audio (optional)" : "Link to Your Parts - Google Drive or OneDrive (optional)"}
+                          value={wPartsLink} onChange={e => setWPartsLink(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")}
+                        />
                         <input aria-label="Deadline" style={inputStyle} type="date" value={wDeadline} onChange={e => setWDeadline(e.target.value)} onFocus={e => (e.target.style.borderColor = "#1254D9")} onBlur={e => (e.target.style.borderColor = "#CFCEC9")} />
                         <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", padding: 16, border: "1px solid #DCDBD7", background: "#F7F6F4" }}>
                           <input type="checkbox" checked={wExpress} onChange={e => setWExpress(e.target.checked)} style={{ width: 16, height: 16, accentColor: "#1254D9", marginTop: 3, cursor: "pointer" }} />
                           <span style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#2A2A2A", lineHeight: 1.5 }}>
-                            <strong>Express Delivery:</strong> I need my parts delivered within 48 hours. <em>($50 rush fee applied)</em>
+                            <strong>Express Delivery:</strong> I need this delivered within 48 hours. <em>($50 rush fee applied)</em>
                           </span>
                         </label>
                       </div>
                     )}
                     {isFinalStep && (
                       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                        <ReviewGroup title="How Can I Help?" rows={[{ label: "Service", value: wizardPath === "flip" ? "Flip Folder Conversion" : "Part Editing & Revoicing" }]} onEdit={() => goToStep(1)} />
+                        <ReviewGroup title="How Can I Help?" rows={[{ label: "Service", value: wizardPath === "arrangement" ? "Custom Arrangement" : "Part Editing & Revoicing" }]} onEdit={() => goToStep(1)} />
                         <ReviewGroup title="About You" rows={[{ label: "Name", value: wName }, { label: "Email", value: wEmail }, { label: "School", value: wSchool }, { label: "Heard Via", value: wHear }]} onEdit={() => goToStep(2)} />
-                        <ReviewGroup title="Your Show" rows={[{ label: "Show Name", value: wShowName }, { label: "Movements", value: wMovements }, { label: "Parts Count", value: wNumParts }, ...(wizardPath === "flip" ? [{ label: "Current Format", value: wCurrentFormat }] : [{ label: "Source Pieces", value: wSources }])]} onEdit={() => goToStep(3)} />
+                        {wizardPath === "arrangement" ? (
+                          <ReviewGroup title="Your Arrangement" rows={[
+                            { label: "Source Music", value: wSourceSong },
+                            { label: "Use Case", value: wUseCase === "stands" ? "Stands Tune" : wUseCase === "parade" ? "Parade Tune" : "Other" },
+                            { label: "Duration", value: ARRANGEMENT_TIERS.find(t => t.value === wDurationTier)?.label ? `${wDurationTier} (${ARRANGEMENT_TIERS.find(t => t.value === wDurationTier)?.price})` : "" },
+                            { label: "Instrumentation", value: wInstrumentation },
+                          ]} onEdit={() => goToStep(3)} />
+                        ) : (
+                          <ReviewGroup title="Your Show" rows={[{ label: "Show Name", value: wShowName }, { label: "Movements", value: wMovements }, { label: "Parts Count", value: wNumParts }, { label: "Source Pieces", value: wSources }]} onEdit={() => goToStep(3)} />
+                        )}
                         {wizardPath === "revoice" && (
                           <ReviewGroup title="What Needs to Change?" rows={[{ label: "Parts", value: wPartsNeedWork === "all" ? "All parts" : "Specific instruments" }, ...(wPartsNeedWork === "specific" ? [{ label: "Instruments", value: wSpecificInstruments }] : []), { label: "Issues", value: wIssuesDescription }, { label: "Show Type", value: wShowType === "stock" ? "Stock show (JW Pepper / Hal Leonard)" : "Custom arrangement" }]} onEdit={() => goToStep(4)} />
                         )}
-                        <ReviewGroup title="Files & Timeline" rows={[{ label: "Parts Link", value: wPartsLink }, { label: "Deadline", value: wDeadline }, { label: "Express", value: wExpress ? "Yes - 48-hour turnaround" : "No" }]} onEdit={() => goToStep(wizardPath === "flip" ? 4 : 5)} />
+                        <ReviewGroup title="Files & Timeline" rows={[{ label: wizardPath === "arrangement" ? "Reference Link" : "Parts Link", value: wPartsLink }, { label: "Deadline", value: wDeadline }, { label: "Express", value: wExpress ? "Yes - 48-hour turnaround" : "No" }]} onEdit={() => goToStep(wizardPath === "arrangement" ? 4 : 5)} />
+                        {wizardPath === "arrangement" && (
+                          <label style={{ display: "flex", alignItems: "flex-start", gap: 12, cursor: "pointer", padding: 16, border: "1px solid #DCDBD7", background: "#F7F6F4", marginTop: 4 }}>
+                            <input type="checkbox" checked={wArrangeMeConsent} onChange={e => setWArrangeMeConsent(e.target.checked)} style={{ width: 16, height: 16, accentColor: "#1254D9", marginTop: 3, cursor: "pointer" }} />
+                            <span style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#2A2A2A", lineHeight: 1.5 }}>
+                              <strong>Arrange Me Listing:</strong> I understand this arrangement is written and licensed for my group, but is non-exclusive: it may also be listed for other ensembles to purchase through Hal Leonard&apos;s Arrange Me.
+                            </span>
+                          </label>
+                        )}
                       </div>
                     )}
                   </div>

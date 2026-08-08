@@ -1,6 +1,6 @@
 # coopermapes.com
 
-Marketing and portfolio site for **Cooper Mapes** — a marching-band arranger, composer, and educator. The site presents his services (flip-folder conversion, part editing & revoicing, custom arranging), a portfolio of selected works with audio playback, an about page, and a multi-step contact/quote flow.
+Marketing and portfolio site for **Cooper Mapes** — a marching-band arranger, composer, and educator. The site presents his services (custom arrangement, part editing & revoicing, fall show arranging), a portfolio of selected works with audio playback, an about page, and a multi-step contact/quote flow.
 
 ## Tech stack
 
@@ -77,7 +77,7 @@ For production, set the same variables in the Vercel project settings.
 Contact submissions post directly to Formspree endpoints (no backend):
 
 - **Inquiry form** — general contact
-- **Quote wizard** — the multi-step flip-folder / revoicing request flow
+- **Quote wizard** — the multi-step custom arrangement / revoicing request flow
 
 Both live in `app/components/ContactSection.tsx`.
 

@@ -3,7 +3,7 @@ import ServicesSection from "../components/ServicesSection";
 export const metadata = {
   title: "Ensemble Arranging Services and Pricing",
   description:
-    "Flip folder conversion ($50–$200), part editing & revoicing ($100–$500), and custom marching band arranging ($2,000–$3,000) for school band programs.",
+    "Custom arrangement ($100–$200), part editing & revoicing ($100–$500), and fall show arranging ($2,000–$3,000) for school band programs.",
   alternates: { canonical: "/services" },
 };
 
@@ -14,10 +14,10 @@ const SERVICES_JSONLD = {
   "@graph": [
     {
       "@type": "Service",
-      name: "Flip Folder Conversion",
-      serviceType: "Sheet music flip folder conversion",
+      name: "Custom Arrangement",
+      serviceType: "Custom stands and parade tune arrangement",
       description:
-        "Conversion of full-size marching band sheet music into clean, legible flip-folder-sized parts for every member of the ensemble.",
+        "Short custom arrangement of a specific song for a marching band stands routine or parade performance, priced by duration.",
       provider: { "@id": "https://coopermapes.com/#person" },
       areaServed: "United States",
       url: "https://coopermapes.com/services",
@@ -26,7 +26,7 @@ const SERVICES_JSONLD = {
         priceCurrency: "USD",
         priceSpecification: {
           "@type": "PriceSpecification",
-          minPrice: 50,
+          minPrice: 100,
           maxPrice: 200,
           priceCurrency: "USD",
         },
@@ -54,8 +54,8 @@ const SERVICES_JSONLD = {
     },
     {
       "@type": "Service",
-      name: "Custom Marching Band Arranging",
-      serviceType: "Custom marching band arrangement",
+      name: "Fall Show Arranging",
+      serviceType: "Custom marching band show arrangement",
       description:
         "Fully custom marching band show arrangements written for a specific ensemble, priced by show length and complexity.",
       provider: { "@id": "https://coopermapes.com/#person" },
