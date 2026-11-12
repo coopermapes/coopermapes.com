@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Inter } from "next/font/google";
 import "./globals.css";
-import Nav from "./components/Nav";
-import Footer from "./components/Footer";
+import SiteChrome from "./components/SiteChrome";
 import { PostHogProvider } from "./components/PostHogProvider";
 
 const anton = Anton({
@@ -129,11 +128,7 @@ export default function RootLayout({
         />
         <PostHogProvider>
           <a href="#main-content" className="skip-link">Skip to main content</a>
-          <Nav />
-          <main id="main-content">
-            {children}
-          </main>
-          <Footer />
+          <SiteChrome>{children}</SiteChrome>
         </PostHogProvider>
         </body>
     </html>
