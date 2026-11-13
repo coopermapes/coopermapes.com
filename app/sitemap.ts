@@ -9,12 +9,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     {
-      url: "https://coopermapes.com/services",
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.9,
-    },
-    {
       url: "https://coopermapes.com/portfolio",
       lastModified: new Date(),
       changeFrequency: "monthly",
@@ -37,18 +31,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "monthly",
       priority: 0.8,
-    },
-    {
-      url: "https://coopermapes.com/terms",
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    {
-      url: "https://coopermapes.com/privacy",
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
     },
     // Self-contained tool apps served from public/ — listed so search engines
     // discover them (they're only reachable via the Projects page otherwise).

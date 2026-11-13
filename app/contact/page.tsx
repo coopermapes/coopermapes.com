@@ -3,7 +3,7 @@ import ContactSection from "../components/ContactSection";
 export const metadata = {
   title: "Contact: Get in Touch",
   description:
-    "Request a quote for a custom arrangement, part editing & revoicing, or fall show arranging, or send a general inquiry.",
+    "Get in touch with Cooper Mapes about arranging, part editing, or any other project inquiry.",
   alternates: { canonical: "/contact" },
 };
 

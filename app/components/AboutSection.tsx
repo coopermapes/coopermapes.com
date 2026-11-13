@@ -220,11 +220,6 @@ export default function AboutSection() {
               I hold a Bachelor of Arts in Music from the University of Mississippi and a Master of Music Composition from the University of Memphis. I am currently furthering my education at the University of Memphis, pursuing a Doctor of Musical Arts in Music Composition.
             </p>
           </ScrollFadeUp>
-          <ScrollFadeUp delay={isMobile ? 300 : 950}>
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
-              Whether you are a first-time marching director looking for basic resources or part of an established organization seeking in-depth show analysis, my services can help your program advance as an ensemble.
-            </p>
-          </ScrollFadeUp>
 
           {/* Logo row */}
           <ScrollFadeUp delay={isMobile ? 350 : 1100}>
@@ -248,54 +243,8 @@ export default function AboutSection() {
         <div style={{
           flex: isMobile ? "0 0 auto" : "0 0 22%",
           width: isMobile ? "100%" : undefined,
-          padding: isMobile
-            ? "clamp(20px,5vw,36px) clamp(20px,5vw,40px) clamp(32px,7vw,52px)"
-            : "clamp(80px,10.4vw,150px) clamp(20px,2.2vw,36px) clamp(48px,5vw,72px)",
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
           order: isMobile ? 2 : undefined,
-          background: isMobile ? "#F7F6F4" : undefined,
-        }}>
-          {[
-            { label: "Years Arranging with Music Notation Software", value: "13", initialDelay: isMobile ? 0 : 1200 },
-            { label: "Years Teaching Competitive Marching Band", value: "7", initialDelay: isMobile ? 100 : 1300 },
-            { label: "Years of Collegiate Music Experience", value: "7", initialDelay: isMobile ? 200 : 1400 },
-          ].map((stat, i, arr) => (
-            <ScrollFadeUp key={i} delay={stat.initialDelay}>
-            <div
-              style={{
-                padding: isMobile ? "clamp(12px,3vw,20px) 0" : "clamp(22px,2.8vw,36px) 0",
-                borderBottom: i < arr.length - 1 ? "1px solid #E4E3DE" : "none",
-              }}
-            >
-              <div style={{
-                fontFamily: "var(--font-inter)",
-                fontSize: isMobile ? 12 : 16,
-                fontWeight: 600,
-                letterSpacing: isMobile ? "1px" : "2px",
-                textTransform: "uppercase",
-                color: "#6F6F6A",
-                marginBottom: isMobile ? 12 : 20,
-                lineHeight: 1.4,
-                maxWidth: isMobile ? "155px" : undefined,
-              }}>
-                {stat.label}
-              </div>
-              <div style={{
-                fontFamily: "var(--font-anton)",
-                fontWeight: 400,
-                fontSize: "clamp(48px,4.5vw,72px)",
-                lineHeight: 0.88,
-                letterSpacing: "-2px",
-                color: "#111111",
-              }}>
-                {stat.value}
-              </div>
-            </div>
-            </ScrollFadeUp>
-          ))}
-        </div>
+        }} />
 
       </div>
     </div>

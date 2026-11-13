@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import EmailLink from "./EmailLink";
@@ -47,7 +46,7 @@ const SOCIAL = [
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
         <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.96C5.12 20 12 20 12 20s6.88 0 8.59-.46a2.78 2.78 0 0 0 1.96-1.96A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
-        <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#020201"/>
+        <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02" fill="#FFFFFF"/>
       </svg>
     ),
   },
@@ -63,31 +62,10 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
       aria-label={label}
       onMouseEnter={() => setHov(true)}
       onMouseLeave={() => setHov(false)}
-      style={{ color: hov ? "#5B7BD6" : "#FFFFFF", transition: "color .2s ease", display: "flex", alignItems: "center" }}
+      style={{ color: hov ? "#1254D9" : "#111111", transition: "color .2s ease", display: "flex", alignItems: "center" }}
     >
       {icon}
     </a>
-  );
-}
-
-function FooterLink({ href, children, style }: { href: string; children: React.ReactNode; style?: React.CSSProperties }) {
-  const [hov, setHov] = useState(false);
-  return (
-    <Link
-      href={href}
-      onMouseEnter={() => setHov(true)}
-      onMouseLeave={() => setHov(false)}
-      style={{
-        fontFamily: "var(--font-inter)",
-        fontSize: 11,
-        color: hov ? "#FFFFFF" : "#A0A09B",
-        textDecoration: "none",
-        transition: "color .2s ease",
-        ...style,
-      }}
-    >
-      {children}
-    </Link>
   );
 }
 
@@ -121,42 +99,13 @@ export default function Footer() {
 
   return (
     <footer style={{
-      background: "#020201",
-      color: "#FFFFFF",
+      backgroundColor: "#EAEAEA",
+      color: "#111111",
       padding: isMobile
         ? "clamp(32px,8vw,56px) clamp(20px,5vw,40px) 24px"
         : "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
       marginTop: -2,
     }}>
-      {/* Wordmark */}
-      <Link
-        href="/"
-        style={{ textDecoration: "none", display: isMobile ? "block" : "inline-block" }}
-      >
-        <div style={{
-          fontFamily: "var(--font-anton)",
-          fontWeight: 400,
-          fontSize: isMobile ? "clamp(52px,13vw,128px)" : "clamp(44px,9vw,128px)",
-          lineHeight: 0.85,
-          letterSpacing: isMobile ? "0px" : "-3px",
-          textTransform: "uppercase",
-          color: "#FFFFFF",
-          whiteSpace: isMobile ? "normal" : "nowrap",
-        }}>
-          Cooper Mapes
-          <span style={{
-            fontFamily: "var(--font-inter)",
-            fontSize: ".16em",
-            fontWeight: 500,
-            top: "-4.5em",
-            position: "relative",
-            letterSpacing: 0,
-          }}>
-            ©2026
-          </span>
-        </div>
-      </Link>
-
       {/* Bottom row */}
       <div ref={bottomRowRef} style={{
         display: "flex",
@@ -164,8 +113,7 @@ export default function Footer() {
         alignItems: "center",
         justifyContent: "space-between",
         gap: 18,
-        marginTop: isMobile ? "clamp(16px,4vw,24px)" : "clamp(36px,5vw,56px)",
-        borderTop: "1px solid #242422",
+        borderTop: "1px solid #DCDBD7",
         paddingTop: 24,
       }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 6 : 14 }}>
@@ -175,42 +123,30 @@ export default function Footer() {
             fontWeight: 500,
             letterSpacing: isMobile ? "0.5px" : "1.2px",
             textTransform: "uppercase",
-            color: "#A0A09B",
+            color: "#3A3A3A",
             whiteSpace: isMobile ? "nowrap" : undefined,
             width: isMobile ? "100%" : undefined,
           }}>
             © Cooper Mapes 2026{" "}
-            <span style={{ color: "#3A3A3A" }}>|</span>
+            <span style={{ color: "#B6B5AD" }}>|</span>
             {" "}Arranger · Composer · Educator
           </span>
-          {!isMobile && (
-            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-              <FooterLink href="/terms">Terms of Service</FooterLink>
-              <FooterLink href="/privacy">Privacy Policy</FooterLink>
-            </div>
-          )}
         </div>
 
         <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined }}>
           {SOCIAL.map(s => (
             <SocialLink key={s.key} href={s.href} label={s.label} icon={s.icon} />
           ))}
-          <span style={{ color: "#3A3A3A" }}>|</span>
+          <span style={{ color: "#B6B5AD" }}>|</span>
           <EmailLink
-            color="#A0A09B"
-            hoverColor="#FFFFFF"
+            color="#3A3A3A"
+            hoverColor="#111111"
             style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500 }}
           >
             contact@coopermapes.com
           </EmailLink>
         </div>
 
-        {isMobile && (
-          <div style={{ display: "flex", justifyContent: "center", gap: 16, width: "100%" }}>
-            <FooterLink href="/terms" style={{ fontSize: 12 }}>Terms of Service</FooterLink>
-            <FooterLink href="/privacy" style={{ fontSize: 12 }}>Privacy Policy</FooterLink>
-          </div>
-        )}
       </div>
     </footer>
   );

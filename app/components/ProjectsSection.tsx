@@ -234,7 +234,7 @@ export default function ProjectsSection() {
       number: "04",
       title: "Theoretically 01",
       description:
-        "An ear-training game I built to stay on top of chord recognition, styled after late-'90s music software with a vintage '01 tag (my birth year). Three modes: chord trainer, note guesser, and rhythm identifier. It's like Wordle and music theory spontaneously combined.",
+        "An ear-training game I built to stay on top of chord recognition, styled after late-'90s music software with a vintage '01 tag (my birth year). Three modes: chord trainer, note guesser, and rhythm identifier.",
       tags: ["Ear Training", "Daily Puzzle", "Web Game"],
       buttonLabel: "Visit Theoretically 01",
       buttonHref: "https://theoretically.io/",
@@ -308,16 +308,6 @@ export default function ProjectsSection() {
             </div>
             <div style={{ flex: isMobile ? "0 0 auto" : "1 1 380px", width: isMobile ? "100%" : undefined }}>
               <ScrollFadeUp delay={150}>
-                <div aria-hidden="true" style={{
-                  fontFamily: "var(--font-anton)",
-                  fontSize: 15,
-                  letterSpacing: "1px",
-                  textTransform: "uppercase",
-                  marginBottom: 8,
-                }}>
-                  <span style={{ color: "#B6B5AD" }}>/ </span>
-                  <span style={{ color: "#111111" }}>{project.number}</span>
-                </div>
                 <h2 style={{
                   fontFamily: "var(--font-anton)",
                   fontWeight: 400,
