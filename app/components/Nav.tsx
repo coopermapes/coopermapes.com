@@ -115,8 +115,8 @@ export default function Nav() {
   return (
     <>
       <nav
-        style={{ height: "98px", zIndex: 100 }}
-        className={`fixed top-0 left-0 right-0 flex items-center transition-all duration-300 bg-white/97 border-b border-[#E4E3DE]`}
+        style={{ height: "98px", zIndex: 100, backgroundColor: "#FFFFFF", borderBottom: "1px solid #E4E3DE" }}
+        className="fixed top-0 left-0 right-0 flex items-center"
       >
         <div
           className="flex items-center justify-between w-full"
@@ -130,10 +130,10 @@ export default function Nav() {
             style={{ display: "flex", alignItems: "center", textDecoration: "none" }}
           >
             <Image
-              src="/cm-mark.png"
+              src="/website-logo.png"
               alt="Cooper Mapes"
-              width={3578}
-              height={1173}
+              width={4238}
+              height={1545}
               priority
               sizes="160px"
               style={{ height: isMobile ? 36 : 50, width: "auto", display: "block" }}
