@@ -39,15 +39,15 @@ Always load both via Google Fonts in the `<head>`:
 |---|---|---|---|---|
 | Page/section h1 | Anton | `clamp(44px, 6.5vw, 80px)` | 400 | `#111111` |
 | Hero h1 | Anton | `clamp(46px, 8vw, 96px)` | 400 | `#111111` |
-| Carousel titles | Anton | `clamp(28px, 4vw, 56px)` | 400 | `#FFFFFF` |
+| Carousel titles | Anton | `clamp(22px, 2.8vw, 32px)` | 400 | `#111111` |
 | Stat numerals | Anton | `clamp(48px, 4.5vw, 72px)` | 400 | `#111111` |
 | Section numerals (muted) | Anton | `clamp(48px, 5.5vw, 96px)` | 400 | `#B6B5AD` or `#D5D4CE` |
 | Eyebrow / section label | Inter | `11px` – `12px` | 500 | `#1254D9` |
 | Body copy | Inter | `16px` – `18px` | 400 | `#5A5A5A` or `#3A3A3A` |
 | Nav links | Inter | `17px` | 500 | `#111111` |
 | Buttons | Inter | `13px` | 600 | `#FFFFFF` |
-| Form labels | Inter | `13px` | 500 | `#3A3A3A` |
-| Form inputs | Inter | `15px` | 400 | `#141414` |
+| Form labels (Contact) | Inter | `17px` | 600 | `#111111` |
+| Form inputs | Inter | `15px` | 400 | `#111111` |
 | Meta / captions | Inter | `12px` – `13px` | 500 | `#9A9A95` |
 | Stat labels | Inter | `18px` | 600 | `#9A9A95` |
 
@@ -61,7 +61,7 @@ Always load both via Google Fonts in the `<head>`:
 | Primary text | `#111111` | Default body text, headings |
 | Background white | `#FFFFFF` | Main page background, card surfaces |
 | Background gray | `#EAEAEA` | Alternating section backgrounds, page canvas |
-| Background dark | `#020201` | Portfolio section, dark hero accent block |
+| Background dark | `#020201` | Not currently used as a full-section background (Portfolio is now white, Home's dark before/after panel was removed) — kept as a token for any future dark section |
 | Subtle surface | `#FAFAF8` | Table rows, info cards |
 | Sidebar surface | `#F7F6F4` | Wizard sidebar, form sidebars |
 
@@ -133,7 +133,7 @@ Always load both via Google Fonts in the `<head>`:
 
 **Section Blocks**
 - Vertical section padding: `clamp(48px, 6vw, 96px)` typical; up to `clamp(64px, 7vw, 96px)` for hero-weight sections
-- Max content width: `1180px` (standard), `1320px` (portfolio), `1100px` (contact), `760px` (Terms/Privacy — narrower deliberately, for readable line-length on dense legal paragraphs)
+- Max content width: `1180px` (standard), `1320px` (portfolio), `560px` (contact form — single centered form, not the wide multi-column layout used elsewhere)
 - Hero top padding max: `384px`
 
 ---
@@ -144,7 +144,7 @@ Always load both via Google Fonts in the `<head>`:
 - **Two-column flex rows** with `flex-wrap: wrap` and `gap: clamp(40px, 5vw, 72px)` for service and about layouts. Each column uses `flex: 1 1 340px` / `flex: 1 1 380px` so they collapse naturally on mobile.
 - **Nav is fixed**, `z-index: 60`, `height: 98px`. All page content has `padding-top: 98px`.
 - **Sections alternate** between `#FFFFFF` and `#EAEAEA` backgrounds. Dark sections (`#020201`) are used sparingly for strong contrast moments.
-- **No border-radius** on layout elements, service cards, buttons, or badges — sharp rectangular corners throughout. The only exception is wizard step indicator circles.
+- **No border-radius** on layout elements, service cards, buttons, or badges — sharp rectangular corners throughout. Exceptions: radio inputs (`border-radius: 9999px`, see `globals.css`) and the Portfolio carousel's pagination dots (small circular indicators, not a card/button/badge).
 
 ---
 
@@ -184,14 +184,14 @@ A 7×7px square, no border-radius, color `#1254D9`, `margin-top: 8px`, paired wi
 
 ### Form Inputs
 ```css
-padding: 12px 16px;
-border: 1px solid #CFCEC9;
+padding: 12px 14px;
+border: 1px solid #DCDBD7;
 font-size: 15px;
-color: #141414;
+color: #111111;
 background: #FFFFFF;
 outline: none;
-/* Focus */
-border-color: #1254D9;
+/* Focus (via global :focus-visible, not a custom input rule) */
+outline: 2px solid #1254D9;
 ```
 No border-radius. Placeholder color: `#A6A5A0`.
 
@@ -240,7 +240,7 @@ input, select, textarea, button { font-family: inherit; }
 
 ## 8. Dark Section Overrides
 
-When inside a `background: #020201` section, override colors as follows:
+Not currently applied anywhere in the live site (Portfolio and Home's dark panel were both converted to light backgrounds). Kept as reference for any future dark section — when inside a `background: #020201` section, override colors as follows:
 
 | Element | Dark-bg value |
 |---|---|
@@ -259,6 +259,6 @@ When inside a `background: #020201` section, override colors as follows:
 
 - All images: `object-fit: cover`, never stretched
 - Photo panels use `image-slot` web component for drag-and-drop replacement
-- Portfolio cards: fixed ratio `clamp(280px, 76vw, 400px)` tall, `clamp(220px, 60vw, 320px)` wide
+- Portfolio carousel cards: square (`aspect-ratio: 1/1`), `clamp(220px, 28vw, 340px)` wide (`CoverflowCarousel.tsx`)
 - About photo: `flex: 0 0 35%` of the row, `object-position: 60% 22%`
 - School/affiliation logos: `height: 175px; width: auto`

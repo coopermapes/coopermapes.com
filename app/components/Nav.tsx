@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
@@ -24,7 +25,6 @@ export default function Nav() {
   const pathname = usePathname();
   const router = useRouter();
   const isMobile = useIsMobile();
-  const [scrolled, setScrolled] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -83,13 +83,6 @@ export default function Nav() {
     }
   };
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
   // Close menu when route changes
   useEffect(() => { setMenuOpen(false); }, [pathname]);
 
@@ -119,16 +112,11 @@ export default function Nav() {
     }
   }, [menuOpen]);
 
-  const isHome = pathname === "/";
-  const solid = !isHome || scrolled || menuOpen || isMobile;
-
   return (
     <>
       <nav
         style={{ height: "98px", zIndex: 100 }}
-        className={`fixed top-0 left-0 right-0 flex items-center transition-all duration-300 ${
-          solid ? "bg-white/97 border-b border-[#E4E3DE]" : "bg-transparent border-b border-transparent"
-        }`}
+        className={`fixed top-0 left-0 right-0 flex items-center transition-all duration-300 bg-white/97 border-b border-[#E4E3DE]`}
       >
         <div
           className="flex items-center justify-between w-full"
@@ -138,25 +126,18 @@ export default function Nav() {
           <Link
             href="/"
             onClick={(e) => navigateAfterClose(e, "/")}
-            style={{
-              fontFamily: "var(--font-anton)",
-              fontSize: "clamp(24px,5vw,38px)",
-              letterSpacing: "-0.5px",
-              color: "#111111",
-              textDecoration: "none",
-            }}
-            className="uppercase"
+            aria-label="Cooper Mapes — home"
+            style={{ display: "flex", alignItems: "center", textDecoration: "none" }}
           >
-            Cooper Mapes
-            <span style={{
-              fontFamily: "var(--font-inter)",
-              fontSize: 13,
-              fontWeight: 500,
-              position: "relative",
-              top: isMobile ? "-0.9em" : "-1.6em",
-              marginLeft: 3,
-              letterSpacing: 0,
-            }}>©</span>
+            <Image
+              src="/cm-mark.png"
+              alt="Cooper Mapes"
+              width={3578}
+              height={1173}
+              priority
+              sizes="160px"
+              style={{ height: isMobile ? 36 : 50, width: "auto", display: "block" }}
+            />
           </Link>
 
           {/* Desktop links */}

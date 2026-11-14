@@ -105,7 +105,6 @@ export default function HomeSection() {
           <FadeUp delay={150}>
             <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(48px,9.6vw,128px)", lineHeight: ".84", letterSpacing: "-2px", textTransform: "uppercase", color: "#111111", margin: 0 }}>
               Cooper Mapes
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: ".18em", fontWeight: 500, letterSpacing: 0, position: "relative", top: "-4.0em", marginLeft: "0.05em" }}>©</span>
             </h1>
           </FadeUp>
 

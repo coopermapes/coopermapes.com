@@ -208,7 +208,7 @@ export default function ProjectsSection() {
       buttonHref: "https://www.youtube.com/@coopermapes",
       media: (
         <VideoEmbed
-          src="https://www.youtube.com/embed/GOI8BsAJWhE"
+          src="https://www.youtube.com/embed/6_1Da4P4kVY"
           title="DCI Transcription & Analysis"
         />
       ),

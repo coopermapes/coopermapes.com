@@ -194,7 +194,7 @@ export default function AboutSection() {
             <h1 style={{
               fontFamily: "var(--font-anton)",
               fontWeight: 400,
-              fontSize: isMobile ? "clamp(36px,9vw,56px)" : "clamp(44px,5.5vw,82px)",
+              fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)",
               lineHeight: 0.92,
               letterSpacing: "-1.5px",
               textTransform: "uppercase",

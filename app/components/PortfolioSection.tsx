@@ -54,7 +54,7 @@ function CaptionAnimate({ initialDelay, children }: { initialDelay: number; chil
 // ── Works data ────────────────────────────────────────────────────────────────
 const WORKS = [
   { slot: "pf-spire",     title: "Eternal Spire",     type: "Marching Band",  year: "2026", length: "7:03", image: "/portfolio/images/pf-spire.jpeg",     audio: "/portfolio/audio/eternal-spire.mp3",    posY: 50 },
-  { slot: "pf-escher",    title: "Escher Sketch",     type: "Marching Band",  year: "2025", length: "6:35", image: "/portfolio/images/pf-escher.jpeg",    audio: "/portfolio/audio/escher-sketch.mp3",    posY: 2  },
+  { slot: "pf-escher",    title: "Escher Sketch",     type: "Marching Band",  year: "2025", length: "6:21", image: "/portfolio/images/pf-escher.jpeg",    audio: "/portfolio/audio/escher-sketch.mp3",    posY: 2  },
   { slot: "pf-calmstorm", title: "In Calm and Storm", type: "Drum Corps",     year: "2026", length: "3:33", image: "/portfolio/images/pf-calmstorm.jpeg", audio: "/portfolio/audio/in-calm-and-storm.mp3", posY: 50 },
   { slot: "pf-ramayana",  title: "Ramayana",          type: "Drum Corps",     year: "2025", length: "2:00", image: "/portfolio/images/pf-ramayana.jpeg",  audio: "/portfolio/audio/ramayana.mp3",          posY: 16 },
   { slot: "pf-ignite",    title: "Ignite",            type: "Indoor Winds",   year: "2024", length: "0:56", image: "/portfolio/images/pf-ignite.jpeg",    audio: "/portfolio/audio/ignite-mvmt-i.mp3",    posY: 50 },
@@ -114,8 +114,8 @@ export default function PortfolioSection() {
       if (destroyed || !waveRef.current) return;
       const ws = WaveSurfer.create({
         container: waveRef.current,
-        waveColor: "rgba(255,255,255,0.22)",
-        progressColor: "#5B7BD6",
+        waveColor: "#CFCEC9",
+        progressColor: "#0B3A9A",
         cursorWidth: 0,
         barWidth: 2,
         barGap: 1,
@@ -180,7 +180,7 @@ export default function PortfolioSection() {
         {/* ── Header ── */}
         <div style={{ display: "flex", justifyContent: "center", borderBottom: "1px solid #DCDBD7", paddingBottom: 22 }}>
           <ScrollFadeUp delay={150}>
-            <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(34px,5vw,72px)", lineHeight: .9, letterSpacing: "-2px", textTransform: "uppercase", color: "#111111", margin: 0, textAlign: "center" }}>
+            <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)", lineHeight: .92, letterSpacing: "-1.5px", textTransform: "uppercase", color: "#111111", margin: 0, textAlign: "center" }}>
               Selected Works
             </h1>
           </ScrollFadeUp>
@@ -202,8 +202,7 @@ export default function PortfolioSection() {
             <div style={{
               width: "100%",
               maxWidth: 420,
-              background: "#0E0E0D",
-              border: "1px solid #242422",
+              background: "transparent",
               padding: "14px 16px 12px",
               display: "flex",
               flexDirection: "column",
@@ -217,23 +216,23 @@ export default function PortfolioSection() {
                   onTouchStart={() => setPlayPressed(true)}
                   onTouchEnd={() => setPlayPressed(false)}
                   onTouchCancel={() => setPlayPressed(false)}
-                  style={{ width: 40, height: 40, borderRadius: "50%", border: `1.5px solid ${wsReady ? "rgba(255,255,255,0.7)" : "rgba(255,255,255,0.2)"}`, background: "transparent", cursor: wsReady ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "border-color .3s ease, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && playPressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && playPressed ? 0.75 : 1 }}
+                  style={{ width: 40, height: 40, borderRadius: "50%", border: `1.5px solid ${wsReady ? "#111111" : "rgba(0,0,0,0.2)"}`, background: "transparent", cursor: wsReady ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "border-color .3s ease, transform 0.1s ease, opacity 0.1s ease", transform: isMobile && playPressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && playPressed ? 0.75 : 1 }}
                 >
                   {playing
-                    ? <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#fff" : "#555"}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                    : <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#fff" : "#555"} style={{ marginLeft: 2 }}><polygon points="5,3 19,12 5,21"/></svg>}
+                    ? <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#111111" : "#B6B5AD"}><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                    : <svg width="13" height="13" viewBox="0 0 24 24" fill={wsReady ? "#111111" : "#B6B5AD"} style={{ marginLeft: 2 }}><polygon points="5,3 19,12 5,21"/></svg>}
                 </button>
                 <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 700, letterSpacing: ".5px", textTransform: "uppercase", color: wsReady ? "#FFFFFF" : "#444", transition: "color .3s ease", lineHeight: 1.2 }}>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", color: wsReady ? "#111111" : "#9A9A95", transition: "color .3s ease", lineHeight: 1.2 }}>
                       {work.title}
                     </div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: wsReady ? "rgba(255,255,255,0.45)" : "#333", transition: "color .3s ease", marginTop: 3, lineHeight: 1.2 }}>
+                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: "#5A5A5A", transition: "color .3s ease", marginTop: 3, lineHeight: 1.2 }}>
                       {wsReady ? "Cooper Mapes" : "Loading…"}
                     </div>
                   </div>
-                  <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.4)", letterSpacing: ".5px", flexShrink: 0 }}>
-                    {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")}
+                  <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 500, color: "#5A5A5A", letterSpacing: ".5px", flexShrink: 0 }}>
+                    {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")} / {work.length}
                   </div>
                 </div>
               </div>

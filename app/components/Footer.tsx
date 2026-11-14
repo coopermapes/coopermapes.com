@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
+import Image from "next/image";
 import EmailLink from "./EmailLink";
 
 const SOCIAL = [
@@ -74,6 +75,31 @@ export default function Footer() {
   const bottomRowRef = useRef<HTMLDivElement>(null);
   const copyrightRef = useRef<HTMLSpanElement>(null);
   const [copyrightFontSize, setCopyrightFontSize] = useState<string | undefined>(undefined);
+  // Desktop only: true when the row is wide enough to seat the logo between the
+  // copyright text (left) and social/email (right) without crowding them.
+  const [wide, setWide] = useState(false);
+
+  useEffect(() => {
+    if (isMobile) return;
+    const row = bottomRowRef.current;
+    if (!row) return;
+    const measure = () => setWide(row.offsetWidth >= 1100);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(row);
+    return () => ro.disconnect();
+  }, [isMobile]);
+  const inline = !isMobile && wide;
+  const logo = (
+    <Image
+      src="/keynote-publishing.png"
+      alt="Keynote Music Publishing"
+      width={3862}
+      height={918}
+      sizes="234px"
+      style={{ width: isMobile ? 180 : 234, height: "auto", display: "block" }}
+    />
+  );
 
   useEffect(() => {
     if (!isMobile) return;
@@ -106,8 +132,22 @@ export default function Footer() {
         : "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
       marginTop: -2,
     }}>
+      {/* Keynote Music Publishing logo — stacked above the row unless it fits inline */}
+      {!inline && (
+        <div style={{ display: "flex", justifyContent: "center", marginBottom: isMobile ? 32 : 40 }}>
+          {logo}
+        </div>
+      )}
+
       {/* Bottom row */}
-      <div ref={bottomRowRef} style={{
+      <div ref={bottomRowRef} style={inline ? {
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
+        alignItems: "center",
+        gap: 18,
+        borderTop: "1px solid #DCDBD7",
+        paddingTop: 24,
+      } : {
         display: "flex",
         flexWrap: "wrap",
         alignItems: "center",
@@ -133,7 +173,9 @@ export default function Footer() {
           </span>
         </div>
 
-        <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined }}>
+        {inline && logo}
+
+        <div style={{ display: "flex", gap: isMobile ? 0 : 18, alignItems: "center", width: isMobile ? "100%" : undefined, justifyContent: isMobile ? "space-between" : undefined, justifySelf: inline ? "end" : undefined }}>
           {SOCIAL.map(s => (
             <SocialLink key={s.key} href={s.href} label={s.label} icon={s.icon} />
           ))}

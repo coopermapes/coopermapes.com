@@ -408,7 +408,7 @@ export function CoverflowCarousel({
                 {active.meta.map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #E4E3DE" }}>
                     <dt style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: ".8px", textTransform: "uppercase", color: "#5A5A5A", margin: 0 }}>{row.label}</dt>
-                    <dd style={{ fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, color: "#111111", margin: 0 }}>{row.value}</dd>
+                    <dd style={{ fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 500, color: "#111111", margin: 0 }}>{row.value}</dd>
                   </div>
                 ))}
               </dl>
