@@ -40,7 +40,6 @@ Always load both via Google Fonts in the `<head>`:
 | Page/section h1 | Anton | `clamp(44px, 6.5vw, 80px)` | 400 | `#111111` |
 | Hero h1 | Anton | `clamp(46px, 8vw, 96px)` | 400 | `#111111` |
 | Carousel titles | Anton | `clamp(22px, 2.8vw, 32px)` | 400 | `#111111` |
-| Stat numerals | Anton | `clamp(48px, 4.5vw, 72px)` | 400 | `#111111` |
 | Section numerals (muted) | Anton | `clamp(48px, 5.5vw, 96px)` | 400 | `#B6B5AD` or `#D5D4CE` |
 | Eyebrow / section label | Inter | `11px` – `12px` | 500 | `#1254D9` |
 | Body copy | Inter | `16px` – `18px` | 400 | `#5A5A5A` or `#3A3A3A` |
@@ -48,8 +47,10 @@ Always load both via Google Fonts in the `<head>`:
 | Buttons | Inter | `13px` | 600 | `#FFFFFF` |
 | Form labels (Contact) | Inter | `17px` | 600 | `#111111` |
 | Form inputs | Inter | `15px` | 400 | `#111111` |
-| Meta / captions | Inter | `12px` – `13px` | 500 | `#9A9A95` |
-| Stat labels | Inter | `18px` | 600 | `#9A9A95` |
+| Meta / captions | Inter | `12px` – `13px` | 500 | `#5A5A5A` (`#9A9A95` is only 2.83:1 on white — fails AA, don't use for text) |
+| Carousel meta labels | Inter | `11px` uppercase | 500 | `#5A5A5A` |
+| Carousel meta values | Inter | `13px` | 500 | `#111111` |
+| Audio player title / name / time | Inter | `12px` / `11px` / `10px` | 600 / 500 / 500 | `#111111` / `#5A5A5A` / `#5A5A5A` |
 
 ---
 
@@ -262,3 +263,6 @@ Not currently applied anywhere in the live site (Portfolio and Home's dark panel
 - Portfolio carousel cards: square (`aspect-ratio: 1/1`), `clamp(220px, 28vw, 340px)` wide (`CoverflowCarousel.tsx`)
 - About photo: `flex: 0 0 35%` of the row, `object-position: 60% 22%`
 - School/affiliation logos: `height: 175px; width: auto`
+- Nav logo: CM key mark (`/cm-mark.png`), `50px` tall desktop / `36px` mobile, inside the fixed `98px` header
+- Footer logo: Keynote Music Publishing (`/keynote-publishing.png`), `234px` wide desktop / `180px` mobile
+- Audio player (Portfolio): transparent, no border; unplayed waves `#CFCEC9`, played waves `#0B3A9A` (player-only color, not a brand token); play button ring/icon `#111111`
