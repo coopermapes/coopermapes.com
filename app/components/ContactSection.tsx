@@ -5,9 +5,7 @@ import { Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import { useIsMobile } from "../hooks/useIsMobile";
 
-// TODO(Cooper): replace with the real Formspree endpoint once you create one
-// for this simplified contact form.
-const FORMSPREE_ENDPOINT = "https://formspree.io/f/REPLACE_ME";
+const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaeoqdzn";
 
 // Same scroll-triggered fade-up used on Projects and Portfolio.
 function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
@@ -143,15 +141,15 @@ export default function ContactSection() {
 
         <ScrollFadeUp delay={350}>
         {submitted ? (
-          <div style={{ marginTop: 40, border: "1px solid #DCDBD7", padding: "40px 32px", textAlign: "center" }}>
+          <div style={{ marginTop: 40, border: "1px solid #DCDBD7", background: "#FFFFFF", padding: "40px 32px", textAlign: "center" }}>
             <div style={{ width: 48, height: 48, margin: "0 auto 16px", display: "grid", placeItems: "center", background: "#1254D9", color: "#FFFFFF" }}>
               <Envelope size={22} weight="regular" />
             </div>
-            <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: 24, textTransform: "uppercase", letterSpacing: "-.5px", color: "#111111", margin: 0 }}>
-              Message Received
+            <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)", lineHeight: 1.02, textTransform: "uppercase", letterSpacing: "-.5px", color: "#111111", margin: 0 }}>
+              Sent!
             </h2>
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 15, color: "#5A5A5A", marginTop: 10 }}>
-              Thanks for reaching out — I&apos;ll reply soon.
+            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, lineHeight: 1.8, color: "#5A5A5A", marginTop: 12 }}>
+              Expect to hear back from me soon.
             </p>
           </div>
         ) : (
