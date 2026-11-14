@@ -263,6 +263,6 @@ Not currently applied anywhere in the live site (Portfolio and Home's dark panel
 - Portfolio carousel cards: square (`aspect-ratio: 1/1`), `clamp(220px, 28vw, 340px)` wide (`CoverflowCarousel.tsx`)
 - About photo: `flex: 0 0 35%` of the row, `object-position: 60% 22%`
 - School/affiliation logos: `height: 175px; width: auto`
-- Nav logo: CM key mark (`/cm-mark.png`), `50px` tall desktop / `36px` mobile, inside the fixed `98px` header
+- Nav logo: CM key mark (`/website-logo.png`), `50px` tall desktop / `36px` mobile, inside the fixed `98px` header
 - Footer logo: Keynote Music Publishing (`/keynote-publishing.png`), `234px` wide desktop / `180px` mobile
 - Audio player (Portfolio): transparent, no border; unplayed waves `#CFCEC9`, played waves `#0B3A9A` (player-only color, not a brand token); play button ring/icon `#111111`
