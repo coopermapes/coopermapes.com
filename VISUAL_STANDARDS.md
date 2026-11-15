@@ -6,51 +6,52 @@ A reference for Claude Code (and any developer) to maintain visual consistency a
 
 ## 1. Typography
 
-Two typefaces only. No substitutions.
+Two typefaces only. No substitutions. (Changed 2026-11-14 from Anton + Inter.)
 
-### Anton — Display
-- **Source:** Google Fonts (`family=Anton`)
-- **Role:** Wordmark, page headings, section titles, service names, large numerals, carousel titles
+### Alfa Slab One — Display
+- **Source:** `next/font/google` in `app/layout.tsx` → CSS variable `--font-display`
+- **Role:** Carousel titles, nav mobile overlay, "Sent!" confirmation, project h2s. **Page h1s are logo images, not text** (see §9).
 - **Weights:** 400 (single weight — the only weight available)
 - **Case:** ALWAYS uppercase (`text-transform: uppercase`)
-- **Tracking:** Tight — typically `letter-spacing: -1px` to `-3px`. Never positive.
-- **Size range:** 19px – 168px depending on context (use `clamp()` for fluid sizing)
-- **Line height:** Compressed — `.88` to `1.02` depending on size
+- **Tracking:** `letter-spacing: 0`. Anton's negative tracking makes Alfa's glyphs collide — never use negative tracking here.
+- **Line height:** Compressed — `.84` to `1.02` depending on size
+- **License note:** SIL OFL with Reserved Font Name "Alfa Slab" — a modified copy of the font must be renamed.
 
-### Inter — Everything Else
-- **Source:** Google Fonts (`family=Inter:wght@400;500;600`)
+### Piazzolla — Everything Else
+- **Source:** `next/font/google` in `app/layout.tsx` → CSS variable `--font-body`. Variable font: do **not** pass a `weight` list (it triggers a Google Fonts "exactly one entry" error).
 - **Role:** Body copy, nav links, labels/eyebrows, form fields, buttons, captions, badges, footer
 - **Weights:** 400 (regular), 500 (medium), 600 (semibold)
 - **Case:** Sentence case for body; UPPERCASE for small UI labels
-- **Tracking:** Normal for body; `letter-spacing: 1.2px` – `1.6px` on uppercase labels
-- **Size range:** 11px – 18px
+- **Tracking:** Normal for body; `letter-spacing: 1px` – `1.6px` on uppercase labels
 
-### Font Loading
-Always load both via Google Fonts in the `<head>`:
-```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-```
+### Body Size Scale (four sizes only)
+Min 14, max 24, even numbers only, max four sizes. Currently:
+
+| Tier | Size | Used for |
+|---|---|---|
+| Subheader | `22px` | Page intros (Projects, Contact) |
+| Default | `20px` | Main paragraphs (About bio), nav links |
+| Secondary | `18px` | Project descriptions, form labels and inputs, not-found body, Home CTA |
+| Tertiary | `16px` | Buttons, tag pills, captions, meta, audio player, footer, eyebrows (fluid `clamp(16px, 1.45vw, 22px)`) |
+
+Don't introduce sizes outside this scale. Fluid `clamp()` is only for display text and the Home eyebrow.
 
 ### Typographic Roles in Practice
 
 | Element | Font | Size | Weight | Color |
 |---|---|---|---|---|
-| Page/section h1 | Anton | `clamp(44px, 6.5vw, 80px)` | 400 | `#111111` |
-| Hero h1 | Anton | `clamp(46px, 8vw, 96px)` | 400 | `#111111` |
-| Carousel titles | Anton | `clamp(22px, 2.8vw, 32px)` | 400 | `#111111` |
-| Section numerals (muted) | Anton | `clamp(48px, 5.5vw, 96px)` | 400 | `#B6B5AD` or `#D5D4CE` |
-| Eyebrow / section label | Inter | `11px` – `12px` | 500 | `#1254D9` |
-| Body copy | Inter | `16px` – `18px` | 400 | `#5A5A5A` or `#3A3A3A` |
-| Nav links | Inter | `17px` | 500 | `#111111` |
-| Buttons | Inter | `13px` | 600 | `#FFFFFF` |
-| Form labels (Contact) | Inter | `17px` | 600 | `#111111` |
-| Form inputs | Inter | `15px` | 400 | `#111111` |
-| Meta / captions | Inter | `12px` – `13px` | 500 | `#5A5A5A` (`#9A9A95` is only 2.83:1 on white — fails AA, don't use for text) |
-| Carousel meta labels | Inter | `11px` uppercase | 500 | `#5A5A5A` |
-| Carousel meta values | Inter | `13px` | 500 | `#111111` |
-| Audio player title / name / time | Inter | `12px` / `11px` / `10px` | 600 / 500 / 500 | `#111111` / `#5A5A5A` / `#5A5A5A` |
+| Page h1 (Projects, Portfolio, About, Contact) | Logo image | em-sized off the h1 font-size, `clamp(44px, 6.5vw, 80px)` | — | — |
+| Hero h1 (Home wordmark) | Logo image | `clamp(43.2px, 8.64vw, 115.2px)` | — | — |
+| Carousel titles | Alfa Slab One | `clamp(22px, 2.8vw, 32px)` | 400 | `#111111` |
+| Eyebrow / section label | Piazzolla | `clamp(16px, 1.45vw, 22px)` | 500 | `#1254D9` |
+| Body copy | Piazzolla | `20px` (About), `18px` (descriptions) | 400 | `#5A5A5A` or `#3A3A3A` |
+| Nav links | Piazzolla | `20px`, `44px` gap | 500 | `#111111` |
+| Buttons | Piazzolla | `16px` (Home CTA `18px`) | 600 | `#FFFFFF` |
+| Form labels (Contact) | Piazzolla | `18px` | 600 | `#111111` |
+| Form inputs | Piazzolla | `18px` | 400 | `#111111` |
+| Meta / captions | Piazzolla | `16px` | 500 | `#5A5A5A` (`#9A9A95` is only 2.83:1 on white — fails AA, don't use for text) |
+| Carousel meta labels / values | Piazzolla | `16px` | 500 | `#5A5A5A` / `#111111` |
+| Audio player title / name / time | Piazzolla | `16px` | 600 / 500 / 500 | `#111111` / `#5A5A5A` / `#5A5A5A` |
 
 ---
 
@@ -82,8 +83,8 @@ Always load both via Google Fonts in the `<head>`:
 | `#6A6A6A` | Secondary form text, subtitles |
 | `#9A9A95` | Meta labels, table secondary, stat label |
 | `#A0A09B` | Dimmed eyebrow (e.g. copyright) |
-| `#B6B5AD` | Anton numerals on gray background |
-| `#D5D4CE` | Anton numerals on white background |
+| `#B6B5AD` | Display numerals on gray background |
+| `#D5D4CE` | Display numerals on white background |
 
 ### Borders / Dividers
 | Hex | Context |
@@ -156,8 +157,8 @@ Always load both via Google Fonts in the `<head>`:
 background: #1254D9;
 color: #FFFFFF;
 border: 1.5px solid #1254D9;
-padding: 12px 24px;
-font-size: 13px;
+padding: 15px 24px;
+font-size: 16px;
 font-weight: 600;
 letter-spacing: 0.6px;
 text-transform: uppercase;
@@ -172,8 +173,8 @@ border-color: #0E45B5;
 
 ### Eyebrow / Section Labels
 ```css
-font-family: Inter, sans-serif;
-font-size: 11px; /* or 12px for larger contexts */
+font-family: var(--font-body), Georgia, serif;
+font-size: 16px;
 font-weight: 500;
 letter-spacing: 1.4px; /* or 1.6px */
 text-transform: uppercase;
@@ -181,13 +182,13 @@ color: #1254D9;
 ```
 
 ### Bullet Points (service lists)
-A 7×7px square, no border-radius, color `#1254D9`, `margin-top: 8px`, paired with 16px / line-height 1.6 body text.
+A 7×7px square, no border-radius, color `#1254D9`, `margin-top: 8px`, paired with 18px / line-height 1.6 body text.
 
 ### Form Inputs
 ```css
 padding: 12px 14px;
 border: 1px solid #DCDBD7;
-font-size: 15px;
+font-size: 18px;
 color: #111111;
 background: #FFFFFF;
 outline: none;
@@ -200,7 +201,7 @@ No border-radius. Placeholder color: `#A6A5A0`.
 ```css
 background: #1254D9;
 color: #FFFFFF;
-font-size: 11px;
+font-size: 16px;
 font-weight: 500;
 letter-spacing: 1px;
 text-transform: uppercase;
@@ -227,7 +228,7 @@ Always include at the top of any stylesheet:
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
 body {
-  font-family: Inter, Helvetica, Arial, sans-serif;
+  font-family: var(--font-body), Georgia, serif;
   color: #111111;
   background: #FFFFFF;
   -webkit-font-smoothing: antialiased;
@@ -259,6 +260,7 @@ Not currently applied anywhere in the live site (Portfolio and Home's dark panel
 ## 9. Image & Media Conventions
 
 - All images: `object-fit: cover`, never stretched
+- **Page-title logos** (`public/projects-logo.png`, `selected-works-logo.png`, `about-logo.png`, `name-wordmark.png`, `contact-logo.png`): PNGs cropped to the ink bounding box and rendered with `next/image` inside the h1. Height is set in `em` off the h1 font-size so the cap height matches Alfa Slab One (cap height = 0.778em): image height = (image px height ÷ cap-letter px height) × 0.778em. Top/bottom margins in `em` reproduce the old text line box so content below doesn't shift. Set `maxWidth: "none"` on any logo wider than its container — Tailwind preflight's `img { max-width: 100% }` otherwise squashes fixed-height images. Fit caps use `min(clamp(...), calc((100vw - 2 * gutter) / <logo width in em>))` on the h1 font-size so they never overflow on phones.
 - Photo panels use `image-slot` web component for drag-and-drop replacement
 - Portfolio carousel cards: square (`aspect-ratio: 1/1`), `clamp(220px, 28vw, 340px)` wide (`CoverflowCarousel.tsx`)
 - About photo: `flex: 0 0 35%` of the row, `object-position: 60% 22%`
