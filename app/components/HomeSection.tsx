@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import GridPattern from "./GridPattern";
 import { useIsMobile } from "../hooks/useIsMobile";
@@ -57,9 +58,9 @@ function HeroCta({ isMobile }: { isMobile: boolean }) {
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
       style={{
-        fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase",
+        fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 600, letterSpacing: ".8px", textTransform: "uppercase",
         color: "#ffffff", display: "inline-flex", alignItems: "center", justifyContent: "center",
-        cursor: "pointer", lineHeight: 1, border: "1.5px solid #1254D9", padding: "16px 32px",
+        cursor: "pointer", lineHeight: 1, border: "1.5px solid #1254D9", padding: "15px 21px",
         background: "#1254D9", borderRadius: 0,
         transition: "background-color .2s ease, border-color .2s ease, transform 0.1s ease, opacity 0.1s ease",
         transform: isMobile && pressed ? "scale(0.96)" : "scale(1)",
@@ -103,27 +104,43 @@ export default function HomeSection() {
         }}>
           {/* H1 */}
           <FadeUp delay={150}>
-            <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(48px,9.6vw,128px)", lineHeight: ".84", letterSpacing: "-2px", textTransform: "uppercase", color: "#111111", margin: 0 }}>
-              Cooper Mapes
+            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: isMobile ? "min(clamp(27px,8.64vw,54px), calc((100vw - 2 * clamp(20px,5vw,40px)) / 10.781))" : "min(clamp(43.2px,8.64vw,115.2px), calc((100vw - 2 * clamp(24px,5vw,64px)) / 10.781))", lineHeight: ".84", letterSpacing: "0", textTransform: "uppercase", color: "#111111", margin: 0 }}>
+              {/* Wordmark image, sized in em off the h1's own font-size (same method as the
+                  page-title logos). The small letters' caps are 607px of the 861px-tall image
+                  → image is 1.1035em tall and 9.703em wide; the big C and M rise above the
+                  cap line. marginTop (-0.3192em) puts the image's baseline where the text
+                  glyphs' baseline sat in this 0.84 line box, and marginBottom keeps the box
+                  0.84em tall so the spacing below is unchanged. The font-size above is capped
+                  so the 9.703em-wide image always fits between the hero's side padding.
+                  Sizes are 90% of the original (10% smaller than first set); 10.781 = 9.703 / 0.9. */}
+              <Image
+                src="/name-wordmark.png"
+                alt="Cooper Mapes"
+                width={7571}
+                height={861}
+                priority
+                sizes="(max-width: 768px) 100vw, 1250px"
+                style={{ display: "block", height: "1.1035em", width: "auto", margin: "-0.3192em 0 0.0557em" }}
+              />
             </h1>
           </FadeUp>
 
           {/* Eyebrow */}
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 22 }}>
             <FadeUp delay={550} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px,1.45vw,18px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Arranger</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Arranger</span>
             </FadeUp>
             <FadeUp delay={550} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px,1.45vw,18px)", fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
             </FadeUp>
             <FadeUp delay={700} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px,1.45vw,18px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Composer</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Composer</span>
             </FadeUp>
             <FadeUp delay={700} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px,1.45vw,18px)", fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
             </FadeUp>
             <FadeUp delay={850} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-inter)", fontSize: "clamp(13px,1.45vw,18px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Educator</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Educator</span>
             </FadeUp>
           </div>
 

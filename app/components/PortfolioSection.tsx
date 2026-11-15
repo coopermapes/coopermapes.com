@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { CoverflowCarousel } from "./CoverflowCarousel";
 import type WaveSurfer from "wavesurfer.js";
@@ -180,8 +181,27 @@ export default function PortfolioSection() {
         {/* ── Header ── */}
         <div style={{ display: "flex", justifyContent: "center", borderBottom: "1px solid #DCDBD7", paddingBottom: 22 }}>
           <ScrollFadeUp delay={150}>
-            <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)", lineHeight: .92, letterSpacing: "-1.5px", textTransform: "uppercase", color: "#111111", margin: 0, textAlign: "center" }}>
-              Selected Works
+            <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)", lineHeight: .92, letterSpacing: "0", textTransform: "uppercase", color: "#111111", margin: 0, textAlign: "center" }}>
+              {/* Wordmark image, sized in em off the h1's own font-size so its cap height
+                  matches the other page titles (same method as the Projects logo): caps are
+                  607/635 of the image height → 0.8139em tall, and the 0.0207em top offset
+                  seats its baseline where the text glyphs would sit in a 0.92 line box.
+                  On phones the full one-line width (10.35em) is wider than the screen, so
+                  width is capped to the available space and the height follows. */}
+              <Image
+                src="/selected-works-logo.png"
+                alt="Selected Works"
+                width={8072}
+                height={635}
+                priority
+                sizes="(max-width: 768px) 100vw, 830px"
+                style={{
+                  display: "block",
+                  width: "min(10.347em, calc(100vw - 2 * clamp(16px, 4vw, 32px)))",
+                  height: "auto",
+                  margin: "0.0207em 0 0.0854em",
+                }}
+              />
             </h1>
           </ScrollFadeUp>
         </div>
@@ -206,7 +226,7 @@ export default function PortfolioSection() {
               padding: "14px 16px 12px",
               display: "flex",
               flexDirection: "column",
-              gap: 10,
+              gap: 22,
             }}>
               {/* Top row: circle button + track info + timestamp */}
               <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -224,14 +244,14 @@ export default function PortfolioSection() {
                 </button>
                 <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
                   <div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", color: wsReady ? "#111111" : "#9A9A95", transition: "color .3s ease", lineHeight: 1.2 }}>
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 600, letterSpacing: ".5px", textTransform: "uppercase", color: wsReady ? "#111111" : "#9A9A95", transition: "color .3s ease", lineHeight: 1.2 }}>
                       {work.title}
                     </div>
-                    <div style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, color: "#5A5A5A", transition: "color .3s ease", marginTop: 3, lineHeight: 1.2 }}>
+                    <div style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500, color: "#5A5A5A", transition: "color .3s ease", marginTop: 3, lineHeight: 1.2 }}>
                       {wsReady ? "Cooper Mapes" : "Loading…"}
                     </div>
                   </div>
-                  <div style={{ fontFamily: "var(--font-inter)", fontSize: 10, fontWeight: 500, color: "#5A5A5A", letterSpacing: ".5px", flexShrink: 0 }}>
+                  <div style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500, color: "#5A5A5A", letterSpacing: ".5px", flexShrink: 0 }}>
                     {Math.floor(elapsed / 60)}:{String(Math.floor(elapsed % 60)).padStart(2, "0")} / {work.length}
                   </div>
                 </div>

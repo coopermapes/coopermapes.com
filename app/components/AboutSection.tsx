@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import AboutGridPattern from "./AboutGridPattern";
 import { useIsMobile } from "../hooks/useIsMobile";
 
@@ -112,8 +113,8 @@ function LogoItem({ src, alt, label, lines, active, onActivate }: typeof LOGOS[0
         }}
       >
         <div style={{
-          fontFamily: "var(--font-inter)",
-          fontSize: 11,
+          fontFamily: "var(--font-body)",
+          fontSize: 16,
           fontWeight: 600,
           letterSpacing: "1px",
           textTransform: "uppercase",
@@ -123,7 +124,7 @@ function LogoItem({ src, alt, label, lines, active, onActivate }: typeof LOGOS[0
           {label}
         </div>
         {lines.map((l, i) => (
-          <div key={i} style={{ fontFamily: "var(--font-inter)", fontSize: 13, lineHeight: 1.5, color: "#111111", marginBottom: i === lines.length - 1 ? 0 : 6 }}>
+          <div key={i} style={{ fontFamily: "var(--font-body)", fontSize: 16, lineHeight: 1.5, color: "#111111", marginBottom: i === lines.length - 1 ? 0 : 6 }}>
             <div>{l.text}</div>
             <div style={{ color: "#6A6A6A" }}>{l.year}</div>
           </div>
@@ -192,31 +193,43 @@ export default function AboutSection() {
         }}>
           <ScrollFadeUp delay={isMobile ? 100 : 150}>
             <h1 style={{
-              fontFamily: "var(--font-anton)",
+              fontFamily: "var(--font-display)",
               fontWeight: 400,
               fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)",
               lineHeight: 0.92,
-              letterSpacing: "-1.5px",
+              letterSpacing: "0",
               textTransform: "uppercase",
               color: "#111111",
               margin: 0,
             }}>
-              About
+              {/* Wordmark image sized in em off the h1's font-size (same method as the
+                  Projects logo): caps are 606/637 of the image height → 0.8178em tall,
+                  and the 0.0078em top offset seats the baseline where the text glyphs
+                  would sit in a 0.92 line box. */}
+              <Image
+                src="/about-logo.png"
+                alt="About"
+                width={3058}
+                height={637}
+                priority
+                sizes="320px"
+                style={{ display: "block", height: "0.8178em", width: "auto", margin: "0.0078em 0 0.0944em" }}
+              />
             </h1>
           </ScrollFadeUp>
 
           <ScrollFadeUp delay={isMobile ? 150 : 500}>
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 28, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 20, color: "#3A3A3A", lineHeight: 1.8, marginTop: 28, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
               At the age of 12, I downloaded MuseScore&apos;s notation software for the first time. From this, I have developed my arranging skills and have formed a deep-seated passion for music for over a decade.
             </p>
           </ScrollFadeUp>
           <ScrollFadeUp delay={isMobile ? 200 : 650}>
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 20, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
               My name is Cooper Mapes; I am a freelance musician, specializing in marching band arranging and software-based music engraving.
             </p>
           </ScrollFadeUp>
           <ScrollFadeUp delay={isMobile ? 250 : 800}>
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 20, color: "#3A3A3A", lineHeight: 1.8, marginTop: 18, textAlign: "left", textWrap: "pretty" as React.CSSProperties["textWrap"] }}>
               I hold a Bachelor of Arts in Music from the University of Mississippi and a Master of Music Composition from the University of Memphis. I am currently furthering my education at the University of Memphis, pursuing a Doctor of Musical Arts in Music Composition.
             </p>
           </ScrollFadeUp>

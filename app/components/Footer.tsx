@@ -73,8 +73,6 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
 export default function Footer() {
   const isMobile = useIsMobile();
   const bottomRowRef = useRef<HTMLDivElement>(null);
-  const copyrightRef = useRef<HTMLSpanElement>(null);
-  const [copyrightFontSize, setCopyrightFontSize] = useState<string | undefined>(undefined);
   // Desktop only: true when the row is wide enough to seat the logo between the
   // copyright text (left) and social/email (right) without crowding them.
   const [wide, setWide] = useState(false);
@@ -100,28 +98,6 @@ export default function Footer() {
       style={{ width: isMobile ? 180 : 234, height: "auto", display: "block" }}
     />
   );
-
-  useEffect(() => {
-    if (!isMobile) return;
-    const fit = () => {
-      const row = bottomRowRef.current;
-      const el = copyrightRef.current;
-      if (!row || !el) return;
-      const w = row.offsetWidth;
-      el.style.whiteSpace = "nowrap";
-      let lo = 6, hi = 40;
-      while (hi - lo > 0.25) {
-        const mid = (lo + hi) / 2;
-        el.style.fontSize = mid + "px";
-        if (el.scrollWidth <= w) lo = mid; else hi = mid;
-      }
-      setCopyrightFontSize(lo + "px");
-    };
-    fit();
-    const ro = new ResizeObserver(fit);
-    if (bottomRowRef.current) ro.observe(bottomRowRef.current);
-    return () => ro.disconnect();
-  }, [isMobile]);
 
   return (
     <footer style={{
@@ -157,14 +133,13 @@ export default function Footer() {
         paddingTop: 24,
       }}>
         <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 6 : 14 }}>
-          <span ref={copyrightRef} style={{
-            fontFamily: "var(--font-inter)",
-            fontSize: isMobile ? (copyrightFontSize ?? 10) : 12,
+          <span style={{
+            fontFamily: "var(--font-body)",
+            fontSize: 16,
             fontWeight: 500,
-            letterSpacing: isMobile ? "0.5px" : "1.2px",
+            letterSpacing: isMobile ? "0.5px" : "1.2px", lineHeight: 1.5,
             textTransform: "uppercase",
             color: "#3A3A3A",
-            whiteSpace: isMobile ? "nowrap" : undefined,
             width: isMobile ? "100%" : undefined,
           }}>
             © Cooper Mapes 2026{" "}
@@ -183,7 +158,7 @@ export default function Footer() {
           <EmailLink
             color="#3A3A3A"
             hoverColor="#111111"
-            style={{ fontFamily: "var(--font-inter)", fontSize: 12, fontWeight: 500 }}
+            style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500 }}
           >
             contact@coopermapes.com
           </EmailLink>

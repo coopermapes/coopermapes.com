@@ -388,18 +388,18 @@ export function CoverflowCarousel({
       {showCaption && active?.title && (
         <CaptionFade captionKey={selected}>
           <div style={{
-            marginTop: 8,
+            marginTop: 20,
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             padding: "0 24px",
             textAlign: "center",
           }}>
-            <p style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: "clamp(22px,2.8vw,32px)", textTransform: "uppercase", letterSpacing: "-.5px", color: "#111111", margin: 0 }}>
+            <p style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: "clamp(22px,2.8vw,32px)", textTransform: "uppercase", letterSpacing: "0", color: "#111111", margin: 0 }}>
               {active.title}
             </p>
             {active.subtitle && (
-              <p style={{ fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 500, letterSpacing: ".8px", textTransform: "uppercase", color: "#5A5A5A", marginTop: 6 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500, letterSpacing: ".8px", textTransform: "uppercase", color: "#5A5A5A", marginTop: 6 }}>
                 {active.subtitle}
               </p>
             )}
@@ -407,8 +407,8 @@ export function CoverflowCarousel({
               <dl style={{ marginTop: 20, width: "100%", maxWidth: 260 }}>
                 {active.meta.map(row => (
                   <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #E4E3DE" }}>
-                    <dt style={{ fontFamily: "var(--font-inter)", fontSize: 11, fontWeight: 500, letterSpacing: ".8px", textTransform: "uppercase", color: "#5A5A5A", margin: 0 }}>{row.label}</dt>
-                    <dd style={{ fontFamily: "var(--font-inter)", fontSize: 13, fontWeight: 500, color: "#111111", margin: 0 }}>{row.value}</dd>
+                    <dt style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500, letterSpacing: ".8px", textTransform: "uppercase", color: "#5A5A5A", margin: 0 }}>{row.label}</dt>
+                    <dd style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500, color: "#111111", margin: 0 }}>{row.value}</dd>
                   </div>
                 ))}
               </dl>

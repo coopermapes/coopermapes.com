@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import { useIsMobile } from "../hooks/useIsMobile";
@@ -42,8 +43,8 @@ function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React
 }
 
 const inputStyle: React.CSSProperties = {
-  fontFamily: "var(--font-inter)",
-  fontSize: 15,
+  fontFamily: "var(--font-body)",
+  fontSize: 18,
   color: "#111111",
   background: "#FFFFFF",
   border: "1px solid #DCDBD7",
@@ -53,9 +54,9 @@ const inputStyle: React.CSSProperties = {
 
 function FieldLabel({ htmlFor, children }: { htmlFor: string; children: React.ReactNode }) {
   return (
-    <label htmlFor={htmlFor} style={{ fontFamily: "var(--font-inter)", fontSize: 17, fontWeight: 600, color: "#111111" }}>
+    <label htmlFor={htmlFor} style={{ fontFamily: "var(--font-body)", fontSize: 18, fontWeight: 600, color: "#111111" }}>
       {children}{" "}
-      <span style={{ fontWeight: 400, color: "#5A5A5A", fontSize: 14 }}>(required)</span>
+      <span style={{ fontWeight: 400, color: "#5A5A5A", fontSize: 16 }}>(required)</span>
     </label>
   );
 }
@@ -130,10 +131,24 @@ export default function ContactSection() {
       }}>
         <ScrollFadeUp delay={150}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 12 }}>
-          <h1 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)", lineHeight: ".92", letterSpacing: "-1.5px", textTransform: "uppercase", color: "#111111", margin: 0 }}>
-            Get In Touch
+          <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: isMobile ? "min(clamp(40px,10vw,60px), calc((100vw - 2 * clamp(20px,5vw,40px)) / 8.129))" : "min(clamp(44px,6.5vw,80px), calc((100vw - 2 * clamp(24px,5vw,64px)) / 8.129))", lineHeight: ".92", letterSpacing: "0", textTransform: "uppercase", color: "#111111", margin: 0, width: "max-content" }}>
+            {/* Wordmark image sized in em off the h1's font-size (same method as the other
+                page-title logos): caps are 607/632 of the image height → 0.81em tall, and
+                the 0.0143em top / 0.0957em bottom margins match the text heading's 0.92
+                line box. At 8.129em wide it is wider than the 432px form column, so it is
+                allowed to overflow it symmetrically (max-width none, h1 width max-content);
+                the font-size above is capped so it still fits the viewport on small phones. */}
+            <Image
+              src="/contact-logo.png"
+              alt="Get In Touch"
+              width={6342}
+              height={632}
+              priority
+              sizes="(max-width: 768px) 100vw, 660px"
+              style={{ display: "block", height: "0.81em", width: "auto", maxWidth: "none", margin: "0.0143em 0 0.0957em" }}
+            />
           </h1>
-          <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, color: "#5A5A5A", maxWidth: 440, lineHeight: 1.8, margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: 22, color: "#5A5A5A", maxWidth: 520, lineHeight: 1.8, margin: 0 }}>
             For any questions, inquiries, or music services, get in direct contact with me by filling out the form below.
           </p>
         </div>
@@ -145,10 +160,10 @@ export default function ContactSection() {
             <div style={{ width: 48, height: 48, margin: "0 auto 16px", display: "grid", placeItems: "center", background: "#1254D9", color: "#FFFFFF" }}>
               <Envelope size={22} weight="regular" />
             </div>
-            <h2 style={{ fontFamily: "var(--font-anton)", fontWeight: 400, fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)", lineHeight: 1.02, textTransform: "uppercase", letterSpacing: "-.5px", color: "#111111", margin: 0 }}>
+            <h2 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)", lineHeight: 1.02, textTransform: "uppercase", letterSpacing: "0", color: "#111111", margin: 0 }}>
               Sent!
             </h2>
-            <p style={{ fontFamily: "var(--font-inter)", fontSize: 17, lineHeight: 1.8, color: "#5A5A5A", marginTop: 12 }}>
+            <p style={{ fontFamily: "var(--font-body)", fontSize: 20, lineHeight: 1.8, color: "#5A5A5A", marginTop: 12 }}>
               Expect to hear back from me soon.
             </p>
           </div>
@@ -171,7 +186,7 @@ export default function ContactSection() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 placeholder="Tell me a bit about your project."
-                style={{ ...inputStyle, resize: "vertical", fontFamily: "var(--font-inter)" }}
+                style={{ ...inputStyle, resize: "vertical", fontFamily: "var(--font-body)" }}
               />
             </div>
 
@@ -182,7 +197,7 @@ export default function ContactSection() {
               onMouseLeave={isMobile ? undefined : () => setBtnHover(false)}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                fontFamily: "var(--font-inter)", fontSize: 14, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase",
+                fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase",
                 color: "#FFFFFF",
                 background: !isValid || submitting ? "#1254D9" : btnHover ? "#0E45B5" : "#1254D9",
                 border: "1.5px solid #1254D9",
@@ -197,7 +212,7 @@ export default function ContactSection() {
             </button>
 
             {error && (
-              <p style={{ fontFamily: "var(--font-inter)", fontSize: 13, color: "#CC3333", margin: 0 }}>
+              <p style={{ fontFamily: "var(--font-body)", fontSize: 16, color: "#CC3333", margin: 0 }}>
                 Something went wrong sending your message. Please try again or email directly.
               </p>
             )}

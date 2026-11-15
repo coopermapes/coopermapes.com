@@ -56,13 +56,13 @@ function ProjectButton({ href, label }: { href: string; label: string }) {
         color: "#fff",
         border: "1.5px solid #1254D9",
         padding: "16px 24px",
-        fontSize: 13,
+        fontSize: 16,
         fontWeight: 600,
         letterSpacing: ".8px",
         textTransform: "uppercase",
         cursor: "pointer",
         transition: "background-color .2s ease, border-color .2s ease, transform 0.1s ease, opacity 0.1s ease",
-        fontFamily: "var(--font-inter)",
+        fontFamily: "var(--font-body)",
         borderRadius: 0,
         display: "inline-block",
         textDecoration: "none",
@@ -94,8 +94,8 @@ function TagPill({ label }: { label: string }) {
       display: "inline-block",
       background: "#EAEAEA",
       color: "#4A4A4A",
-      fontFamily: "var(--font-inter)",
-      fontSize: 12,
+      fontFamily: "var(--font-body)",
+      fontSize: 16,
       fontWeight: 600,
       letterSpacing: ".2px",
       padding: "4px 12px",
@@ -262,17 +262,30 @@ export default function ProjectsSection() {
       }}>
         <ScrollFadeUp>
           <h1 style={{
-            fontFamily: "var(--font-anton)",
+            fontFamily: "var(--font-display)",
             fontWeight: 400,
             fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)",
             lineHeight: ".92",
-            letterSpacing: "-1.5px",
+            letterSpacing: "0",
             textTransform: "uppercase",
             margin: 0,
           }}>
-            Projects
+            {/* Wordmark image sized in em off the h1's own font-size so its cap
+                height matches the text h1s on the other pages (Alfa Slab One cap
+                height = 0.778em; the logo's caps are 606/635 of its height →
+                0.8153em tall). The 0.0104em top offset lines its cap line and
+                baseline up with where the text glyphs would sit in a 0.92 line box. */}
+            <Image
+              src="/projects-logo.png"
+              alt="Projects"
+              width={4582}
+              height={635}
+              priority
+              sizes="480px"
+              style={{ display: "block", height: "0.8153em", width: "auto", margin: "0.0104em 0 0.0943em" }}
+            />
           </h1>
-          <p style={{ fontSize: 18, lineHeight: 1.65, color: "#5A5A5A", margin: "20px 0 0", maxWidth: 620, textAlign: "left" }}>
+          <p style={{ fontSize: 22, lineHeight: 1.65, color: "#5A5A5A", margin: "20px 0 0", maxWidth: 620, textAlign: "left" }}>
             All my passion projects in one place.
           </p>
         </ScrollFadeUp>
@@ -309,17 +322,17 @@ export default function ProjectsSection() {
             <div style={{ flex: isMobile ? "0 0 auto" : "1 1 380px", width: isMobile ? "100%" : undefined }}>
               <ScrollFadeUp delay={150}>
                 <h2 style={{
-                  fontFamily: "var(--font-anton)",
+                  fontFamily: "var(--font-display)",
                   fontWeight: 400,
                   fontSize: isMobile ? "clamp(26px,7vw,40px)" : "clamp(30px,3.6vw,46px)",
                   lineHeight: 1.02,
-                  letterSpacing: "-.5px",
+                  letterSpacing: "0",
                   textTransform: "uppercase",
                   margin: 0,
                 }}>
                   {project.title}
                 </h2>
-                <p style={{ fontSize: 16, lineHeight: 1.65, color: "#4A4A4A", margin: "20px 0 0", maxWidth: 430, textAlign: "left" }}>
+                <p style={{ fontSize: 18, lineHeight: 1.65, color: "#4A4A4A", margin: "20px 0 0", maxWidth: 430, textAlign: "left" }}>
                   {project.description}
                 </p>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 20 }}>

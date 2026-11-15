@@ -1,18 +1,17 @@
 import type { Metadata } from "next";
-import { Anton, Inter } from "next/font/google";
+import { Alfa_Slab_One, Piazzolla } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "./components/SiteChrome";
 import { PostHogProvider } from "./components/PostHogProvider";
 
-const anton = Anton({
+const display = Alfa_Slab_One({
   weight: "400",
-  variable: "--font-anton",
+  variable: "--font-display",
   subsets: ["latin"],
 });
 
-const inter = Inter({
-  weight: ["400", "500", "600"],
-  variable: "--font-inter",
+const piazzolla = Piazzolla({
+  variable: "--font-body",
   subsets: ["latin"],
 });
 
@@ -119,7 +118,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${anton.variable} ${inter.variable} h-full antialiased`}
+      className={`${display.variable} ${piazzolla.variable} h-full antialiased`}
     >
       <body className="min-h-full bg-white text-[#111111]">
         <script

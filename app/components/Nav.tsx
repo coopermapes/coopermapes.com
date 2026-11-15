@@ -144,7 +144,7 @@ export default function Nav() {
           {!isMobile && (
             <ul
               className="flex items-center list-none"
-              style={{ gap: "36px" }}
+              style={{ gap: "44px" }}
               onMouseLeave={() => setHovered(null)}
             >
               {LINKS.map(({ label, href }) => {
@@ -157,8 +157,8 @@ export default function Nav() {
                       onMouseEnter={() => setHovered(href)}
                       aria-current={isActive ? "page" : undefined}
                       style={{
-                        fontFamily: "var(--font-inter)",
-                        fontSize: "17px",
+                        fontFamily: "var(--font-body)",
+                        fontSize: "20px",
                         fontWeight: 500,
                         textDecoration: "none",
                         color: isActive ? "#1254D9" : hovered === href ? "#1254D9" : "#111111",
@@ -236,11 +236,11 @@ export default function Nav() {
                     aria-current={isActive ? "page" : undefined}
                     onClick={(e) => navigateAfterClose(e, href)}
                     style={{
-                      fontFamily: "var(--font-anton)",
+                      fontFamily: "var(--font-display)",
                       fontSize: "clamp(40px,10vw,56px)",
                       fontWeight: 400,
                       textTransform: "uppercase",
-                      letterSpacing: "-1px",
+                      letterSpacing: "0",
                       color: isActive ? "#1254D9" : "#ffffff",
                       textDecoration: "none",
                       display: "block",

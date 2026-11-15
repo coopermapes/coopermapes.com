@@ -22,7 +22,7 @@ export default function NotFound() {
     >
       <div
         style={{
-          fontFamily: "var(--font-anton)",
+          fontFamily: "var(--font-display)",
           fontWeight: 400,
           textTransform: "uppercase",
           fontSize: "clamp(64px, 12vw, 140px)",
@@ -34,9 +34,9 @@ export default function NotFound() {
       </div>
       <p
         style={{
-          fontFamily: "var(--font-inter)",
+          fontFamily: "var(--font-body)",
           fontWeight: 500,
-          fontSize: 16,
+          fontSize: 18,
           color: "#4A4A4A",
           marginTop: 20,
           maxWidth: 420,
@@ -48,9 +48,9 @@ export default function NotFound() {
       <Link
         href="/"
         style={{
-          fontFamily: "var(--font-inter)",
+          fontFamily: "var(--font-body)",
           fontWeight: 600,
-          fontSize: 14,
+          fontSize: 16,
           textTransform: "uppercase",
           letterSpacing: "1px",
           color: "#FFFFFF",

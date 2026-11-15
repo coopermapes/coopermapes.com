@@ -2,8 +2,8 @@
 
 @theme {
   /* Fonts */
-  --font-anton: var(--font-anton);
-  --font-inter: var(--font-inter);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
 
   /* Brand colors */
   --color-black: #111111;
@@ -62,7 +62,7 @@ input[type="radio"] {
   background: var(--color-blue);
   color: #fff;
   padding: 12px 24px;
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-body), Georgia, serif;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.5px;
@@ -87,7 +87,7 @@ html {
 }
 
 body {
-  font-family: var(--font-inter), system-ui, sans-serif;
+  font-family: var(--font-body), Georgia, serif;
   color: var(--color-black);
   background: #020201;
 }
