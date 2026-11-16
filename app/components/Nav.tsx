@@ -16,6 +16,17 @@ const LINKS = [
   { label: "Contact",   href: "/contact" },
 ];
 
+// Mobile menu: pages that have a keyhole-O logo asset show it instead of the text label.
+// `w`/`h` are the PNG's pixel size (sets the aspect ratio); `em` is the height in em off the
+// link's font-size so the logo's cap height lines up with the text labels (Alfa Slab One cap
+// height = 0.778em; each logo's caps are 606px of its height, plus the O's overshoot).
+// Colored with a CSS mask so one black PNG serves both white and active-blue states.
+// Pages with no logo asset yet (Home, Portfolio, Contact) stay as text.
+const MENU_LOGOS: Record<string, { src: string; w: number; h: number; em: number }> = {
+  "/projects": { src: "/projects-logo.png", w: 4582, h: 635, em: 0.8153 },
+  "/about":    { src: "/about-logo.png",    w: 3058, h: 637, em: 0.8178 },
+};
+
 // Matches the overlay's own opacity transition duration below — navigation
 // waits for the overlay to fully fade out before the new page mounts, so its
 // entrance animations never play underneath the still-closing menu.
@@ -248,7 +259,27 @@ export default function Nav() {
                       transition: "color 0.2s ease",
                     }}
                   >
-                    {label}
+                    {MENU_LOGOS[href] ? (
+                      <span style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "1.5em" }}>
+                        <span
+                          role="img"
+                          aria-label={label}
+                          style={{
+                            display: "block",
+                            height: `${MENU_LOGOS[href].em}em`,
+                            aspectRatio: `${MENU_LOGOS[href].w} / ${MENU_LOGOS[href].h}`,
+                            backgroundColor: "currentColor",
+                            WebkitMaskImage: `url(${MENU_LOGOS[href].src})`,
+                            maskImage: `url(${MENU_LOGOS[href].src})`,
+                            WebkitMaskRepeat: "no-repeat",
+                            maskRepeat: "no-repeat",
+                            WebkitMaskSize: "100% 100%",
+                            maskSize: "100% 100%",
+                            transition: "background-color 0.2s ease",
+                          }}
+                        />
+                      </span>
+                    ) : label}
                   </Link>
                 </li>
               );

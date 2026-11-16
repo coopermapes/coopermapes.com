@@ -74,6 +74,22 @@ function HeroCta({ isMobile }: { isMobile: boolean }) {
 
 export default function HomeSection() {
   const isMobile = useIsMobile();
+  // Mobile only: the hero stretches so hero + footer exactly fill the viewport
+  // (footer's bottom edge lands on the bottom of the screen, no black below it).
+  // The footer's height depends on text wrapping, so it's measured, not hardcoded.
+  const [footerH, setFooterH] = useState(0);
+  // Mobile type scale is 16 / 18 / 20 — eyebrow is tertiary (16). Desktop stays fluid.
+  const eyebrowSize = isMobile ? 16 : "clamp(16px,1.45vw,22px)";
+  useEffect(() => {
+    if (!isMobile) return;
+    const footer = document.querySelector("footer");
+    if (!footer) return;
+    const measure = () => setFooterH(footer.getBoundingClientRect().height);
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(footer);
+    return () => ro.disconnect();
+  }, [isMobile]);
 
   return (
     <section id="home">
@@ -85,7 +101,7 @@ export default function HomeSection() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        minHeight: isMobile ? "auto" : "calc(100vh - 98px)",
+        minHeight: isMobile ? `calc(100svh - ${footerH}px + 2px)` : "calc(100vh - 98px)",
         background: "#ffffff",
         paddingTop: isMobile ? 98 : 0,
       }}>
@@ -128,19 +144,19 @@ export default function HomeSection() {
           {/* Eyebrow */}
           <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 22 }}>
             <FadeUp delay={550} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Arranger</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: eyebrowSize, fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Arranger</span>
             </FadeUp>
             <FadeUp delay={550} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: eyebrowSize, fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
             </FadeUp>
             <FadeUp delay={700} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Composer</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: eyebrowSize, fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Composer</span>
             </FadeUp>
             <FadeUp delay={700} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: eyebrowSize, fontWeight: 500, color: "#1254D9", opacity: 0.5 }}> · </span>
             </FadeUp>
             <FadeUp delay={850} style={{ display: "inline-block" }}>
-              <span style={{ fontFamily: "var(--font-body)", fontSize: "clamp(16px,1.45vw,22px)", fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Educator</span>
+              <span style={{ fontFamily: "var(--font-body)", fontSize: eyebrowSize, fontWeight: 500, letterSpacing: ".5px", textTransform: "uppercase", color: "#1254D9" }}>Educator</span>
             </FadeUp>
           </div>
 

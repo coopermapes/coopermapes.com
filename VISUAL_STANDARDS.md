@@ -36,6 +36,19 @@ Min 14, max 24, even numbers only, max four sizes. Currently:
 
 Don't introduce sizes outside this scale. Fluid `clamp()` is only for display text and the Home eyebrow.
 
+### Mobile Size Scale (three sizes: 16 / 18 / 20)
+Decided 2026-11-16. On mobile (`isMobile`, ≤768px) body text uses only 16 / 18 / 20 — the 22px tier does not exist on mobile. Desktop is unchanged. Set via `isMobile ? … : …` inline, never by deleting the desktop value.
+
+| Tier | Size | Used for (mobile) |
+|---|---|---|
+| Primary | `20px` | About bio, Projects intro and Contact intro (were 22 — drop to 20), Contact sub-copy |
+| Secondary | `18px` | Project descriptions, form labels/inputs, **all primary buttons** (Home CTA, Projects "Try The Tool", Contact "Send Message"), not-found body |
+| Tertiary | `16px` | Tag pills, captions, carousel meta, audio player, About hover label, "(required)", error text, Home eyebrow (fixed 16 on mobile, not fluid) |
+
+**Mobile footer exception: `14px`** for the copyright/tagline and the email (still within the 14px minimum). Desktop footer stays 16px.
+
+Display text (Alfa Slab One) keeps its fluid sizes on mobile and is outside the scale. The hidden skip-link is 14px.
+
 ### Typographic Roles in Practice
 
 | Element | Font | Size | Weight | Color |
@@ -266,5 +279,8 @@ Not currently applied anywhere in the live site (Portfolio and Home's dark panel
 - About photo: `flex: 0 0 35%` of the row, `object-position: 60% 22%`
 - School/affiliation logos: `height: 175px; width: auto`
 - Nav logo: CM key mark (`/website-logo.png`), `50px` tall desktop / `36px` mobile, inside the fixed `98px` header
-- Footer logo: Keynote Music Publishing (`/keynote-publishing.png`), `234px` wide desktop / `180px` mobile
+- Footer logo: Keynote Music Publishing (`/keynote-publishing-v2.png`), `234px` wide desktop / `180px` mobile. The PNG is the supplied "New Keynote for Website.png" **unedited** (white keyhole — do not make it transparent), cropped to the logo + 2px right pad so it is 3862×918 with 3824×898 of ink. **Rename the file (v3, …) whenever its contents change** — Next's optimized-image URL otherwise stays identical and browsers/CDN keep serving the old picture.
+- **Mobile footer** (≤768px): centered copyright, no `|` divider, tagline ("Arranger · Composer · Educator") on its own line; 14px text; spacing 24px top → logo → 21px → divider → 18px → text → ~20px → icons/email → 24px bottom. The logo is nudged down 3px (`paddingTop: 3` / `marginBottom: 21`) because its ink is top-heavy (visual centroid ~39% down).
+- **Mobile Home hero** stretches (`minHeight: calc(100svh - <measured footer height>px + 2px)`) so hero + footer exactly fill the viewport — no black band under the footer. Footer height is measured with a `ResizeObserver`, not hardcoded.
+- **Mobile menu overlay**: Projects and About render their logo PNGs (`projects-logo.png`, `about-logo.png`) via a CSS mask colored with `currentColor` (white; blue `#1254D9` when active), `MENU_LOGOS` in `Nav.tsx`. Home, Portfolio and Contact are still Alfa text until matching assets exist (`selected-works-logo` / `contact-logo` say different words). Each row stays 80px tall (1.5em line box).
 - Audio player (Portfolio): transparent, no border; unplayed waves `#CFCEC9`, played waves `#0B3A9A` (player-only color, not a brand token); play button ring/icon `#111111`

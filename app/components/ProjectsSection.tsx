@@ -56,7 +56,7 @@ function ProjectButton({ href, label }: { href: string; label: string }) {
         color: "#fff",
         border: "1.5px solid #1254D9",
         padding: "16px 24px",
-        fontSize: 16,
+        fontSize: isMobile ? 18 : 16,
         fontWeight: 600,
         letterSpacing: ".8px",
         textTransform: "uppercase",
@@ -285,7 +285,7 @@ export default function ProjectsSection() {
               style={{ display: "block", height: "0.8153em", width: "auto", margin: "0.0104em 0 0.0943em" }}
             />
           </h1>
-          <p style={{ fontSize: 22, lineHeight: 1.65, color: "#5A5A5A", margin: "20px 0 0", maxWidth: 620, textAlign: "left" }}>
+          <p style={{ fontSize: isMobile ? 20 : 22, lineHeight: 1.65, color: "#5A5A5A", margin: "20px 0 0", maxWidth: 620, textAlign: "left" }}>
             All my passion projects in one place.
           </p>
         </ScrollFadeUp>

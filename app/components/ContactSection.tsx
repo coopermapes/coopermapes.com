@@ -148,7 +148,7 @@ export default function ContactSection() {
               style={{ display: "block", height: "0.81em", width: "auto", maxWidth: "none", margin: "0.0143em 0 0.0957em" }}
             />
           </h1>
-          <p style={{ fontFamily: "var(--font-body)", fontSize: 22, color: "#5A5A5A", maxWidth: 520, lineHeight: 1.8, margin: 0 }}>
+          <p style={{ fontFamily: "var(--font-body)", fontSize: isMobile ? 20 : 22, color: "#5A5A5A", maxWidth: 520, lineHeight: 1.8, margin: 0 }}>
             For any questions, inquiries, or music services, get in direct contact with me by filling out the form below.
           </p>
         </div>
@@ -197,7 +197,7 @@ export default function ContactSection() {
               onMouseLeave={isMobile ? undefined : () => setBtnHover(false)}
               style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-                fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase",
+                fontFamily: "var(--font-body)", fontSize: isMobile ? 18 : 16, fontWeight: 600, letterSpacing: ".6px", textTransform: "uppercase",
                 color: "#FFFFFF",
                 background: !isValid || submitting ? "#1254D9" : btnHover ? "#0E45B5" : "#1254D9",
                 border: "1.5px solid #1254D9",

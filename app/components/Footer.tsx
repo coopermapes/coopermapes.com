@@ -90,7 +90,7 @@ export default function Footer() {
   const inline = !isMobile && wide;
   const logo = (
     <Image
-      src="/keynote-publishing.png"
+      src="/keynote-publishing-v2.png"
       alt="Keynote Music Publishing"
       width={3862}
       height={918}
@@ -104,13 +104,16 @@ export default function Footer() {
       backgroundColor: "#EAEAEA",
       color: "#111111",
       padding: isMobile
-        ? "clamp(32px,8vw,56px) clamp(20px,5vw,40px) 24px"
+        ? "24px clamp(20px,5vw,40px) 24px"
         : "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
       marginTop: -2,
     }}>
       {/* Keynote Music Publishing logo — stacked above the row unless it fits inline */}
       {!inline && (
-        <div style={{ display: "flex", justifyContent: "center", marginBottom: isMobile ? 32 : 40 }}>
+        // Mobile: the artwork's ink is top-heavy (KEYNOTE is bolder than "Music Publishing", so its
+        // visual centroid sits ~39% down, not 50%). Shift it down 3px for optical centering; the
+        // padding/margin pair keeps the footer's total height unchanged.
+        <div style={{ display: "flex", justifyContent: "center", paddingTop: isMobile ? 3 : 0, marginBottom: isMobile ? 21 : 40 }}>
           {logo}
         </div>
       )}
@@ -130,21 +133,29 @@ export default function Footer() {
         justifyContent: "space-between",
         gap: 18,
         borderTop: "1px solid #DCDBD7",
-        paddingTop: 24,
+        paddingTop: isMobile ? 18 : 24,
       }}>
-        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: isMobile ? "flex-start" : "center", gap: isMobile ? 6 : 14 }}>
+        <div style={{ display: "flex", flexDirection: isMobile ? "column" : "row", alignItems: "center", gap: isMobile ? 6 : 14, width: isMobile ? "100%" : undefined }}>
           <span style={{
             fontFamily: "var(--font-body)",
-            fontSize: 16,
+            fontSize: isMobile ? 14 : 16,
             fontWeight: 500,
             letterSpacing: isMobile ? "0.5px" : "1.2px", lineHeight: 1.5,
             textTransform: "uppercase",
             color: "#3A3A3A",
             width: isMobile ? "100%" : undefined,
+            textAlign: isMobile ? "center" : undefined,
           }}>
-            © Cooper Mapes 2026{" "}
-            <span style={{ color: "#B6B5AD" }}>|</span>
-            {" "}Arranger · Composer · Educator
+            {isMobile ? (
+              // Mobile: centered, no divider, tagline on its own line.
+              <>© Cooper Mapes 2026<br />Arranger · Composer · Educator</>
+            ) : (
+              <>
+                © Cooper Mapes 2026{" "}
+                <span style={{ color: "#B6B5AD" }}>|</span>
+                {" "}Arranger · Composer · Educator
+              </>
+            )}
           </span>
         </div>
 
@@ -158,7 +169,7 @@ export default function Footer() {
           <EmailLink
             color="#3A3A3A"
             hoverColor="#111111"
-            style={{ fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 500 }}
+            style={{ fontFamily: "var(--font-body)", fontSize: isMobile ? 14 : 16, fontWeight: 500 }}
           >
             contact@coopermapes.com
           </EmailLink>
