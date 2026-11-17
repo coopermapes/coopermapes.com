@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import Image from "next/image";
 import EmailLink from "./EmailLink";
+import { CONTACT_EMAIL } from "../lib/contact";
 
 const SOCIAL = [
   {
@@ -171,7 +172,7 @@ export default function Footer() {
             hoverColor="#111111"
             style={{ fontFamily: "var(--font-body)", fontSize: isMobile ? 14 : 16, fontWeight: 500 }}
           >
-            contact@coopermapes.com
+            {CONTACT_EMAIL}
           </EmailLink>
         </div>
 

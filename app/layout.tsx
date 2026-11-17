@@ -3,6 +3,7 @@ import { Alfa_Slab_One, Piazzolla } from "next/font/google";
 import "./globals.css";
 import SiteChrome from "./components/SiteChrome";
 import { PostHogProvider } from "./components/PostHogProvider";
+import { CONTACT_EMAIL } from "./lib/contact";
 
 const display = Alfa_Slab_One({
   weight: "400",
@@ -67,7 +68,7 @@ const ENTITY_JSONLD = {
       jobTitle: ["Marching Band Arranger", "Composer", "Music Educator"],
       description:
         "Cooper Mapes is a marching band arranger, composer, and music educator based in Hernando, Mississippi. He offers custom marching band show arrangements, part editing and revoicing, and custom stands and parade tune arrangements for school band programs.",
-      email: "mailto:contact@coopermapes.com",
+      email: `mailto:${CONTACT_EMAIL}`,
       address: {
         "@type": "PostalAddress",
         addressLocality: "Hernando",

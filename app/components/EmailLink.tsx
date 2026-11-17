@@ -2,9 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
-export const CONTACT_EMAIL = "contact@coopermapes.com";
-export const CONTACT_PHONE_DISPLAY = "662-985-9780";
-export const CONTACT_PHONE_TEL = "6629859780";
+import { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL } from "../lib/contact";
+
+export { CONTACT_EMAIL, CONTACT_PHONE_DISPLAY, CONTACT_PHONE_TEL };
 
 /**
  * Contact link with a clipboard fallback.
