@@ -232,6 +232,30 @@ border-radius: 999px;
 - **Staggered subtitle reveal:** `opacity 0.4s ease 0.18s, transform 0.4s ease 0.18s`
 - **Image/overlay crossfades:** `0.35s ease`
 
+### Page reveals — one shared `<FadeUp>` (`app/components/FadeUp.tsx`)
+
+Every reveal on the site (Home hero stagger, page-title logos, scroll reveals, the Portfolio player)
+uses this one component: **24px rise + opacity, 600ms ease.** Do not hand-roll another fade — there
+used to be five copies that drifted apart (0.5s vs 0.6s, different observer thresholds). Changes to the
+feel of the fade are made in that one file.
+
+- Triggers when the element scrolls into view (IntersectionObserver, threshold 0.1, bottom margin -80px),
+  then waits `delay` ms. Hero items are already in view so they start immediately; stagger via `delay`.
+- **Waits for the images inside it to be loaded and decoded** before fading (capped at 1.2s). This is what
+  stops hand-made PNG logos and photos popping in half-way through a fade. Image loading runs alongside
+  `delay`, so the fade starts at max(delay, image-ready). Put `data-fade-skip` on an `<img>` that should
+  not hold the fade (the off-screen carousel covers do this).
+- Reduced motion: no transition, no transform (`[data-fade]` rule in `globals.css`); content just appears.
+- Not part of this system on purpose: the carousel's caption swap (0.3s, 6px, re-fires on every slide
+  change), the waveform's 0.4s "audio ready" brighten, and the mobile menu view-transition (140/220ms).
+- **Images inside a fade must be `next/image` with a correct `sizes`.** Raw `<img>` ships the full file
+  (the old About portrait was 443KB, the carousel covers 1.3MB). Without `sizes`, Next requests the 3840w
+  variant for a 349px slot.
+- **Nav and Footer hide until the viewport is measured** (`useIsMobileReady` → `visibility: hidden` while
+  `!ready`). The server always renders desktop markup; without this, phones paint the desktop nav/footer
+  for ~0.4s (measured on a 6x CPU slowdown) before hydration swaps it. Don't add un-faded chrome that
+  branches on `isMobile` without the same guard.
+
 ---
 
 ## 7. Base Resets

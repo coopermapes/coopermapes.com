@@ -3,54 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { FadeUp } from "./FadeUp";
 import { CoverflowCarousel } from "./CoverflowCarousel";
 import type WaveSurfer from "wavesurfer.js";
-
-function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) { setVisible(true); return; }
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setTimeout(() => setVisible(true), delay); observer.disconnect(); } },
-      { threshold: 0.1, rootMargin: "0px 0px -80px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [delay]);
-  return (
-    <div ref={ref} style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(24px)",
-      transition: "opacity 0.6s ease, transform 0.6s ease",
-    }}>
-      {children}
-    </div>
-  );
-}
-
-function CaptionAnimate({ initialDelay, children }: { initialDelay: number; children: React.ReactNode }) {
-  const [visible, setVisible] = useState(false);
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) { setVisible(true); return; }
-    const t = setTimeout(() => setVisible(true), initialDelay);
-    return () => clearTimeout(t);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return (
-    <div style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(20px)",
-      transition: "opacity 0.45s ease, transform 0.55s cubic-bezier(.22,.61,.36,1)",
-    }}>
-      {children}
-    </div>
-  );
-}
 
 // ── Works data ────────────────────────────────────────────────────────────────
 const WORKS = [
@@ -180,7 +135,7 @@ export default function PortfolioSection() {
 
         {/* ── Header ── */}
         <div style={{ display: "flex", justifyContent: "center", borderBottom: "1px solid #DCDBD7", paddingBottom: 22 }}>
-          <ScrollFadeUp delay={150}>
+          <FadeUp delay={150}>
             <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: isMobile ? "clamp(40px,10vw,60px)" : "clamp(44px,6.5vw,80px)", lineHeight: .92, letterSpacing: "0", textTransform: "uppercase", color: "#111111", margin: 0, textAlign: "center" }}>
               {/* Wordmark image, sized in em off the h1's own font-size so its cap height
                   matches the other page titles (same method as the Projects logo): caps are
@@ -203,21 +158,21 @@ export default function PortfolioSection() {
                 }}
               />
             </h1>
-          </ScrollFadeUp>
+          </FadeUp>
         </div>
 
         {/* ── Carousel ── */}
-        <ScrollFadeUp delay={0}>
+        <FadeUp delay={0}>
           <div style={{ marginTop: 28 }}>
             <CoverflowCarousel
               slides={slides}
               onSelectedChange={setPfIndex}
             />
           </div>
-        </ScrollFadeUp>
+        </FadeUp>
 
         {/* ── Audio player ── */}
-        <CaptionAnimate initialDelay={400}>
+        <FadeUp delay={400}>
           <div style={{ display: "flex", justifyContent: "center", marginTop: 32 }}>
             <div style={{
               width: "100%",
@@ -260,7 +215,7 @@ export default function PortfolioSection() {
               <div ref={waveRef} style={{ width: "100%", opacity: wsReady ? 1 : 0.15, transition: "opacity .4s ease" }} />
             </div>
           </div>
-        </CaptionAnimate>
+        </FadeUp>
 
       </div>
     </section>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { useIsMobile } from "../hooks/useIsMobile";
+import { useIsMobileReady } from "../hooks/useIsMobile";
 import Image from "next/image";
 import EmailLink from "./EmailLink";
 import { CONTACT_EMAIL } from "../lib/contact";
@@ -72,7 +72,7 @@ function SocialLink({ href, label, icon }: { href: string; label: string; icon: 
 }
 
 export default function Footer() {
-  const isMobile = useIsMobile();
+  const { isMobile, ready } = useIsMobileReady();
   const bottomRowRef = useRef<HTMLDivElement>(null);
   // Desktop only: true when the row is wide enough to seat the logo between the
   // copyright text (left) and social/email (right) without crowding them.
@@ -108,6 +108,8 @@ export default function Footer() {
         ? "24px clamp(20px,5vw,40px) 24px"
         : "clamp(40px,5vw,64px) clamp(24px,5vw,64px) 32px",
       marginTop: -2,
+      // Hidden until the viewport is measured so phones never paint the desktop layout first.
+      visibility: ready ? "visible" : "hidden",
     }}>
       {/* Keynote Music Publishing logo — stacked above the row unless it fits inline */}
       {!inline && (

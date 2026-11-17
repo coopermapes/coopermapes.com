@@ -5,7 +5,7 @@ import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { List, X } from "@phosphor-icons/react";
-import { useIsMobile } from "../hooks/useIsMobile";
+import { useIsMobileReady } from "../hooks/useIsMobile";
 import { Button } from "./ui/button";
 
 const LINKS = [
@@ -19,12 +19,17 @@ const LINKS = [
 // Mobile menu: pages that have a keyhole-O logo asset show it instead of the text label.
 // `w`/`h` are the PNG's pixel size (sets the aspect ratio); `em` is the height in em off the
 // link's font-size so the logo's cap height lines up with the text labels (Alfa Slab One cap
-// height = 0.778em; each logo's caps are 606px of its height, plus the O's overshoot).
+// height = 0.778em). em = (image height / the flat letters' pixel height) * 0.778, where the
+// flat letters' height is measured per file: 606px for Projects/About/Contact, 581px for
+// Portfolio (its artwork is drawn smaller inside its canvas).
 // Colored with a CSS mask so one black PNG serves both white and active-blue states.
-// Pages with no logo asset yet (Home, Portfolio, Contact) stay as text.
+// Every menu item now has a logo asset; a page without one falls back to its text label.
 const MENU_LOGOS: Record<string, { src: string; w: number; h: number; em: number }> = {
-  "/projects": { src: "/projects-logo.png", w: 4582, h: 635, em: 0.8153 },
-  "/about":    { src: "/about-logo.png",    w: 3058, h: 637, em: 0.8178 },
+  "/":          { src: "/home-logo.png",          w: 2685, h: 630, em: 0.8088 },
+  "/portfolio": { src: "/portfolio-logo.png",     w: 4743, h: 604, em: 0.8088 },
+  "/projects":  { src: "/projects-logo.png",      w: 4582, h: 635, em: 0.8153 },
+  "/about":     { src: "/about-logo.png",         w: 3058, h: 637, em: 0.8178 },
+  "/contact":   { src: "/contact-menu-logo.png",  w: 4224, h: 631, em: 0.8101 },
 };
 
 // Matches the overlay's own opacity transition duration below — navigation
@@ -35,7 +40,7 @@ const OVERLAY_CLOSE_MS = 75;
 export default function Nav() {
   const pathname = usePathname();
   const router = useRouter();
-  const isMobile = useIsMobile();
+  const { isMobile, ready } = useIsMobileReady();
   const [hovered, setHovered] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
@@ -126,7 +131,7 @@ export default function Nav() {
   return (
     <>
       <nav
-        style={{ height: "98px", zIndex: 100, backgroundColor: "#FFFFFF", borderBottom: "1px solid #E4E3DE" }}
+        style={{ height: "98px", zIndex: 100, backgroundColor: "#FFFFFF", borderBottom: "1px solid #E4E3DE", visibility: ready ? "visible" : "hidden" }}
         className="fixed top-0 left-0 right-0 flex items-center"
       >
         <div

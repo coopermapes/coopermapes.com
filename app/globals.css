@@ -100,27 +100,13 @@ body {
   }
 }
 
-/* Fade-up animation used for hero stagger and scroll reveals */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(24px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.animate-fade-up {
-  animation: fade-up 500ms ease forwards;
-}
-
+/* Page reveals (hero stagger, titles, scroll fades) all use the shared <FadeUp> component
+   (app/components/FadeUp.tsx): 24px rise + opacity, 600ms ease. There is deliberately no CSS
+   fade class — it would be a second, drifting definition. */
 @media (prefers-reduced-motion: reduce) {
-  .animate-fade-up {
-    animation: none;
-    opacity: 1;
-    transform: none;
+  [data-fade] {
+    transition: none !important;
+    transform: none !important;
   }
 }
 

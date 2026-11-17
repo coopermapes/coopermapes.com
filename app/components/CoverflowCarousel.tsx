@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { CaretLeft, CaretRight } from "@phosphor-icons/react";
 
 const useIsoLayoutEffect =
@@ -331,12 +332,22 @@ export function CoverflowCarousel({
                   cursor: index === selected ? "default" : "pointer",
                 }}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                {/* next/image so each cover is resized + converted to the card's size instead of
+                    shipping the full-size JPEG. The selected cover is the priority image; the rest
+                    load eagerly at low priority (so swiping never reveals an unloaded cover) and are
+                    skipped by FadeUp's image wait so the carousel doesn't hold for all ten. */}
+                <Image
                   src={slide.src}
                   alt={slide.alt}
+                  fill
+                  sizes={cardWidth}
+                  quality={60}
+                  priority={index === selected}
+                  loading="eager"
+                  fetchPriority={index === selected ? "high" : "low"}
                   draggable={false}
-                  style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: `50% ${slide.objectPositionY ?? 50}%`, userSelect: "none", display: "block" }}
+                  {...(index !== selected ? { "data-fade-skip": "" } : {})}
+                  style={{ objectFit: "cover", objectPosition: `50% ${slide.objectPositionY ?? 50}%`, userSelect: "none", display: "block" }}
                 />
               </div>
             ))}

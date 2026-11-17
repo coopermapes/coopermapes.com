@@ -1,46 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { Envelope, ArrowRight } from "@phosphor-icons/react";
 import GridPattern from "./GridPattern";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { FadeUp } from "./FadeUp";
 
 const FORMSPREE_ENDPOINT = "https://formspree.io/f/xaeoqdzn";
-
-// Same scroll-triggered fade-up used on Projects and Portfolio.
-function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) { setVisible(true); return; }
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setVisible(true), delay);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -80px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [delay]);
-
-  return (
-    <div ref={ref} style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(24px)",
-      transition: "opacity 0.6s ease, transform 0.6s ease",
-    }}>
-      {children}
-    </div>
-  );
-}
 
 const inputStyle: React.CSSProperties = {
   fontFamily: "var(--font-body)",
@@ -129,7 +96,7 @@ export default function ContactSection() {
           ? "clamp(48px,12vw,64px) clamp(20px,5vw,40px)"
           : "clamp(72px,9vw,112px) clamp(24px,5vw,64px)",
       }}>
-        <ScrollFadeUp delay={150}>
+        <FadeUp delay={150}>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: 12 }}>
           <h1 style={{ fontFamily: "var(--font-display)", fontWeight: 400, fontSize: isMobile ? "min(clamp(40px,10vw,60px), calc((100vw - 2 * clamp(20px,5vw,40px)) / 8.129))" : "min(clamp(44px,6.5vw,80px), calc((100vw - 2 * clamp(24px,5vw,64px)) / 8.129))", lineHeight: ".92", letterSpacing: "0", textTransform: "uppercase", color: "#111111", margin: 0, width: "max-content" }}>
             {/* Wordmark image sized in em off the h1's font-size (same method as the other
@@ -152,9 +119,9 @@ export default function ContactSection() {
             For any questions, inquiries, or music services, get in direct contact with me by filling out the form below.
           </p>
         </div>
-        </ScrollFadeUp>
+        </FadeUp>
 
-        <ScrollFadeUp delay={350}>
+        <FadeUp delay={350}>
         {submitted ? (
           <div style={{ marginTop: 40, border: "1px solid #DCDBD7", background: "#FFFFFF", padding: "40px 32px", textAlign: "center" }}>
             <div style={{ width: 48, height: 48, margin: "0 auto 16px", display: "grid", placeItems: "center", background: "#1254D9", color: "#FFFFFF" }}>
@@ -185,7 +152,6 @@ export default function ContactSection() {
                 rows={5}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Tell me a bit about your project."
                 style={{ ...inputStyle, resize: "vertical", fontFamily: "var(--font-body)" }}
               />
             </div>
@@ -218,7 +184,7 @@ export default function ContactSection() {
             )}
           </form>
         )}
-        </ScrollFadeUp>
+        </FadeUp>
       </div>
     </section>
   );

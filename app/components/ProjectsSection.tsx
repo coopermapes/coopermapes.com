@@ -1,41 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import { useIsMobile } from "../hooks/useIsMobile";
-
-function ScrollFadeUp({ delay = 0, children }: { delay?: number; children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) { setVisible(true); return; }
-    const el = ref.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setTimeout(() => setVisible(true), delay);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.1, rootMargin: "0px 0px -80px 0px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [delay]);
-
-  return (
-    <div ref={ref} style={{
-      opacity: visible ? 1 : 0,
-      transform: visible ? "translateY(0)" : "translateY(24px)",
-      transition: "opacity 0.6s ease, transform 0.6s ease",
-    }}>
-      {children}
-    </div>
-  );
-}
+import { FadeUp } from "./FadeUp";
 
 // Matches HomeSection's solid primary CTA exactly (size, hover, touch-press).
 function ProjectButton({ href, label }: { href: string; label: string }) {
@@ -140,6 +108,7 @@ function ZoomImage({ src, alt, width, height }: { src: string; alt: string; widt
         alt={alt}
         width={width}
         height={height}
+        sizes="(max-width: 768px) 100vw, 600px"
         style={{
           width: "100%",
           height: "auto",
@@ -260,7 +229,7 @@ export default function ProjectsSection() {
           ? "clamp(40px,9vw,64px) clamp(20px,5vw,40px) clamp(20px,5vw,36px)"
           : "clamp(64px,7vw,96px) clamp(24px,5vw,64px) clamp(24px,3vw,48px)",
       }}>
-        <ScrollFadeUp>
+        <FadeUp>
           <h1 style={{
             fontFamily: "var(--font-display)",
             fontWeight: 400,
@@ -288,7 +257,7 @@ export default function ProjectsSection() {
           <p style={{ fontSize: isMobile ? 20 : 22, lineHeight: 1.65, color: "#5A5A5A", margin: "20px 0 0", maxWidth: 620, textAlign: "left" }}>
             All my passion projects in one place.
           </p>
-        </ScrollFadeUp>
+        </FadeUp>
       </div>
 
       {/* ── Project rows ── */}
@@ -313,14 +282,14 @@ export default function ProjectsSection() {
             gap: isMobile ? "clamp(24px,6vw,40px)" : "clamp(40px,5vw,72px)",
           }}>
             <div style={{ flex: isMobile ? "0 0 auto" : "1.15 1 460px", width: isMobile ? "100%" : undefined }}>
-              <ScrollFadeUp>
+              <FadeUp>
                 <ProjectMedia>
                   {project.media}
                 </ProjectMedia>
-              </ScrollFadeUp>
+              </FadeUp>
             </div>
             <div style={{ flex: isMobile ? "0 0 auto" : "1 1 380px", width: isMobile ? "100%" : undefined }}>
-              <ScrollFadeUp delay={150}>
+              <FadeUp delay={150}>
                 <h2 style={{
                   fontFamily: "var(--font-display)",
                   fontWeight: 400,
@@ -342,7 +311,7 @@ export default function ProjectsSection() {
                 <div style={{ marginTop: 16 }}>
                   <ProjectButton href={project.buttonHref} label={project.buttonLabel} />
                 </div>
-              </ScrollFadeUp>
+              </FadeUp>
             </div>
           </div>
         </div>
