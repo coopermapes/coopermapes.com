@@ -1,4 +1,5 @@
 import ProjectsSection from "../components/ProjectsSection";
+import { getLatestReels } from "../lib/instagram";
 
 export const metadata = {
   title: "Free Music Tools & Projects",
@@ -7,6 +8,7 @@ export const metadata = {
   alternates: { canonical: "/projects" },
 };
 
-export default function ProjectsPage() {
-  return <ProjectsSection />;
+export default async function ProjectsPage() {
+  const reels = await getLatestReels(2);
+  return <ProjectsSection reels={reels} />;
 }

@@ -14,7 +14,7 @@ const LOGOS = [
     label: "University of Memphis",
     // Desktop hover overlay only: the overlay is as narrow as the logo (104px), so it gets the short name.
     // Mobile (full-width panel) and the screen-reader label use the full name.
-    shortLabel: "U of M",
+    shortLabel: "University of\nMemphis",
     // Desktop hover overlay width in px. The Memphis seal is only 104px wide, far too narrow for its two
     // degree lines; the overlay stretches to the right (over the gap / the next logo) so each line fits on one row.
     overlayWidth: 240,
@@ -46,7 +46,8 @@ const LOGOS = [
 
 // The label + degree lines shown for a logo. Desktop: inside the hover overlay on the logo itself.
 // Mobile: in the shared panel under the logo row (the logos are too small to hold this text).
-function LogoDetails({ label, lines }: { label: string; lines: typeof LOGOS[0]["lines"] }) {
+// breakComposition (desktop overlay only): put "Composition" on its own line so the degree text fits the narrow card.
+function LogoDetails({ label, lines, breakComposition }: { label: string; lines: typeof LOGOS[0]["lines"]; breakComposition?: boolean }) {
   return (
     <>
       <div style={{
@@ -55,6 +56,7 @@ function LogoDetails({ label, lines }: { label: string; lines: typeof LOGOS[0]["
         fontWeight: 600,
         letterSpacing: "1px",
         textTransform: "uppercase",
+        whiteSpace: "pre-line",
         color: "#1254D9",
         marginBottom: 6,
       }}>
@@ -62,7 +64,7 @@ function LogoDetails({ label, lines }: { label: string; lines: typeof LOGOS[0]["
       </div>
       {lines.map((l, i) => (
         <div key={i} style={{ fontFamily: "var(--font-body)", fontSize: 16, lineHeight: 1.5, color: "#111111", marginBottom: i === lines.length - 1 ? 0 : 6 }}>
-          <div>{l.text}</div>
+          <div style={{ whiteSpace: "pre-line" }}>{breakComposition ? l.text.replace(" Composition", "\nComposition") : l.text}</div>
           <div style={{ color: "#6A6A6A" }}>{l.year}</div>
         </div>
       ))}
@@ -70,7 +72,7 @@ function LogoDetails({ label, lines }: { label: string; lines: typeof LOGOS[0]["
   );
 }
 
-function LogoItem({ src, w, h, alt, label, shortLabel, overlayWidth, lines, active, dimmed, fadedByNeighbor, onHover, onActivate }: typeof LOGOS[0] & { shortLabel?: string; overlayWidth?: number; active: boolean; dimmed: boolean; fadedByNeighbor: boolean; onHover: (hovering: boolean) => void; onActivate: () => void }) {
+function LogoItem({ src, w, h, alt, label, shortLabel, overlayWidth, lines, active, dimmed, onActivate }: typeof LOGOS[0] & { shortLabel?: string; overlayWidth?: number; active: boolean; dimmed: boolean; onActivate: () => void }) {
   const isMobile = useIsMobile();
   const [hovered, setHovered] = useState(false);
   const [pressed, setPressed] = useState(false);
@@ -86,10 +88,10 @@ function LogoItem({ src, w, h, alt, label, shortLabel, overlayWidth, lines, acti
       aria-label={ariaLabel}
       aria-pressed={isMobile ? active : undefined}
       style={{ position: "relative", zIndex: isRevealed ? 2 : undefined, cursor: "pointer", display: "flex", alignItems: "center", transition: "transform 0.1s ease, opacity 0.1s ease", transform: isMobile && pressed ? "scale(0.96)" : "scale(1)", opacity: isMobile && pressed ? 0.75 : 1 }}
-      onMouseEnter={isMobile ? undefined : () => { setHovered(true); onHover(true); }}
-      onMouseLeave={isMobile ? undefined : () => { setHovered(false); onHover(false); }}
-      onFocus={isMobile ? undefined : () => { setHovered(true); onHover(true); }}
-      onBlur={isMobile ? undefined : () => { setHovered(false); onHover(false); }}
+      onMouseEnter={isMobile ? undefined : () => { setHovered(true); }}
+      onMouseLeave={isMobile ? undefined : () => { setHovered(false); }}
+      onFocus={isMobile ? undefined : () => { setHovered(true); }}
+      onBlur={isMobile ? undefined : () => { setHovered(false); }}
       onClick={isMobile ? onActivate : undefined}
       onTouchStart={() => setPressed(true)}
       onTouchEnd={() => setPressed(false)}
@@ -107,7 +109,7 @@ function LogoItem({ src, w, h, alt, label, shortLabel, overlayWidth, lines, acti
           width: "auto",
           display: "block",
           transition: "opacity .35s ease",
-          opacity: isMobile ? (dimmed ? 0.35 : 1) : (isRevealed || fadedByNeighbor ? 0.1 : 1),
+          opacity: isMobile ? (dimmed ? 0.35 : 1) : (isRevealed ? 0.1 : 1),
         }}
       />
       {!isMobile && (
@@ -128,7 +130,7 @@ function LogoItem({ src, w, h, alt, label, shortLabel, overlayWidth, lines, acti
             pointerEvents: "none",
           }}
         >
-          <LogoDetails label={shortLabel ?? label} lines={lines} />
+          <LogoDetails label={shortLabel ?? label} lines={lines} breakComposition />
         </div>
       )}
     </div>
@@ -138,11 +140,6 @@ function LogoItem({ src, w, h, alt, label, shortLabel, overlayWidth, lines, acti
 export default function AboutSection() {
   const isMobile = useIsMobile();
   const [activeLogo, setActiveLogo] = useState<string | null>(null);
-  // Desktop only: which logo is being hovered. A logo with a wide overlay (Memphis) covers its
-  // neighbour, so while it is hovered the other logos fade to the same ghost level instead of
-  // peeking out around the card.
-  const [hoveredLogo, setHoveredLogo] = useState<string | null>(null);
-  const hoveredHasWideOverlay = hoveredLogo !== null && !!LOGOS.find(l => l.src === hoveredLogo)?.overlayWidth;
 
   // Mobile details panel: collapsed (0px, takes no space) until a logo is tapped, then animates
   // to the height of that logo's text. Each logo's details are stacked absolutely inside the
@@ -288,7 +285,7 @@ export default function AboutSection() {
               justifyContent: "space-between",
             }}>
               {LOGOS.map(logo => (
-                <LogoItem key={logo.src} {...logo} active={activeLogo === logo.src} dimmed={activeLogo !== null && activeLogo !== logo.src} fadedByNeighbor={hoveredHasWideOverlay && hoveredLogo !== logo.src} onHover={(h) => setHoveredLogo(h ? logo.src : (prev) => (prev === logo.src ? null : prev))} onActivate={() => handleActivate(logo.src)} />
+                <LogoItem key={logo.src} {...logo} active={activeLogo === logo.src} dimmed={activeLogo !== null && activeLogo !== logo.src} onActivate={() => handleActivate(logo.src)} />
               ))}
             </div>
 
